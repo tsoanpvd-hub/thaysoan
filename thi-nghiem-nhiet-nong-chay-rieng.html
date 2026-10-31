@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Thí nghiệm nhiệt nóng chảy riêng – Thầy Soạn-STK</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#eef3f4; --panel:#ffffff; --ink:#14292f; --muted:#5a7077; --line:#cfdcdf;
+  --accent:#0b6e7f; --accent-ink:#ffffff; --hot:#d9482b; --cold:#2467c9; --ice:#1b93b8; --ok:#1d8a4e; --warn:#b36b00;
+  --grid:#dbe6e8; --canvas:#f8fbfb; --good-bg:#e4f4ea; --info-bg:#e6f1f4;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1b1f; --panel:#17272c; --ink:#e6f0f2; --muted:#94aab0; --line:#2b4148;
+    --accent:#3fb6cb; --accent-ink:#06222a; --hot:#ff7a59; --cold:#6aa3ff; --ice:#7fdcf2; --ok:#5fd08d; --warn:#f0b455;
+    --grid:#233a41; --canvas:#122227; --good-bg:#153324; --info-bg:#173039;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1b1f; --panel:#17272c; --ink:#e6f0f2; --muted:#94aab0; --line:#2b4148;
+  --accent:#3fb6cb; --accent-ink:#06222a; --hot:#ff7a59; --cold:#6aa3ff; --ice:#7fdcf2; --ok:#5fd08d; --warn:#f0b455;
+  --grid:#233a41; --canvas:#122227; --good-bg:#153324; --info-bg:#173039;
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:"Be Vietnam Pro","Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;line-height:1.5;font-size:15px}
+header{padding:16px 20px 6px;max-width:1280px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:10px}
+h1{margin:0;font-size:24px;font-weight:700;letter-spacing:-.01em}
+.brand{color:var(--accent)}
+header p{margin:2px 0 0;color:var(--muted);font-size:14px}
+header p.back{margin:0 0 6px;font-size:13.5px}
+header p.back a{color:var(--accent);text-decoration:none;font-weight:600}
+header p.who{font-weight:600;color:var(--ink)}
+.themebtn{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:6px 10px;cursor:pointer;font:inherit;font-size:13px}
+main{max-width:1280px;margin:0 auto;padding:12px 20px 30px;display:grid;grid-template-columns:minmax(0,1fr) 350px;gap:16px}
+@media (max-width:960px){main{grid-template-columns:1fr}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}
+.panel h2{margin:0 0 10px;font-size:15px;font-weight:700}
+canvas{width:100%;height:auto;display:block;border-radius:8px;background:var(--canvas);border:1px solid var(--line)}
+.stack{display:flex;flex-direction:column;gap:16px;min-width:0}
+.btnrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;align-items:center}
+button.pri{background:var(--accent);color:var(--accent-ink);border:0;border-radius:8px;padding:10px 16px;font:inherit;font-weight:600;cursor:pointer}
+button.sec{background:transparent;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:10px 14px;font:inherit;cursor:pointer}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.status{margin-left:auto;font-size:13px;color:var(--muted)}
+.field{display:grid;grid-template-columns:1fr auto;gap:2px 8px;align-items:center;margin-bottom:10px}
+.field label{font-size:13.5px}
+.field .num{display:flex;align-items:center;gap:4px}
+.field input[type=number],select{width:84px;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:4px 6px;font:inherit;text-align:right}
+select{width:100%;text-align:left}
+.field .u{color:var(--muted);font-size:12.5px;min-width:30px}
+.field input[type=range]{grid-column:1 / -1;width:100%;accent-color:var(--accent)}
+.grp{font-size:13px;font-weight:700;color:var(--accent);margin:14px 0 8px;padding-top:10px;border-top:1px dashed var(--line)}
+.grp:first-child{border-top:0;margin-top:0;padding-top:0}
+.chk{display:flex;gap:8px;align-items:center;font-size:13.5px;margin:6px 0}
+.result{background:var(--info-bg);border-radius:10px;padding:12px 14px;font-size:14px}
+.result.done{background:var(--good-bg)}
+.result .big{font-size:21px;font-weight:700}
+.result .eq{font-family:"Cambria Math","Latin Modern Math",Georgia,serif;font-size:15px;margin:6px 0;overflow-x:auto;white-space:nowrap}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:10px}
+.ro{border:1px solid var(--line);border-radius:8px;padding:6px 10px}
+.ro span{display:block;font-size:12px;color:var(--muted)}
+.ro b{font-size:18px;font-variant-numeric:tabular-nums}
+.ro.h b{color:var(--hot)} .ro.c b{color:var(--cold)} .ro.i b{color:var(--ice)}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}
+th,td{border-bottom:1px solid var(--line);padding:5px 8px;text-align:right;white-space:nowrap}
+th{color:var(--muted);font-weight:600}
+th:first-child,td:first-child{text-align:left}
+details{margin-top:4px}
+summary{cursor:pointer;font-weight:600;font-size:14px}
+details ol,details ul{margin:8px 0 0;padding-left:20px;font-size:14px}
+details li{margin-bottom:4px}
+footer{text-align:center;color:var(--muted);font-size:13px;padding:0 20px 24px}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <p class="back"><a href="https://claude.ai/artifact/JiPRaSUaFAmceEk8cdMj7P" target="_blank" rel="noopener">← Về trang Học Vật Lý cùng Thầy Soạn-STK</a></p>
+    <h1>Thí nghiệm nhiệt nóng chảy riêng <span class="brand">· Thầy Soạn-STK</span></h1>
+    <p>Thả nước đá vào nước nóng trong nhiệt lượng kế, đo nhiệt độ cân bằng rồi tính nhiệt nóng chảy riêng λ của nước đá.</p>
+    <p class="who">Thầy Đàng Năng Soạn · Trường THPT Phạm Văn Đồng – Phước Hậu · Vật lí THPT</p>
+  </div>
+  <button class="themebtn" id="themeBtn" type="button">Đổi sáng/tối</button>
+</header>
+<main>
+  <div class="stack">
+    <section class="panel">
+      <h2>Bàn thí nghiệm</h2>
+      <canvas id="scene" width="1280" height="640" aria-label="Mô phỏng thả nước đá vào nhiệt lượng kế"></canvas>
+      <div class="btnrow">
+        <button class="pri" id="startBtn" type="button">Thả nước đá vào nhiệt lượng kế</button>
+        <button class="sec" id="resetBtn" type="button">Làm lại từ đầu</button>
+        <label style="font-size:13.5px">Tốc độ
+          <select id="speed" style="width:auto">
+            <option value="0.5">0,5×</option><option value="1">1×</option><option value="3" selected>3×</option><option value="8">8×</option>
+          </select>
+        </label>
+        <span class="status" id="status"></span>
+      </div>
+    </section>
+    <section class="panel">
+      <h2>Đồ thị nhiệt độ theo thời gian</h2>
+      <div class="readouts">
+        <div class="ro c"><span>Nhiệt độ nước</span><b id="roT2">–</b></div>
+        <div class="ro i"><span>Nhiệt độ nước đá</span><b id="roTB">–</b></div>
+        <div class="ro"><span>Đá đã tan</span><b id="roF">0 %</b></div>
+        <div class="ro"><span>Thời gian</span><b id="roTime">0 s</b></div>
+      </div>
+      <canvas id="graph" width="1280" height="520" aria-label="Đồ thị nhiệt độ"></canvas>
+    </section>
+    <section class="panel">
+      <h2>Kết quả và cách tính</h2>
+      <div id="result" class="result"></div>
+    </section>
+    <section class="panel">
+      <h2>Bảng ghi các lần đo</h2>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Lần</th><th>m₁ (g)</th><th>t₀ (°C)</th><th>m₂ (g)</th><th>t₂ (°C)</th><th>t (°C)</th><th>λ đo (J/kg)</th><th>Sai số</th></tr></thead>
+        <tbody id="hist"></tbody>
+      </table></div>
+      <div class="btnrow"><button class="sec" id="clearHist" type="button">Xoá bảng</button></div>
+    </section>
+  </div>
+  <div class="stack">
+    <section class="panel">
+      <h2>Số liệu thí nghiệm (đổi để giảng dạy)</h2>
+      <div id="controls"></div>
+      <div class="grp">Chế độ giảng dạy</div>
+      <label class="chk"><input type="checkbox" id="hideTrue"> Ẩn giá trị λ thật (để học sinh tự tìm)</label>
+      <label class="chk"><input type="checkbox" id="showTheory" checked> Hiện nhiệt độ cân bằng lý thuyết (không hao phí)</label>
+    </section>
+    <section class="panel">
+      <h2>Phương trình cân bằng nhiệt</h2>
+      <div class="result">
+        <div>Nhiệt do nước và cốc toả ra = nhiệt làm đá nóng lên, tan chảy và nóng lên sau khi tan</div>
+        <div class="eq">(m₂c₂ + m₃c₃)(t₂ − t) = m₁c<sub>đ</sub>(0 − t₀) + m₁λ + m₁c₂·t</div>
+        <div class="eq">λ = [(m₂c₂ + m₃c₃)(t₂ − t) − m₁c<sub>đ</sub>(0 − t₀) − m₁c₂·t] / m₁</div>
+        <div style="color:var(--muted);font-size:13px">1: nước đá (c<sub>đ</sub> = 2100 J/kg·K) · 2: nước · 3: cốc nhôm (c₃ = 880 J/kg·K). Nhiệt độ nóng chảy của đá là 0 °C.</div>
+      </div>
+      <details><summary>Gợi ý các bước lên lớp</summary><ol>
+        <li>Đặt m₁, t₀, m₂, t₂, cho học sinh dự đoán nhiệt độ cuối.</li>
+        <li>Thả đá, quan sát: đá tan nhưng nhiệt độ của đá đứng yên ở 0 °C (đường nằm ngang trên đồ thị).</li>
+        <li>Đọc t khi cân bằng, thay vào công thức để tính λ.</li>
+        <li>So với giá trị trong bảng, nêu nguyên nhân sai số.</li>
+      </ol></details>
+      <details><summary>Câu hỏi thảo luận</summary><ul>
+        <li>Vì sao khi đá đang tan, nhiệt độ của đá không đổi dù vẫn nhận nhiệt?</li>
+        <li>Nếu nước quá ít hoặc quá lạnh thì chuyện gì xảy ra với viên đá? Thử bằng cách giảm m₂ hoặc t₂.</li>
+        <li>Bật hao phí ra môi trường: λ đo được lớn hơn hay nhỏ hơn thực tế?</li>
+        <li>Vì sao phải dùng đá ở 0 °C và lau khô nước bám ngoài viên đá?</li>
+      </ul></details>
+    </section>
+  </div>
+</main>
+<footer>Ứng dụng mô phỏng do thầy Đàng Năng Soạn biên soạn · Trường THPT Phạm Văn Đồng – Phước Hậu · Vật lí THPT</footer>
+<script>
+(function(){
+"use strict";
+
+function $(id){return document.getElementById(id);}
+function fmt(x,d){if(d===undefined)d=1;return Number(x).toFixed(d).replace(".",",");}
+function css(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();}
+function clamp(x,a,b){return Math.max(a,Math.min(b,x));}
+function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();}
+function decs(step){return (String(step).split(".")[1]||"").length;}
+
+function buildControls(box,SPEC,P,onChange){
+  SPEC.forEach(function(s){
+    if(s.grp){var g=document.createElement("div");g.className="grp";g.textContent=s.grp;box.appendChild(g);return;}
+    var f=document.createElement("div");f.className="field";
+    var lb=document.createElement("label");lb.textContent=s.label;lb.setAttribute("for","in_"+s.id);f.appendChild(lb);
+    if(s.type==="select"){
+      var sel=document.createElement("select");sel.id="in_"+s.id;
+      s.options.forEach(function(o){var op=document.createElement("option");op.value=o;op.textContent=o;sel.appendChild(op);});
+      sel.value=P[s.id];
+      sel.addEventListener("change",function(){P[s.id]=sel.value;onChange(s.id);});
+      f.style.gridTemplateColumns="1fr";f.appendChild(sel);
+    } else {
+      var w=document.createElement("div");w.className="num";
+      var n=document.createElement("input");n.type="number";n.id="in_"+s.id;n.min=s.min;n.max=s.max;n.step=s.step;n.value=P[s.id];
+      var u=document.createElement("span");u.className="u";u.textContent=s.unit;
+      w.appendChild(n);w.appendChild(u);f.appendChild(w);
+      var r=document.createElement("input");r.type="range";r.id="rg_"+s.id;r.min=s.min;r.max=s.max;r.step=s.step;r.value=P[s.id];
+      r.setAttribute("aria-label",s.label);f.appendChild(r);
+      var apply=function(v){
+        v=parseFloat(v);if(isNaN(v))return;
+        v=clamp(v,s.min,s.max);v=Number(v.toFixed(decs(s.step)+1));
+        P[s.id]=v;onChange(s.id);
+      };
+      n.addEventListener("change",function(){apply(n.value);});
+      r.addEventListener("input",function(){apply(r.value);});
+    }
+    box.appendChild(f);
+  });
+  return function(){
+    SPEC.forEach(function(s){
+      if(!s.id)return;
+      var a=$("in_"+s.id),b=$("rg_"+s.id);
+      if(s.type==="select"){a.value=P[s.id];return;}
+      if(document.activeElement!==a)a.value=P[s.id];
+      if(b)b.value=P[s.id];
+    });
+  };
+}
+
+/* Vẽ đồ thị: o={xmin,xmax,xstep,ymin,ymax,ystep,xlabel,ylabel,series:[{pts,color,label,tail}],hlines:[{y,color,label}]} */
+function plot(c,W,H,o){
+  c.setTransform(2,0,0,2,0,0);c.clearRect(0,0,W,H);
+  var ink=css("--ink"),muted=css("--muted"),grid=css("--grid");
+  c.fillStyle=css("--canvas");c.fillRect(0,0,W,H);
+  var L=54,R=W-16,T=16,B=H-36;
+  function X(v){return L+(R-L)*(v-o.xmin)/(o.xmax-o.xmin);}
+  function Y(v){return B-(B-T)*(v-o.ymin)/(o.ymax-o.ymin);}
+  c.strokeStyle=grid;c.lineWidth=.7;c.fillStyle=muted;c.font="11px sans-serif";c.textAlign="right";
+  for(var v=o.ymin;v<=o.ymax+1e-9;v+=o.ystep){c.beginPath();c.moveTo(L,Y(v));c.lineTo(R,Y(v));c.stroke();c.fillText(Math.round(v*10)/10,L-6,Y(v)+4);}
+  c.textAlign="center";
+  for(var x=o.xmin;x<=o.xmax+1e-9;x+=o.xstep){c.beginPath();c.moveTo(X(x),T);c.lineTo(X(x),B);c.stroke();c.fillText(Math.round(x),X(x),B+14);}
+  c.strokeStyle=ink;c.lineWidth=1.2;c.beginPath();c.moveTo(L,T);c.lineTo(L,B);c.lineTo(R,B);c.stroke();
+  c.fillStyle=muted;c.fillText(o.xlabel,(L+R)/2,H-6);
+  c.save();c.translate(12,(T+B)/2);c.rotate(-Math.PI/2);c.fillText(o.ylabel,0,0);c.restore();
+  (o.hlines||[]).forEach(function(h){
+    if(h.y<o.ymin||h.y>o.ymax)return;
+    c.setLineDash([5,4]);c.strokeStyle=h.color;c.lineWidth=1.2;c.beginPath();c.moveTo(L,Y(h.y));c.lineTo(R,Y(h.y));c.stroke();c.setLineDash([]);
+    c.fillStyle=h.color;c.textAlign="right";c.font="11px sans-serif";c.fillText(h.label,R-4,Y(h.y)-5);
+  });
+  o.series.forEach(function(s){
+    if(!s.pts.length)return;
+    c.strokeStyle=s.color;c.lineWidth=2.2;c.beginPath();
+    s.pts.forEach(function(p,i){if(i===0)c.moveTo(X(p[0]),Y(p[1]));else c.lineTo(X(p[0]),Y(p[1]));});
+    if(s.tail)c.lineTo(X(s.tail[0]),Y(s.tail[1]));
+    c.stroke();
+    if(s.pts.length===1){c.fillStyle=s.color;c.beginPath();c.arc(X(s.pts[0][0]),Y(s.pts[0][1]),4,0,7);c.fill();}
+  });
+  c.textAlign="left";c.font="12px sans-serif";
+  var lx=L+10;
+  o.series.forEach(function(s){c.fillStyle=s.color;c.fillRect(lx,T+6,14,3);c.fillStyle=s.color;c.fillText(s.label,lx+20,T+11);lx+=26+s.label.length*6.6;});
+}
+
+$("themeBtn").addEventListener("click",function(){
+  var cur=document.documentElement.getAttribute("data-theme");
+  var dark=cur?cur==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;
+  document.documentElement.setAttribute("data-theme",dark?"light":"dark");
+});
+
+
+var P={m1:50,t0:0,lam:3.34,m2:300,t2:40,c2:4200,m3:50,h:0,noise:0};
+var CICE=2100,C3=880,K=12,TENV=20,RATE=15;
+var SPEC=[
+  {grp:"Nước đá"},
+  {id:"m1",label:"Khối lượng nước đá m₁",unit:"g",min:10,max:200,step:5},
+  {id:"t0",label:"Nhiệt độ đầu của đá t₀",unit:"°C",min:-10,max:0,step:1},
+  {id:"lam",label:"Nhiệt nóng chảy riêng thật λ",unit:"×10⁵ J/kg",min:2.5,max:4.5,step:0.01},
+  {grp:"Nước và nhiệt lượng kế"},
+  {id:"m2",label:"Khối lượng nước m₂",unit:"g",min:100,max:500,step:10},
+  {id:"t2",label:"Nhiệt độ đầu của nước t₂",unit:"°C",min:20,max:90,step:1},
+  {id:"c2",label:"Nhiệt dung riêng nước c₂",unit:"J/kg·K",min:4000,max:4300,step:10},
+  {id:"m3",label:"Khối lượng cốc nhôm m₃",unit:"g",min:0,max:150,step:5},
+  {grp:"Điều kiện thực tế"},
+  {id:"h",label:"Hao phí ra môi trường",unit:"W/K",min:0,max:0.3,step:0.01},
+  {id:"noise",label:"Sai số đọc nhiệt kế (±)",unit:"°C",min:0,max:1,step:0.1}
+];
+var sync=buildControls($("controls"),SPEC,P,function(){sync();resetSim();});
+$("hideTrue").addEventListener("change",function(){renderResult();renderHist();});
+
+var S={phase:"ready",H:0,T2:0,time:0,dropP:0,lastRec:0,data:[],tMeas:null,runs:[],runNo:0};
+var AT=0,lastTs=null;
+function mI(){return P.m1/1000;}
+function C2(){return P.m2/1000*P.c2+P.m3/1000*C3;}
+function lamJ(){return P.lam*1e5;}
+function TB(H){var m=mI();if(H<0)return H/(m*CICE);if(H<=m*lamJ())return 0;return (H-m*lamJ())/(m*P.c2);}
+function frac(H){return clamp(H/(mI()*lamJ()),0,1);}
+function theory(){return (C2()*P.t2-mI()*CICE*(-P.t0)-mI()*lamJ())/(C2()+mI()*P.c2);}
+function calcLam(t){return (C2()*(P.t2-t)-mI()*CICE*(0-P.t0)-mI()*P.c2*t)/mI();}
+
+function resetSim(){
+  S.phase="ready";S.H=mI()*CICE*P.t0;S.T2=P.t2;S.time=0;S.dropP=0;S.lastRec=0;S.tMeas=null;
+  S.data=[{t:0,a:P.t2,b:TB(S.H)}];
+  $("startBtn").disabled=false;render._ph=null;render();
+}
+function physStep(dt){
+  var q=K*(S.T2-TB(S.H)),c=C2();
+  S.H+=q*dt;S.T2-=q/c*dt;S.T2-=P.h*(S.T2-TENV)/c*dt;
+  if(S.T2<0)S.T2=0;
+  S.time+=dt;
+}
+function finish(){
+  var f=frac(S.H),full=f>=0.999;
+  S.phase="done";
+  var nz=(Math.random()*2-1)*P.noise;
+  if(!full)S.T2=0;
+  S.tMeas=full?Math.round((S.T2+nz)*10)/10:0;
+  S.data.push({t:S.time,a:S.T2,b:TB(S.H)});
+  var lm=full?calcLam(S.tMeas):null;
+  S.runNo++;
+  S.runs.push({n:S.runNo,m1:P.m1,t0:P.t0,m2:P.m2,t2:P.t2,t:S.tMeas,full:full,lam:lm,tr:lamJ()});
+  renderHist();
+}
+function loop(ts){
+  if(lastTs===null)lastTs=ts;
+  var dr=Math.min(.05,(ts-lastTs)/1000);lastTs=ts;AT+=dr;
+  var sp=parseFloat($("speed").value);
+  if(S.phase==="drop"){
+    S.dropP+=dr*sp/1.4;
+    if(S.dropP>=1){S.dropP=1;S.phase="mix";}
+  } else if(S.phase==="mix"){
+    var sd=dr*sp*RATE,n=Math.ceil(sd/0.05),h=sd/n;
+    for(var i=0;i<n;i++){
+      physStep(h);
+      if(S.time-S.lastRec>=1){S.lastRec=S.time;S.data.push({t:S.time,a:S.T2,b:TB(S.H)});}
+    }
+    var d=S.T2-TB(S.H),f=frac(S.H);
+    if(d<0.05||(f<1&&d<1)||S.time>2500)finish();
+  }
+  render();
+  requestAnimationFrame(loop);
+}
+$("startBtn").addEventListener("click",function(){if(S.phase!=="ready")return;S.phase="drop";S.dropP=0;$("startBtn").disabled=true;});
+$("resetBtn").addEventListener("click",resetSim);
+$("clearHist").addEventListener("click",function(){S.runs=[];S.runNo=0;renderHist();});
+$("showTheory").addEventListener("change",render);
+
+function tempHue(T){return 215-clamp((T-0)/100,0,1)*215;}
+var sc=$("scene"),sctx=sc.getContext("2d"),gr=$("graph"),gctx=gr.getContext("2d");
+
+function drawScene(){
+  var c=sctx,W=640,H=320;
+  c.setTransform(2,0,0,2,0,0);c.clearRect(0,0,W,H);
+  var ink=css("--ink"),muted=css("--muted"),grid=css("--grid");
+  c.fillStyle=css("--canvas");c.fillRect(0,0,W,H);
+  c.strokeStyle=grid;c.lineWidth=.6;
+  for(var x=0;x<=W;x+=20){c.beginPath();c.moveTo(x,0);c.lineTo(x,H);c.stroke();}
+  for(var y=0;y<=H;y+=20){c.beginPath();c.moveTo(0,y);c.lineTo(W,y);c.stroke();}
+  c.fillStyle=css("--line");c.fillRect(0,H-14,W,14);
+
+  var cx=330,cw=210,bot=H-18,ch=190,top=bot-ch;
+  var wh=40+(P.m2-100)/400*120,wTop=bot-3-wh;
+  c.fillStyle="rgba(120,140,150,.18)";rr(c,cx-cw/2-14,top-8,cw+28,ch+8,8);c.fill();
+  c.strokeStyle=muted;c.lineWidth=1.5;rr(c,cx-cw/2-14,top-8,cw+28,ch+8,8);c.stroke();
+  c.fillStyle="rgba(255,255,255,.12)";c.fillRect(cx-cw/2,top,cw,ch-3);
+  c.fillStyle="hsla("+tempHue(S.T2)+",75%,55%,.78)";c.fillRect(cx-cw/2+2,wTop,cw-4,wh);
+  c.strokeStyle="hsla("+tempHue(S.T2)+",75%,55%,1)";c.lineWidth=1.5;c.beginPath();c.moveTo(cx-cw/2+2,wTop);c.lineTo(cx+cw/2-2,wTop);c.stroke();
+  c.strokeStyle=ink;c.lineWidth=2.5;c.beginPath();c.moveTo(cx-cw/2,top);c.lineTo(cx-cw/2,bot-3);c.lineTo(cx+cw/2,bot-3);c.lineTo(cx+cw/2,top);c.stroke();
+  c.fillStyle=muted;c.font="12px sans-serif";c.textAlign="center";c.fillText("Nhiệt lượng kế",cx,top-16);
+
+  // nước đá
+  var f=frac(S.H),s0=22+(P.m1-10)/190*22;
+  var sx0=96,sy0=96,tx=cx-s0/2,ty=wTop-s0*0.2;
+  var p=S.dropP,bx,by,s=s0;
+  if(S.phase==="ready"){bx=sx0;by=sy0;}
+  else if(S.phase==="drop"){
+    var a=clamp(p/0.4,0,1),b=clamp((p-0.4)/0.6,0,1);
+    bx=sx0+(tx-sx0)*a;by=sy0+(ty-sy0)*(b*b*(3-2*b));
+  } else {
+    s=s0*Math.cbrt(Math.max(0,1-f));
+    bx=cx-s/2+Math.sin(AT*1.7)*2.5;by=wTop-s*0.2+Math.sin(AT*2.3)*1.2;
+  }
+  if(S.phase==="ready"){
+    c.fillStyle=muted;rr(c,bx-14,by+s+1,s+28,6,3);c.fill();
+  }
+  if(s>0.8){
+    var frost=S.H<0;
+    c.fillStyle=frost?"rgba(240,250,255,.96)":"rgba(175,225,248,.85)";
+    c.strokeStyle=frost?"rgba(120,190,220,1)":ink;c.lineWidth=1.4;
+    rr(c,bx,by,s,s,3);c.fill();c.stroke();
+    c.strokeStyle="rgba(255,255,255,.9)";c.lineWidth=1.2;c.beginPath();c.moveTo(bx+4,by+s*0.3);c.lineTo(bx+s*0.45,by+4);c.stroke();
+  }
+  c.fillStyle=ink;c.font="bold 12px sans-serif";c.textAlign="center";
+  if(S.phase==="ready"||S.phase==="drop"){
+    c.fillText("Nước đá "+P.m1+" g",bx+s/2,by+s+22);
+    c.fillStyle=css("--ice");c.fillText(fmt(P.t0,0)+" °C",bx+s/2,by+s+37);
+  }
+  // giọt tan
+  if(S.phase==="mix"&&f<1){
+    c.fillStyle="hsla(200,80%,60%,.8)";
+    for(var i=0;i<3;i++){var ph=(AT*0.9+i*0.33)%1;c.beginPath();c.arc(cx-s/2+6+i*s/3,wTop+ph*26,2,0,7);c.fill();}
+  }
+  // nhiệt kế
+  var tx2=500,tTop=34,tBot=bot-10,tH=tBot-tTop;
+  c.fillStyle="rgba(255,255,255,.5)";rr(c,tx2,tTop,14,tH,7);c.fill();
+  c.strokeStyle=ink;c.lineWidth=1.6;rr(c,tx2,tTop,14,tH,7);c.stroke();
+  var fr=clamp((S.T2+10)/110,0,1);
+  c.fillStyle=css("--hot");rr(c,tx2+4,tBot-6-(tH-14)*fr,6,(tH-14)*fr+6,3);c.fill();
+  c.beginPath();c.arc(tx2+7,tBot-1,9,0,Math.PI*2);c.fill();
+  c.strokeStyle=ink;c.lineWidth=1;c.fillStyle=muted;c.font="10px sans-serif";c.textAlign="left";
+  for(var d=0;d<=100;d+=20){var yy=tBot-6-(tH-14)*((d+10)/110);c.beginPath();c.moveTo(tx2+16,yy);c.lineTo(tx2+22,yy);c.stroke();c.fillText(d,tx2+25,yy+3);}
+  c.fillStyle=ink;c.font="bold 12px sans-serif";c.textAlign="center";c.fillText("Nhiệt kế",tx2+7,tTop-8);
+  // màn hình số
+  c.fillStyle="rgba(0,0,0,.78)";rr(c,24,16,160,64,6);c.fill();
+  c.fillStyle="#8fe3f0";c.font="11px sans-serif";c.textAlign="left";c.fillText("Nước",34,32);
+  c.font="bold 22px monospace";c.fillText(fmt(S.T2,1)+" °C",34,54);
+  c.font="11px sans-serif";c.fillText("Đá còn lại: "+fmt((1-f)*100,0)+" %",34,72);
+  c.fillStyle=muted;c.font="12px sans-serif";c.textAlign="left";
+  var msg=S.phase==="ready"?"Nước đá đặt trên đĩa, chuẩn bị thả vào nước."
+    :S.phase==="drop"?"Đang thả đá vào nước..."
+    :S.phase==="mix"?(f<=0&&S.H<0?"Đá đang nóng lên đến 0 °C.":f<1?"Đá đang tan chảy, nhiệt độ của đá giữ 0 °C.":"Đá đã tan hết, nước tan hoà vào nước nóng.")
+    :(frac(S.H)>=0.999?"Đã cân bằng nhiệt.":"Nước đã nguội đến 0 °C nhưng đá chưa tan hết.");
+  c.fillText(msg,24,H-26);
+}
+function drawGraph(){
+  var xm=Math.max(120,Math.ceil((S.time*1.2)/30)*30);
+  var lo=Math.floor((Math.min(P.t0,0)-2)/5)*5,hi=Math.ceil((P.t2+3)/5)*5;
+  var started=S.phase!=="ready"&&S.phase!=="drop";
+  var pa=[],pb=[];
+  if(started){S.data.forEach(function(p){pa.push([p.t,p.a]);pb.push([p.t,p.b]);});}
+  else{pa=[[0,P.t2]];pb=[[0,TB(S.H)]];}
+  var hl=[];
+  if($("showTheory").checked){var th=Math.max(0,theory());hl.push({y:th,color:css("--ok"),label:"t lý thuyết ≈ "+fmt(th,1)+" °C"});}
+  plot(gctx,640,260,{xmin:0,xmax:xm,xstep:xm/6,ymin:lo,ymax:hi,ystep:(hi-lo)>40?10:5,xlabel:"Thời gian (s)",ylabel:"Nhiệt độ (°C)",
+    series:[{pts:pa,color:css("--cold"),label:"Nước + cốc",tail:started?[S.time,S.T2]:null},{pts:pb,color:css("--ice"),label:"Nước đá",tail:started?[S.time,TB(S.H)]:null}],hlines:hl});
+}
+function renderResult(){
+  var el=$("result");
+  if(S.phase!=="done"){
+    el.className="result";
+    el.innerHTML=S.phase==="ready"?"Bấm “Thả nước đá vào nhiệt lượng kế” để bắt đầu. Khi nhiệt độ đã cân bằng, cách tính sẽ hiện ở đây."
+      :"Đang trao đổi nhiệt... Quan sát: đá tan nhưng nhiệt độ của đá đứng yên ở 0 °C, còn nước nguội dần.";
+    return;
+  }
+  var full=frac(S.H)>=0.999,hide=$("hideTrue").checked;
+  if(!full){
+    el.className="result";
+    el.innerHTML="<div><b>Đá chưa tan hết.</b> Nước và cốc nguội xuống 0 °C nhưng nhiệt lượng toả ra không đủ làm tan toàn bộ đá, còn khoảng "+fmt((1-frac(S.H))*100,0)+" % đá. Với trường hợp này không dùng được phương trình trên để tính λ.</div><div style=\"margin-top:6px\">Hãy tăng m₂, tăng t₂ hoặc giảm m₁ rồi làm lại.</div>";
+    return;
+  }
+  var t=S.tMeas,m1=mI(),c2=C2();
+  var Qto=c2*(P.t2-t),Q1=m1*CICE*(0-P.t0),Q3=m1*P.c2*t,Ql=Qto-Q1-Q3,lm=Ql/m1;
+  var h='<div>Nhiệt độ cân bằng đo được: <span class="big">t = '+fmt(t,1)+' °C</span></div>';
+  h+='<div class="eq">Q<sub>toả</sub> = ('+fmt(P.m2/1000,3)+'·'+P.c2+' + '+fmt(P.m3/1000,3)+'·'+C3+')·('+fmt(P.t2,1)+' − '+fmt(t,1)+') = '+fmt(Qto,0)+' J</div>';
+  h+='<div class="eq">Q<sub>đá nóng lên đến 0 °C</sub> = '+fmt(m1,3)+'·'+CICE+'·('+fmt(0-P.t0,1)+') = '+fmt(Q1,0)+' J</div>';
+  h+='<div class="eq">Q<sub>nước đá tan nóng lên đến t</sub> = '+fmt(m1,3)+'·'+P.c2+'·'+fmt(t,1)+' = '+fmt(Q3,0)+' J</div>';
+  h+='<div class="eq">Q<sub>nóng chảy</sub> = '+fmt(Qto,0)+' − '+fmt(Q1,0)+' − '+fmt(Q3,0)+' = '+fmt(Ql,0)+' J</div>';
+  h+='<div class="eq">λ = Q<sub>nóng chảy</sub> / m₁ = '+fmt(Ql,0)+' / '+fmt(m1,3)+'</div>';
+  h+='<div>Nhiệt nóng chảy riêng đo được: <span class="big">λ ≈ '+fmt(lm/1e5,2)+' × 10⁵ J/kg</span></div>';
+  if(hide){h+='<div style="color:var(--muted);margin-top:6px">Giá trị thật đang ẩn. Bỏ chọn “Ẩn giá trị λ thật” để đối chiếu.</div>';}
+  else{
+    var err=(lm-lamJ())/lamJ()*100;
+    h+='<div style="margin-top:6px">Giá trị thật: '+fmt(P.lam,2)+' × 10⁵ J/kg · Sai số: <b style="color:'+(Math.abs(err)<3?'var(--ok)':'var(--warn)')+'">'+(err>=0?'+':'')+fmt(err,1)+'%</b></div>';
+    if(P.h>0.001||P.noise>0.001)h+='<div style="color:var(--muted);font-size:13px;margin-top:4px">Sai số do '+(P.h>0.001?'nhiệt trao đổi với môi trường':'')+(P.h>0.001&&P.noise>0.001?' và ':'')+(P.noise>0.001?'sai số đọc nhiệt kế':'')+'.</div>';
+  }
+  el.className="result done";el.innerHTML=h;
+}
+function renderHist(){
+  var tb=$("hist"),hide=$("hideTrue").checked;
+  if(!S.runs.length){tb.innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--muted)">Chưa có lần đo nào.</td></tr>';return;}
+  tb.innerHTML=S.runs.map(function(r){
+    var e=(r.lam==null||hide)?"–":((r.lam-r.tr)/r.tr*100);
+    return "<tr><td>"+r.n+"</td><td>"+r.m1+"</td><td>"+r.t0+"</td><td>"+r.m2+"</td><td>"+r.t2+"</td><td>"+fmt(r.t,1)+"</td><td>"+(r.lam==null?"đá chưa tan hết":fmt(r.lam,0))+"</td><td>"+(typeof e==="number"?(e>=0?"+":"")+fmt(e,1)+"%":e)+"</td></tr>";
+  }).join("");
+}
+function render(){
+  drawScene();drawGraph();
+  var ph=S.phase;
+  $("roT2").textContent=fmt(S.T2,1)+" °C";
+  $("roTB").textContent=fmt(TB(S.H),1)+" °C";
+  $("roF").textContent=fmt(frac(S.H)*100,0)+" %";
+  $("roTime").textContent=Math.round(S.time)+" s";
+  $("status").textContent=ph==="ready"?"Sẵn sàng":ph==="drop"?"Đang thả đá":ph==="mix"?"Đang trao đổi nhiệt":"Hoàn thành";
+  if(render._ph!==ph){render._ph=ph;renderResult();}
+}
+resetSim();renderHist();
+requestAnimationFrame(loop);
+
+})();
+</script>
+</body>
+</html>

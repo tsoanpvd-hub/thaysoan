@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mô phỏng nhiệt dung riêng – Thầy Soạn-STK</title>
+<style>
+:root{
+  --bg:#eef3f4; --panel:#ffffff; --ink:#14292f; --muted:#5a7077; --line:#cfdcdf;
+  --accent:#0b6e7f; --accent-ink:#ffffff; --hot:#d9482b; --cold:#2467c9; --ok:#1d8a4e; --warn:#b36b00;
+  --grid:#dbe6e8; --canvas:#f8fbfb; --good-bg:#e4f4ea; --info-bg:#e6f1f4;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1b1f; --panel:#17272c; --ink:#e6f0f2; --muted:#94aab0; --line:#2b4148;
+    --accent:#3fb6cb; --accent-ink:#06222a; --hot:#ff7a59; --cold:#6aa3ff; --ok:#5fd08d; --warn:#f0b455;
+    --grid:#233a41; --canvas:#122227; --good-bg:#153324; --info-bg:#173039;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1b1f; --panel:#17272c; --ink:#e6f0f2; --muted:#94aab0; --line:#2b4148;
+  --accent:#3fb6cb; --accent-ink:#06222a; --hot:#ff7a59; --cold:#6aa3ff; --ok:#5fd08d; --warn:#f0b455;
+  --grid:#233a41; --canvas:#122227; --good-bg:#153324; --info-bg:#173039;
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:"Be Vietnam Pro","Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;line-height:1.5;font-size:15px}
+header{padding:18px 20px 6px;max-width:1280px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:10px}
+h1{margin:0;font-size:24px;font-weight:700;letter-spacing:-.01em}
+.brand{color:var(--accent)}
+header p{margin:2px 0 0;color:var(--muted);font-size:14px}
+.themebtn{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:6px 10px;cursor:pointer;font:inherit;font-size:13px}
+main{max-width:1280px;margin:0 auto;padding:12px 20px 30px;display:grid;grid-template-columns:minmax(0,1fr) 350px;gap:16px}
+@media (max-width:960px){main{grid-template-columns:1fr}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}
+.panel h2{margin:0 0 10px;font-size:15px;font-weight:700}
+canvas{width:100%;height:auto;display:block;border-radius:8px;background:var(--canvas);border:1px solid var(--line)}
+.stack{display:flex;flex-direction:column;gap:16px;min-width:0}
+.btnrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;align-items:center}
+button.pri{background:var(--accent);color:var(--accent-ink);border:0;border-radius:8px;padding:10px 16px;font:inherit;font-weight:600;cursor:pointer}
+button.sec{background:transparent;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:10px 14px;font:inherit;cursor:pointer}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.status{margin-left:auto;font-size:13px;color:var(--muted)}
+.field{display:grid;grid-template-columns:1fr auto;gap:2px 8px;align-items:center;margin-bottom:10px}
+.field label{font-size:13.5px}
+.field .num{display:flex;align-items:center;gap:4px}
+.field input[type=number],select{width:84px;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:4px 6px;font:inherit;text-align:right}
+select{width:100%;text-align:left}
+.field .u{color:var(--muted);font-size:12.5px;min-width:30px}
+.field input[type=range]{grid-column:1 / -1;width:100%;accent-color:var(--accent)}
+.grp{font-size:13px;font-weight:700;color:var(--accent);margin:14px 0 8px;padding-top:10px;border-top:1px dashed var(--line)}
+.grp:first-of-type{border-top:0;margin-top:0;padding-top:0}
+.chk{display:flex;gap:8px;align-items:center;font-size:13.5px;margin:6px 0}
+.result{background:var(--info-bg);border-radius:10px;padding:12px 14px;font-size:14px}
+.result.done{background:var(--good-bg)}
+.result .big{font-size:22px;font-weight:700}
+.result .eq{font-family:"Cambria Math","Latin Modern Math",Georgia,serif;font-size:15px;margin:6px 0;overflow-x:auto;white-space:nowrap}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:10px}
+.ro{border:1px solid var(--line);border-radius:8px;padding:6px 10px}
+.ro span{display:block;font-size:12px;color:var(--muted)}
+.ro b{font-size:18px;font-variant-numeric:tabular-nums}
+.ro.h b{color:var(--hot)} .ro.c b{color:var(--cold)}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}
+th,td{border-bottom:1px solid var(--line);padding:5px 8px;text-align:right;white-space:nowrap}
+th{color:var(--muted);font-weight:600}
+th:first-child,td:first-child{text-align:left}
+details{margin-top:4px}
+summary{cursor:pointer;font-weight:600;font-size:14px}
+details ol,details ul{margin:8px 0 0;padding-left:20px;font-size:14px}
+details li{margin-bottom:4px}
+footer{text-align:center;color:var(--muted);font-size:13px;padding:0 20px 24px}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Thí nghiệm nhiệt dung riêng <span class="brand">· Thầy Soạn-STK</span></h1>
+    <p>Thả vật nóng vào nhiệt lượng kế chứa nước lạnh, đo nhiệt độ cân bằng rồi tính nhiệt dung riêng của vật.</p>
+  </div>
+  <button class="themebtn" id="themeBtn" type="button">Đổi sáng/tối</button>
+</header>
+
+<main>
+  <div class="stack">
+    <section class="panel">
+      <h2>Bàn thí nghiệm</h2>
+      <canvas id="scene" width="1280" height="640" aria-label="Mô phỏng nhiệt lượng kế"></canvas>
+      <div class="btnrow">
+        <button class="pri" id="startBtn" type="button">Thả vật vào nhiệt lượng kế</button>
+        <button class="sec" id="resetBtn" type="button">Làm lại từ đầu</button>
+        <label style="font-size:13.5px">Tốc độ
+          <select id="speed" style="width:auto">
+            <option value="0.5">0,5×</option>
+            <option value="1" selected>1×</option>
+            <option value="3">3×</option>
+            <option value="8">8×</option>
+          </select>
+        </label>
+        <span class="status" id="status"></span>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Đồ thị nhiệt độ theo thời gian</h2>
+      <div class="readouts">
+        <div class="ro h"><span>Nhiệt độ vật</span><b id="roT1">–</b></div>
+        <div class="ro c"><span>Nhiệt độ nước</span><b id="roT2">–</b></div>
+        <div class="ro"><span>Thời gian</span><b id="roTime">0 s</b></div>
+      </div>
+      <canvas id="graph" width="1280" height="520" aria-label="Đồ thị nhiệt độ"></canvas>
+    </section>
+
+    <section class="panel">
+      <h2>Kết quả và cách tính</h2>
+      <div id="result" class="result">Bấm “Thả vật vào nhiệt lượng kế” để bắt đầu thí nghiệm. Khi nhiệt độ đã cân bằng, cách tính sẽ hiện ở đây.</div>
+    </section>
+
+    <section class="panel">
+      <h2>Bảng ghi các lần đo</h2>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Lần</th><th>Vật</th><th>m₁ (g)</th><th>t₁ (°C)</th><th>m₂ (g)</th><th>t₂ (°C)</th><th>t (°C)</th><th>c đo (J/kg·K)</th><th>Sai số</th></tr></thead>
+          <tbody id="hist"><tr><td colspan="9" style="text-align:center;color:var(--muted)">Chưa có lần đo nào.</td></tr></tbody>
+        </table>
+      </div>
+      <div class="btnrow"><button class="sec" id="clearHist" type="button">Xoá bảng</button></div>
+    </section>
+  </div>
+
+  <div class="stack">
+    <section class="panel">
+      <h2>Số liệu thí nghiệm (đổi để giảng dạy)</h2>
+      <div id="controls"></div>
+
+      <div class="grp">Chế độ giảng dạy</div>
+      <label class="chk"><input type="checkbox" id="hideTrue"> Ẩn giá trị c thật của vật (để học sinh tự tìm)</label>
+      <label class="chk"><input type="checkbox" id="showTheory" checked> Hiện nhiệt độ cân bằng lý thuyết (không hao phí)</label>
+    </section>
+
+    <section class="panel">
+      <h2>Phương trình cân bằng nhiệt</h2>
+      <div class="result" style="font-size:14px">
+        <div>Nhiệt toả ra = Nhiệt thu vào</div>
+        <div class="eq">m₁·c₁·(t₁ − t) = (m₂·c₂ + m₃·c₃)·(t − t₂)</div>
+        <div style="color:var(--muted);font-size:13px">1: vật kim loại · 2: nước · 3: cốc nhiệt lượng kế (nhôm, c₃ = 880 J/kg·K)</div>
+      </div>
+      <details>
+        <summary>Gợi ý các bước lên lớp</summary>
+        <ol>
+          <li>Đặt m₁, t₁, m₂, t₂ rồi cho học sinh dự đoán nhiệt độ cân bằng.</li>
+          <li>Bấm thả vật, quan sát hai đường nhiệt độ tiến lại gần nhau.</li>
+          <li>Đọc t, thay vào phương trình cân bằng nhiệt để tìm c₁.</li>
+          <li>So sánh với giá trị trong bảng, tìm nguyên nhân gây sai số.</li>
+        </ol>
+      </details>
+      <details>
+        <summary>Câu hỏi thảo luận</summary>
+        <ul>
+          <li>Vì sao nhiệt độ cân bằng gần với nhiệt độ ban đầu của nước hơn?</li>
+          <li>Tăng m₂ gấp đôi thì t thay đổi thế nào?</li>
+          <li>Bật “Hao phí ra môi trường”: c đo được lớn hơn hay nhỏ hơn thực tế? Vì sao?</li>
+          <li>Thay vật bằng chì (c nhỏ), nhiệt độ cân bằng thay đổi ra sao?</li>
+        </ul>
+      </details>
+    </section>
+  </div>
+</main>
+<footer>Ứng dụng mô phỏng do Thầy Soạn-STK biên soạn · Dùng cho dạy học Vật lí</footer>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- Dữ liệu ---------- */
+var MATERIALS = {
+  "Đồng":380, "Nhôm":880, "Sắt":460, "Chì":130, "Kẽm":380, "Thép":460, "Tự chọn":null
+};
+var P = {mat:"Đồng", c1:380, m1:200, t1:100, m2:300, t2:20, c2:4200, m3:50, h:0, noise:0, k:2};
+
+var SPEC = [
+  {grp:"Vật kim loại"},
+  {id:"mat", label:"Chất liệu", type:"select"},
+  {id:"c1", label:"Nhiệt dung riêng thật c₁", unit:"J/kg·K", min:100, max:2500, step:10},
+  {id:"m1", label:"Khối lượng m₁", unit:"g", min:20, max:600, step:5},
+  {id:"t1", label:"Nhiệt độ đầu t₁", unit:"°C", min:40, max:100, step:1},
+  {grp:"Nước và nhiệt lượng kế"},
+  {id:"m2", label:"Khối lượng nước m₂", unit:"g", min:100, max:500, step:10},
+  {id:"t2", label:"Nhiệt độ đầu của nước t₂", unit:"°C", min:5, max:35, step:1},
+  {id:"c2", label:"Nhiệt dung riêng nước c₂", unit:"J/kg·K", min:4000, max:4300, step:10},
+  {id:"m3", label:"Khối lượng cốc nhôm m₃", unit:"g", min:0, max:150, step:5},
+  {grp:"Điều kiện thực tế"},
+  {id:"h", label:"Hao phí ra môi trường", unit:"W/K", min:0, max:0.3, step:0.01},
+  {id:"noise", label:"Sai số đọc nhiệt kế (±)", unit:"°C", min:0, max:1, step:0.1}
+];
+var C3 = 880;
+
+/* ---------- Trạng thái ---------- */
+var S = {phase:"ready", T1:0, T2:0, time:0, dropP:0, lastRec:0, data:[], tMeas:null, runs:[], runNo:0};
+var lastTs = null;
+
+/* ---------- Tiện ích ---------- */
+function $(id){return document.getElementById(id);}
+function fmt(x,d){ if(d===undefined) d=1; return Number(x).toFixed(d).replace(".",","); }
+function css(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+function clamp(x,a,b){return Math.max(a,Math.min(b,x));}
+function C1(){return P.m1/1000*P.c1;}
+function C2(){return P.m2/1000*P.c2 + P.m3/1000*C3;}
+
+/* ---------- Dựng bảng điều khiển ---------- */
+var ctl = $("controls");
+SPEC.forEach(function(s){
+  if(s.grp){ var g=document.createElement("div"); g.className="grp"; g.textContent=s.grp; ctl.appendChild(g); return; }
+  var f=document.createElement("div"); f.className="field";
+  var lb=document.createElement("label"); lb.textContent=s.label; lb.setAttribute("for","in_"+s.id); f.appendChild(lb);
+  if(s.type==="select"){
+    var sel=document.createElement("select"); sel.id="in_"+s.id;
+    Object.keys(MATERIALS).forEach(function(k){var o=document.createElement("option");o.value=k;o.textContent=k+(MATERIALS[k]?" ("+MATERIALS[k]+")":"");sel.appendChild(o);});
+    sel.value=P.mat;
+    sel.addEventListener("change",function(){
+      P.mat=sel.value;
+      if(MATERIALS[P.mat]!==null){ P.c1=MATERIALS[P.mat]; syncInputs(); }
+      resetSim();
+    });
+    f.style.gridTemplateColumns="1fr"; f.appendChild(sel);
+  } else {
+    var w=document.createElement("div"); w.className="num";
+    var n=document.createElement("input"); n.type="number"; n.id="in_"+s.id; n.min=s.min; n.max=s.max; n.step=s.step; n.value=P[s.id];
+    var u=document.createElement("span"); u.className="u"; u.textContent=s.unit;
+    w.appendChild(n); w.appendChild(u); f.appendChild(w);
+    var r=document.createElement("input"); r.type="range"; r.id="rg_"+s.id; r.min=s.min; r.max=s.max; r.step=s.step; r.value=P[s.id];
+    r.setAttribute("aria-label",s.label); f.appendChild(r);
+    function apply(v){
+      v=parseFloat(v); if(isNaN(v)) return;
+      v=clamp(v,s.min,s.max); P[s.id]=v;
+      if(s.id==="c1"){ matchMat(); }
+      syncInputs(); resetSim();
+    }
+    n.addEventListener("change",function(){apply(n.value);});
+    r.addEventListener("input",function(){apply(r.value);});
+  }
+  ctl.appendChild(f);
+});
+function matchMat(){
+  var found="Tự chọn";
+  Object.keys(MATERIALS).forEach(function(k){ if(MATERIALS[k]===P.c1) found=k; });
+  P.mat=found;
+}
+function syncInputs(){
+  SPEC.forEach(function(s){
+    if(!s.id) return;
+    var a=$("in_"+s.id), b=$("rg_"+s.id);
+    if(s.type==="select"){ a.value=P.mat; return; }
+    if(document.activeElement!==a) a.value=P[s.id];
+    if(b) b.value=P[s.id];
+  });
+}
+$("hideTrue").addEventListener("change",render);
+$("showTheory").addEventListener("change",render);
+
+/* ---------- Mô phỏng ---------- */
+function resetSim(){
+  S.phase="ready"; S.T1=P.t1; S.T2=P.t2; S.time=0; S.dropP=0; S.lastRec=0; S.tMeas=null;
+  S.data=[{t:0,a:P.t1,b:P.t2}];
+  $("startBtn").disabled=false;
+  render();
+}
+function theoryT(){ var a=C1(), b=C2(); return (a*P.t1+b*P.t2)/(a+b); }
+
+function physStep(dt){
+  var k=P.k, c1=C1(), c2=C2();
+  var q=k*(S.T1-S.T2);
+  var loss=P.h*(S.T2-P.t2);
+  S.T1 -= q/c1*dt;
+  S.T2 += (q-loss)/c2*dt;
+  S.time += dt;
+}
+function finish(){
+  S.phase="done";
+  var noise=(Math.random()*2-1)*P.noise;
+  S.tMeas=Math.round((S.T2+noise)*10)/10;
+  S.data.push({t:S.time,a:S.T1,b:S.T2});
+  var t=S.tMeas, cm=null;
+  if(P.t1-t>0.05){ cm=C2()*(t-P.t2)/((P.m1/1000)*(P.t1-t)); }
+  S.runNo++;
+  S.runs.push({n:S.runNo,mat:P.mat,m1:P.m1,t1:P.t1,m2:P.m2,t2:P.t2,t:t,c:cm,true_:P.c1});
+  renderHist();
+}
+
+function loop(ts){
+  if(lastTs===null) lastTs=ts;
+  var dtReal=Math.min(0.05,(ts-lastTs)/1000); lastTs=ts;
+  var sp=parseFloat($("speed").value);
+  if(S.phase==="drop"){
+    S.dropP+=dtReal*sp/1.4;
+    if(S.dropP>=1){ S.dropP=1; S.phase="mix"; }
+  } else if(S.phase==="mix"){
+    var simDt=dtReal*sp*12, n=Math.ceil(simDt/0.05), h=simDt/n;
+    for(var i=0;i<n;i++){
+      physStep(h);
+      if(S.time-S.lastRec>=1){ S.lastRec=S.time; S.data.push({t:S.time,a:S.T1,b:S.T2}); }
+    }
+    if(Math.abs(S.T1-S.T2)<0.04 || S.time>1500){ finish(); }
+  }
+  render();
+  requestAnimationFrame(loop);
+}
+
+$("startBtn").addEventListener("click",function(){
+  if(S.phase!=="ready") return;
+  S.phase="drop"; S.dropP=0; $("startBtn").disabled=true;
+});
+$("resetBtn").addEventListener("click",resetSim);
+$("clearHist").addEventListener("click",function(){S.runs=[];S.runNo=0;renderHist();});
+$("themeBtn").addEventListener("click",function(){
+  var cur=document.documentElement.getAttribute("data-theme");
+  var dark = cur ? cur==="dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+  document.documentElement.setAttribute("data-theme", dark?"light":"dark");
+});
+
+/* ---------- Vẽ cảnh ---------- */
+var sc=$("scene"), sctx=sc.getContext("2d");
+var gr=$("graph"), gctx=gr.getContext("2d");
+
+function tempHue(T){ return 215-clamp((T-5)/95,0,1)*215; }
+function waterColor(T,a){ return "hsla("+tempHue(T)+",75%,55%,"+a+")"; }
+function metalColor(T,mat){
+  var base={ "Đồng":[184,115,51], "Nhôm":[185,192,200], "Sắt":[120,124,130], "Chì":[95,100,110], "Kẽm":[165,175,182], "Thép":[110,118,128], "Tự chọn":[150,150,155] }[mat]||[150,150,155];
+  var f=clamp((T-30)/70,0,1)*0.55;
+  var r=Math.round(base[0]*(1-f)+255*f), g=Math.round(base[1]*(1-f)+80*f), b=Math.round(base[2]*(1-f)+40*f);
+  return "rgb("+r+","+g+","+b+")";
+}
+function rr(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
+
+function drawScene(){
+  var c=sctx, W=640, H=320;
+  c.setTransform(2,0,0,2,0,0);
+  c.clearRect(0,0,W,H);
+  var ink=css("--ink"), muted=css("--muted"), grid=css("--grid"), line=css("--line");
+  c.fillStyle=css("--canvas")||"#fff"; c.fillRect(0,0,W,H);
+  // lưới
+  c.strokeStyle=grid; c.lineWidth=.6;
+  for(var x=0;x<=W;x+=20){c.beginPath();c.moveTo(x,0);c.lineTo(x,H);c.stroke();}
+  for(var y=0;y<=H;y+=20){c.beginPath();c.moveTo(0,y);c.lineTo(W,y);c.stroke();}
+  // mặt bàn
+  c.fillStyle=css("--line"); c.fillRect(0,H-14,W,14);
+
+  // nhiệt lượng kế
+  var cx=330, cw=210, bot=H-18, ch=190, top=bot-ch;
+  var wh=40+(P.m2-100)/400*120;
+  var wTop=bot-3-wh;
+  // vỏ ngoài (cách nhiệt)
+  c.fillStyle="rgba(120,140,150,.18)"; rr(c,cx-cw/2-14,top-8,cw+28,ch+8,8); c.fill();
+  c.strokeStyle=muted; c.lineWidth=1.5; rr(c,cx-cw/2-14,top-8,cw+28,ch+8,8); c.stroke();
+  // cốc trong
+  c.fillStyle="rgba(255,255,255,.12)"; c.fillRect(cx-cw/2,top,cw,ch-3);
+  // nước
+  c.fillStyle=waterColor(S.T2,.78); c.fillRect(cx-cw/2+2,wTop,cw-4,wh);
+  c.strokeStyle=waterColor(S.T2,1); c.lineWidth=1.5; c.beginPath(); c.moveTo(cx-cw/2+2,wTop); c.lineTo(cx+cw/2-2,wTop); c.stroke();
+  c.strokeStyle=ink; c.lineWidth=2.5; c.beginPath(); c.moveTo(cx-cw/2,top); c.lineTo(cx-cw/2,bot-3); c.lineTo(cx+cw/2,bot-3); c.lineTo(cx+cw/2,top); c.stroke();
+  // nắp / que khuấy
+  c.fillStyle=muted; c.font="12px sans-serif"; c.textAlign="center";
+  c.fillText("Nhiệt lượng kế",cx,top-16);
+
+  // vật kim loại
+  var s=28+P.m1/600*30;
+  var sx0=110, sy0=70, ex=cx-30, ey=bot-3-s-2;
+  var bx,by,p=S.dropP;
+  if(S.phase==="ready"){bx=sx0;by=sy0;}
+  else{
+    var a=clamp(p/0.4,0,1), b=clamp((p-0.4)/0.6,0,1);
+    bx=sx0+(ex-sx0)*a; by=sy0+(ey-sy0)*(b*b*(3-2*b));
+    if(S.phase==="mix"||S.phase==="done"){bx=ex;by=ey;}
+  }
+  // dây treo
+  if(S.phase==="ready"||S.phase==="drop"){
+    c.strokeStyle=muted; c.lineWidth=1.2; c.beginPath(); c.moveTo(bx+s/2,0); c.lineTo(bx+s/2,by); c.stroke();
+  }
+  c.fillStyle=metalColor(S.T1,P.mat); c.strokeStyle=ink; c.lineWidth=1.5;
+  rr(c,bx,by,s,s,3); c.fill(); c.stroke();
+  c.fillStyle="rgba(255,255,255,.35)"; c.fillRect(bx+4,by+4,s*0.35,3);
+  // nhãn vật
+  c.fillStyle=ink; c.font="bold 12px sans-serif"; c.textAlign="center";
+  var showLabel = S.phase==="ready"||S.phase==="drop";
+  if(showLabel){
+    c.fillText("Vật "+P.mat.toLowerCase()+" "+P.m1+" g",bx+s/2,by+s+16);
+    c.fillStyle=css("--hot"); c.fillText(fmt(S.T1,1)+" °C",bx+s/2,by+s+31);
+  }
+  // sóng nhiệt khi trao đổi
+  if(S.phase==="mix"){
+    var amp=clamp((S.T1-S.T2)/60,0,1);
+    c.strokeStyle="rgba(217,72,43,"+(0.15+0.7*amp)+")"; c.lineWidth=1.5;
+    for(var i=0;i<3;i++){
+      var ph=(S.time*0.6+i*0.33)%1, yy=ey-8-ph*34;
+      c.beginPath(); c.moveTo(ex+4,yy); c.quadraticCurveTo(ex+s/2,yy-6,ex+s-4,yy); c.stroke();
+    }
+  }
+  // nhiệt kế
+  var tx=500, tTop=34, tBot=bot-10, tH=tBot-tTop;
+  c.fillStyle="rgba(255,255,255,.5)"; rr(c,tx,tTop,14,tH,7); c.fill();
+  c.strokeStyle=ink; c.lineWidth=1.6; rr(c,tx,tTop,14,tH,7); c.stroke();
+  var frac=clamp((S.T2-0)/110,0,1);
+  c.fillStyle=css("--hot"); rr(c,tx+4,tBot-6-(tH-14)*frac,6,(tH-14)*frac+6,3); c.fill();
+  c.beginPath(); c.arc(tx+7,tBot-1,9,0,Math.PI*2); c.fill();
+  c.strokeStyle=ink; c.lineWidth=1; c.fillStyle=muted; c.font="10px sans-serif"; c.textAlign="left";
+  for(var d=0;d<=100;d+=20){
+    var yy2=tBot-6-(tH-14)*(d/110);
+    c.beginPath(); c.moveTo(tx+16,yy2); c.lineTo(tx+22,yy2); c.stroke(); c.fillText(d,tx+25,yy2+3);
+  }
+  c.fillStyle=ink; c.font="bold 12px sans-serif"; c.textAlign="center";
+  c.fillText("Nhiệt kế",tx+7,tTop-8);
+  // màn hình số
+  var dx=24, dy=20;
+  c.fillStyle="rgba(0,0,0,.78)"; rr(c,dx,dy,150,46,6); c.fill();
+  c.fillStyle="#8fe3f0"; c.font="11px sans-serif"; c.textAlign="left";
+  c.fillText("Nước",dx+10,dy+16);
+  c.font="bold 22px monospace"; c.fillText(fmt(S.T2,1)+" °C",dx+10,dy+38);
+  // chú thích trạng thái
+  c.fillStyle=muted; c.font="12px sans-serif"; c.textAlign="left";
+  var msg = S.phase==="ready" ? "Vật đã được đun nóng, đang treo bên ngoài." :
+            S.phase==="drop" ? "Đang thả vật vào nước..." :
+            S.phase==="mix" ? "Nhiệt truyền từ vật sang nước (khuấy đều)." :
+            "Đã cân bằng nhiệt.";
+  c.fillText(msg,24,H-26);
+}
+
+function drawGraph(){
+  var c=gctx, W=640, H=260;
+  c.setTransform(2,0,0,2,0,0); c.clearRect(0,0,W,H);
+  var ink=css("--ink"), muted=css("--muted"), grid=css("--grid");
+  c.fillStyle=css("--canvas")||"#fff"; c.fillRect(0,0,W,H);
+  var L=50,R=W-16,T=16,B=H-36;
+  var yMin=Math.floor((P.t2-3)/5)*5, yMax=Math.ceil((P.t1+3)/5)*5;
+  var lastT=S.data.length?S.data[S.data.length-1].t:0;
+  var xMax=Math.max(120,Math.ceil(lastT*1.2/30)*30);
+  function X(t){return L+(R-L)*t/xMax;}
+  function Y(v){return B-(B-T)*(v-yMin)/(yMax-yMin);}
+  c.strokeStyle=grid; c.lineWidth=.7; c.fillStyle=muted; c.font="11px sans-serif";
+  var ys=(yMax-yMin)>60?10:5;
+  c.textAlign="right";
+  for(var v=yMin;v<=yMax;v+=ys){c.beginPath();c.moveTo(L,Y(v));c.lineTo(R,Y(v));c.stroke();c.fillText(v,L-6,Y(v)+4);}
+  c.textAlign="center";
+  var xs=xMax/6;
+  for(var i=0;i<=6;i++){var tt=xs*i;c.beginPath();c.moveTo(X(tt),T);c.lineTo(X(tt),B);c.stroke();c.fillText(Math.round(tt),X(tt),B+14);}
+  c.strokeStyle=ink; c.lineWidth=1.2; c.beginPath(); c.moveTo(L,T); c.lineTo(L,B); c.lineTo(R,B); c.stroke();
+  c.fillStyle=muted; c.fillText("Thời gian (s)",(L+R)/2,H-6);
+  c.save(); c.translate(12,(T+B)/2); c.rotate(-Math.PI/2); c.fillText("Nhiệt độ (°C)",0,0); c.restore();
+  // lý thuyết
+  if($("showTheory").checked){
+    var th=theoryT();
+    c.setLineDash([5,4]); c.strokeStyle=css("--ok"); c.lineWidth=1.2;
+    c.beginPath(); c.moveTo(L,Y(th)); c.lineTo(R,Y(th)); c.stroke(); c.setLineDash([]);
+    c.fillStyle=css("--ok"); c.textAlign="right"; c.fillText("t lý thuyết ≈ "+fmt(th,1)+" °C",R-4,Y(th)-5);
+  }
+  function plot(key,color){
+    if(S.phase==="ready"||S.phase==="drop"){return;}
+    c.strokeStyle=color; c.lineWidth=2.2; c.beginPath();
+    S.data.forEach(function(p,i){ if(i===0) c.moveTo(X(p.t),Y(p[key])); else c.lineTo(X(p.t),Y(p[key])); });
+    c.lineTo(X(S.time),Y(key==="a"?S.T1:S.T2)); c.stroke();
+  }
+  if(S.phase==="ready"||S.phase==="drop"){
+    c.fillStyle=css("--hot"); c.beginPath(); c.arc(X(0),Y(P.t1),4,0,7); c.fill();
+    c.fillStyle=css("--cold"); c.beginPath(); c.arc(X(0),Y(P.t2),4,0,7); c.fill();
+  }
+  plot("a",css("--hot")); plot("b",css("--cold"));
+  // chú giải
+  c.textAlign="left"; c.font="12px sans-serif";
+  c.fillStyle=css("--hot"); c.fillRect(L+10,T+6,14,3); c.fillText("Vật",L+30,T+11);
+  c.fillStyle=css("--cold"); c.fillRect(L+70,T+6,14,3); c.fillText("Nước + cốc",L+90,T+11);
+}
+
+/* ---------- Kết quả ---------- */
+function renderResult(){
+  var el=$("result");
+  if(S.phase!=="done"){
+    el.className="result";
+    el.innerHTML = S.phase==="ready"
+      ? "Bấm “Thả vật vào nhiệt lượng kế” để bắt đầu thí nghiệm. Khi nhiệt độ đã cân bằng, cách tính sẽ hiện ở đây."
+      : "Đang trao đổi nhiệt... Quan sát nhiệt kế và đồ thị, đợi hai đường nhiệt độ gặp nhau.";
+    return;
+  }
+  var t=S.tMeas, m1=P.m1/1000, m2=P.m2/1000, m3=P.m3/1000;
+  var Qthu_w=m2*P.c2*(t-P.t2), Qthu_c=m3*C3*(t-P.t2), Qthu=Qthu_w+Qthu_c;
+  var dT1=P.t1-t;
+  var hide=$("hideTrue").checked;
+  var h='<div>Nhiệt độ cân bằng đo được: <span class="big">t = '+fmt(t,1)+' °C</span></div>';
+  h+='<div class="eq">Q<sub>thu</sub> = ('+fmt(m2,3)+'·'+P.c2+' + '+fmt(m3,3)+'·'+C3+')·('+fmt(t,1)+' − '+fmt(P.t2,1)+') = '+fmt(Qthu,0)+' J</div>';
+  if(dT1<=0.05){
+    h+='<div>Nhiệt độ cân bằng gần bằng t₁ nên không tính được c₁. Hãy tăng m₁ hoặc t₁.</div>';
+  } else {
+    var cm=Qthu/(m1*dT1);
+    h+='<div class="eq">c₁ = Q<sub>thu</sub> / [m₁·(t₁ − t)] = '+fmt(Qthu,0)+' / ['+fmt(m1,3)+'·('+fmt(P.t1,1)+' − '+fmt(t,1)+')]</div>';
+    h+='<div>Nhiệt dung riêng đo được: <span class="big">c₁ ≈ '+fmt(cm,0)+' J/kg·K</span></div>';
+    if(hide){
+      h+='<div style="color:var(--muted);margin-top:6px">Giá trị thật đang ẩn. Bỏ chọn “Ẩn giá trị c thật” để đối chiếu.</div>';
+    } else {
+      var err=(cm-P.c1)/P.c1*100;
+      h+='<div style="margin-top:6px">Giá trị thật (bảng): '+P.c1+' J/kg·K · Sai số: <b style="color:'+(Math.abs(err)<3?'var(--ok)':'var(--warn)')+'">'+(err>=0?'+':'')+fmt(err,1)+'%</b></div>';
+      if(P.h>0.001 || P.noise>0.001){
+        h+='<div style="color:var(--muted);font-size:13px;margin-top:4px">Sai số do: '+(P.h>0.001?'nhiệt hao phí ra môi trường':'')+(P.h>0.001&&P.noise>0.001?' và ':'')+(P.noise>0.001?'sai số đọc nhiệt kế':'')+'.</div>';
+      }
+    }
+  }
+  el.className="result done"; el.innerHTML=h;
+}
+function renderHist(){
+  var tb=$("hist");
+  if(!S.runs.length){ tb.innerHTML='<tr><td colspan="9" style="text-align:center;color:var(--muted)">Chưa có lần đo nào.</td></tr>'; return; }
+  var hide=$("hideTrue").checked;
+  tb.innerHTML=S.runs.map(function(r){
+    var err = (r.c==null||hide) ? "–" : ((r.c-r.true_)/r.true_*100);
+    return "<tr><td>"+r.n+"</td><td>"+r.mat+"</td><td>"+r.m1+"</td><td>"+r.t1+"</td><td>"+r.m2+"</td><td>"+r.t2+"</td><td>"+fmt(r.t,1)+"</td><td>"+(r.c==null?"–":fmt(r.c,0))+"</td><td>"+(typeof err==="number"?(err>=0?"+":"")+fmt(err,1)+"%":err)+"</td></tr>";
+  }).join("");
+}
+
+function render(){
+  drawScene(); drawGraph();
+  var ph=S.phase;
+  $("roT1").textContent = fmt(S.T1,1)+" °C";
+  $("roT2").textContent = fmt(S.T2,1)+" °C";
+  $("roTime").textContent = Math.round(S.time)+" s";
+  $("status").textContent = ph==="ready"?"Sẵn sàng":ph==="drop"?"Đang thả vật":ph==="mix"?"Đang trao đổi nhiệt":"Hoàn thành";
+  if(render._ph!==ph || ph==="done" && render._hide!==$("hideTrue").checked){
+    render._ph=ph; render._hide=$("hideTrue").checked; renderResult(); renderHist();
+  }
+}
+$("hideTrue").addEventListener("change",function(){renderResult();renderHist();});
+
+/* ---------- Khởi động ---------- */
+resetSim();
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

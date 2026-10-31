@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Định luật Boyle (Bài 9 – Vật lí 12) – Thầy Soạn-STK</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#eef3f4; --panel:#ffffff; --ink:#14292f; --muted:#5a7077; --line:#cfdcdf;
+  --accent:#0b6e7f; --accent-ink:#ffffff; --hot:#d9482b; --cold:#2467c9; --ice:#1b93b8; --ok:#1d8a4e; --warn:#b36b00;
+  --grid:#dbe6e8; --canvas:#f8fbfb; --good-bg:#e4f4ea; --info-bg:#e6f1f4;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1b1f; --panel:#17272c; --ink:#e6f0f2; --muted:#94aab0; --line:#2b4148;
+    --accent:#3fb6cb; --accent-ink:#06222a; --hot:#ff7a59; --cold:#6aa3ff; --ice:#7fdcf2; --ok:#5fd08d; --warn:#f0b455;
+    --grid:#233a41; --canvas:#122227; --good-bg:#153324; --info-bg:#173039;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1b1f; --panel:#17272c; --ink:#e6f0f2; --muted:#94aab0; --line:#2b4148;
+  --accent:#3fb6cb; --accent-ink:#06222a; --hot:#ff7a59; --cold:#6aa3ff; --ice:#7fdcf2; --ok:#5fd08d; --warn:#f0b455;
+  --grid:#233a41; --canvas:#122227; --good-bg:#153324; --info-bg:#173039;
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:"Be Vietnam Pro","Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;line-height:1.5;font-size:15px}
+header{padding:16px 20px 6px;max-width:1280px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:10px}
+h1{margin:0;font-size:24px;font-weight:700;letter-spacing:-.01em}
+.brand{color:var(--accent)}
+header p{margin:2px 0 0;color:var(--muted);font-size:14px}
+header p.back{margin:0 0 6px;font-size:13.5px}
+header p.back a{color:var(--accent);text-decoration:none;font-weight:600}
+header p.who{font-weight:600;color:var(--ink)}
+.themebtn{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:6px 10px;cursor:pointer;font:inherit;font-size:13px}
+main{max-width:1280px;margin:0 auto;padding:12px 20px 30px;display:grid;grid-template-columns:minmax(0,1fr) 350px;gap:16px}
+@media (max-width:960px){main{grid-template-columns:1fr}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}
+.panel h2{margin:0 0 10px;font-size:15px;font-weight:700}
+canvas{width:100%;height:auto;display:block;border-radius:8px;background:var(--canvas);border:1px solid var(--line)}
+.stack{display:flex;flex-direction:column;gap:16px;min-width:0}
+.btnrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;align-items:center}
+button.pri{background:var(--accent);color:var(--accent-ink);border:0;border-radius:8px;padding:10px 16px;font:inherit;font-weight:600;cursor:pointer}
+button.sec{background:transparent;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:10px 14px;font:inherit;cursor:pointer}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.status{margin-left:auto;font-size:13px;color:var(--muted)}
+.field{display:grid;grid-template-columns:1fr auto;gap:2px 8px;align-items:center;margin-bottom:10px}
+.field label{font-size:13.5px}
+.field .num{display:flex;align-items:center;gap:4px}
+.field input[type=number],select{width:84px;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:4px 6px;font:inherit;text-align:right}
+select{width:100%;text-align:left}
+.field .u{color:var(--muted);font-size:12.5px;min-width:30px}
+.field input[type=range]{grid-column:1 / -1;width:100%;accent-color:var(--accent)}
+.grp{font-size:13px;font-weight:700;color:var(--accent);margin:14px 0 8px;padding-top:10px;border-top:1px dashed var(--line)}
+.grp:first-child{border-top:0;margin-top:0;padding-top:0}
+.chk{display:flex;gap:8px;align-items:center;font-size:13.5px;margin:6px 0}
+.result{background:var(--info-bg);border-radius:10px;padding:12px 14px;font-size:14px}
+.result.done{background:var(--good-bg)}
+.result .big{font-size:21px;font-weight:700}
+.result .eq{font-family:"Cambria Math","Latin Modern Math",Georgia,serif;font-size:15px;margin:6px 0;overflow-x:auto;white-space:nowrap}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:10px}
+.ro{border:1px solid var(--line);border-radius:8px;padding:6px 10px}
+.ro span{display:block;font-size:12px;color:var(--muted)}
+.ro b{font-size:18px;font-variant-numeric:tabular-nums}
+.ro.h b{color:var(--hot)} .ro.c b{color:var(--cold)} .ro.i b{color:var(--ice)}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}
+th,td{border-bottom:1px solid var(--line);padding:5px 8px;text-align:right;white-space:nowrap}
+th{color:var(--muted);font-weight:600}
+th:first-child,td:first-child{text-align:left}
+details{margin-top:4px}
+summary{cursor:pointer;font-weight:600;font-size:14px}
+details ol,details ul{margin:8px 0 0;padding-left:20px;font-size:14px}
+details li{margin-bottom:4px}
+footer{text-align:center;color:var(--muted);font-size:13px;padding:0 20px 24px}
+
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.tab{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:10px;padding:9px 14px;font:inherit;font-weight:600;cursor:pointer;font-size:14px}
+.tab[aria-selected="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.prog{display:flex;align-items:center;gap:10px;margin-top:10px;font-size:13.5px}
+.prog input{flex:1;accent-color:var(--accent)}
+.note{font-size:14px;margin:0 0 8px}
+.note b{color:var(--accent)}
+.q{margin-bottom:16px;padding-bottom:12px;border-bottom:1px dashed var(--line)}
+.q p{margin:0 0 6px;font-weight:600;font-size:14.5px}
+.opt{display:flex;gap:8px;align-items:flex-start;margin:4px 0;font-size:14px;cursor:pointer}
+.opt input{margin-top:4px}
+.fb{margin-top:6px;font-size:13.5px;padding:6px 10px;border-radius:8px}
+.fb.ok{background:var(--good-bg);color:var(--ok)}
+.fb.no{background:var(--info-bg);color:var(--warn)}
+.chal{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:10px 0}
+.chal label{font-size:13px;color:var(--muted);display:block}
+.chal input{width:100%;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:6px 8px;font:inherit}
+.bad{color:var(--warn)} .good{color:var(--ok)}
+ul.tight{margin:6px 0 0;padding-left:20px;font-size:14px} ul.tight li{margin-bottom:4px}
+
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.tab{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:10px;padding:9px 14px;font:inherit;font-weight:600;cursor:pointer;font-size:14px}
+.tab[aria-selected="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.prog{display:flex;align-items:center;gap:10px;margin-top:10px;font-size:13.5px}
+.prog input{flex:1;accent-color:var(--accent)}
+.note{font-size:14px;margin:0 0 8px}
+.q{margin-bottom:16px;padding-bottom:12px;border-bottom:1px dashed var(--line)}
+.q p{margin:0 0 6px;font-weight:600;font-size:14.5px}
+.opt{display:flex;gap:8px;align-items:flex-start;margin:4px 0;font-size:14px;cursor:pointer}
+.opt input{margin-top:4px}
+.fb{margin-top:6px;font-size:13.5px;padding:6px 10px;border-radius:8px}
+.fb.ok{background:var(--good-bg);color:var(--ok)}
+.fb.no{background:var(--info-bg);color:var(--warn)}
+.states{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;margin-top:10px}
+.st{border:2px solid var(--ink);border-radius:6px;padding:8px 10px;text-align:center;font-size:14px;min-height:64px}
+.st small{display:block;color:var(--muted);font-size:12px}
+.arr{font-size:26px;color:var(--muted)}
+.inline{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin:8px 0}
+.inline label{font-size:13px;color:var(--muted);display:block}
+.inline input{width:110px;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:6px 8px;font:inherit}
+.bad{color:var(--warn)} .good{color:var(--ok)}
+ul.tight{margin:6px 0 0;padding-left:20px;font-size:14px} ul.tight li{margin-bottom:4px}
+.steps{font-size:14px;margin:6px 0 0;padding-left:20px} .steps li{margin-bottom:4px}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <p class="back"><a href="https://claude.ai/artifact/JiPRaSUaFAmceEk8cdMj7P" target="_blank" rel="noopener">← Về trang Học Vật Lý cùng Thầy Soạn-STK</a></p>
+    <h1>Định luật Boyle (Bài 9 – Vật lí 12) <span class="brand">· Thầy Soạn-STK</span></h1>
+    <p>Thông số trạng thái, quá trình đẳng nhiệt, thí nghiệm khảo sát p theo V, định luật Boyle p·V = hằng số, đường đẳng nhiệt và bài tập p₁V₁ = p₂V₂.</p>
+    <p class="who">Thầy Đàng Năng Soạn · Trường THPT Phạm Văn Đồng – Phước Hậu · Vật lí THPT</p>
+  </div>
+  <button class="themebtn" id="themeBtn" type="button">Đổi sáng/tối</button>
+</header>
+<main>
+  <div class="stack">
+    <section class="panel">
+      <div class="tabs" role="tablist">
+        <button class="tab" id="tb_t1" role="tab" aria-selected="true" type="button">1. Thông số trạng thái và quá trình</button>
+        <button class="tab" id="tb_t2" role="tab" aria-selected="false" type="button">2. Thí nghiệm đẳng nhiệt</button>
+        <button class="tab" id="tb_t3" role="tab" aria-selected="false" type="button">3. Định luật Boyle</button>
+        <button class="tab" id="tb_t4" role="tab" aria-selected="false" type="button">4. Ôn tập</button>
+      </div>
+    </section>
+
+    <!-- ===== TAB 1 ===== -->
+    <div id="p_t1" class="stack">
+      <section class="panel">
+        <h2>Lượng khí trong bình kín (mô phỏng Hình 9.1)</h2>
+        <canvas id="box" width="1280" height="600" aria-label="Bình kín có nhiệt kế, áp kế, thước đo"></canvas>
+        <div class="inline" style="margin-top:12px">
+          <div style="flex:1;min-width:220px"><label for="sT">Nhiệt độ T: <b id="vT"></b></label><input type="range" id="sT" min="250" max="450" step="5" value="300" style="width:100%"></div>
+          <div style="flex:1;min-width:220px"><label for="sV">Thể tích V: <b id="vV"></b></label><input type="range" id="sV" min="2" max="20" step="0.5" value="10" style="width:100%"></div>
+        </div>
+        <div class="readouts">
+          <div class="ro h"><span>Nhiệt độ T</span><b id="o_T">–</b></div>
+          <div class="ro"><span>Áp suất p</span><b id="o_p">–</b></div>
+          <div class="ro c"><span>Thể tích V</span><b id="o_V">–</b></div>
+          <div class="ro"><span>Khối lượng khí m</span><b>không đổi</b></div>
+        </div>
+        <p class="hint" style="margin:8px 0 0;font-size:13px;color:var(--muted)">Lượng khí xác định bởi bốn đại lượng: khối lượng m, thể tích V, nhiệt độ T và áp suất p. Các hạt khí chuyển động hỗn loạn, áp suất là áp suất trung bình của các phân tử khí tác dụng lên thành bình.</p>
+        <div class="btnrow">
+          <button class="sec" id="ansTool" type="button">Dụng cụ đo và đơn vị SI</button>
+        </div>
+        <div id="ansToolTxt" class="result" style="display:none;margin-top:8px">
+          <b>Dụng cụ:</b> nhiệt kế đo T, áp kế đo p, thước đo các kích thước để tính V (cân đo khối lượng m).
+          <div class="eq">Đơn vị SI: m (kg) · V (m³) · T (K) · p (Pa)</div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Trạng thái và quá trình biến đổi trạng thái (Hình 9.2)</h2>
+        <p class="note">Đặt bình ở một trạng thái rồi bấm “Lưu trạng thái 1”. Thay đổi T hoặc V rồi bấm “Lưu trạng thái 2”.</p>
+        <div class="btnrow" style="margin-top:0"><button class="pri" id="save1" type="button">Lưu trạng thái 1</button><button class="pri" id="save2" type="button">Lưu trạng thái 2</button><button class="sec" id="clr12" type="button">Xoá</button></div>
+        <div class="states">
+          <div class="st" id="st1">Trạng thái 1<small>chưa lưu</small></div>
+          <div class="arr">→</div>
+          <div class="st" id="st2">Trạng thái 2<small>chưa lưu</small></div>
+        </div>
+        <div class="result" id="procTxt" style="margin-top:10px">Quá trình biến đổi từ trạng thái 1 sang trạng thái 2 gọi tắt là quá trình. Trong hầu hết các quá trình, cả ba thông số p, V, T đều biến đổi. Quá trình chỉ có hai thông số biến đổi còn một thông số không đổi gọi là đẳng quá trình.</div>
+      </section>
+
+      <section class="panel">
+        <h2>Quả bóng bay trong bóng mát và ngoài nắng (Hình 9.3)</h2>
+        <canvas id="ball" width="1280" height="340" aria-label="Quả bóng bay trong bóng mát và ngoài nắng"></canvas>
+        <div class="btnrow"><button class="sec" id="ansBall" type="button">Xem gợi ý so sánh</button></div>
+        <div id="ansBallTxt" class="result" style="display:none;margin-top:8px">Ngoài nắng, khí trong bóng nóng lên: <b>nhiệt độ T tăng</b>, bóng căng hơn nên <b>thể tích V tăng</b>, áp suất p của khí cũng thay đổi (tăng). Cả ba thông số trạng thái đều thay đổi, đây không phải là đẳng quá trình.</div>
+      </section>
+    </div>
+
+    <!-- ===== TAB 2 ===== -->
+    <div id="p_t2" class="stack" style="display:none">
+      <section class="panel">
+        <h2>Thí nghiệm về quá trình đẳng nhiệt (mô phỏng Hình 9.4)</h2>
+        <canvas id="lab" width="1280" height="660" aria-label="Xi lanh, pit-tông và áp kế"></canvas>
+        <div class="inline" style="margin-top:12px">
+          <div style="flex:1;min-width:240px"><label for="sVe">Dịch chuyển pit-tông (thể tích khí V): <b id="vVe"></b></label><input type="range" id="sVe" min="1.5" max="5" step="0.5" value="3" style="width:100%"></div>
+        </div>
+        <div class="readouts">
+          <div class="ro c"><span>Thể tích V đọc được</span><b id="e_V">–</b></div>
+          <div class="ro"><span>Áp suất p đọc được</span><b id="e_p">–</b></div>
+          <div class="ro v"><span>Tích p·V</span><b id="e_pv">–</b></div>
+          <div class="ro h"><span>Nhiệt độ khí</span><b id="e_T">–</b></div>
+        </div>
+        <div class="btnrow">
+          <button class="pri" id="rec" type="button">Ghi số liệu vào bảng</button>
+          <button class="sec" id="load91" type="button">Nạp số liệu Bảng 9.1</button>
+          <button class="sec" id="clrRows" type="button">Xoá bảng</button>
+          <label class="chk" style="margin:0 0 0 6px"><input type="checkbox" id="chNoise" checked> Mô phỏng sai số đọc</label>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Bảng số liệu (tương tự Bảng 9.1)</h2>
+        <div class="tablewrap"><table>
+          <thead><tr><th>Lần thí nghiệm</th><th>V (cm³)</th><th>p (10⁵ Pa)</th><th>p·V (10⁵ Pa·cm³)</th></tr></thead>
+          <tbody id="rows"></tbody>
+        </table></div>
+        <div class="result" id="anaTxt" style="margin-top:10px"></div>
+      </section>
+
+      <section class="panel">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px">
+          <h2 style="margin:0">Đường biểu diễn</h2>
+          <select id="grSel" style="width:auto"><option value="pv">p theo V</option><option value="pi">p theo 1/V</option><option value="pvv">p·V theo V</option></select>
+        </div>
+        <canvas id="gExp" width="1280" height="520" aria-label="Đồ thị từ số liệu thí nghiệm"></canvas>
+        <div class="btnrow"><button class="sec" id="stmt" type="button">Phát biểu mối quan hệ giữa p và V</button></div>
+        <div id="stmtTxt" class="result" style="display:none;margin-top:8px">Trong quá trình đẳng nhiệt của một khối lượng khí xác định, tích <b>p·V</b> gần như không đổi: áp suất tỉ lệ nghịch với thể tích.</div>
+      </section>
+    </div>
+
+    <!-- ===== TAB 3 ===== -->
+    <div id="p_t3" class="stack" style="display:none">
+      <section class="panel">
+        <h2>Định luật Boyle</h2>
+        <div class="result">
+          <div>Khi nhiệt độ của một khối lượng khí xác định giữ không đổi thì áp suất gây ra bởi khí tỉ lệ nghịch với thể tích của nó.</div>
+          <div class="eq">p·V = hằng số  (9.1)  ·  p₁V₁ = p₂V₂  (9.2)</div>
+          <div style="font-size:13.5px;color:var(--muted)">Định luật do nhà vật lí và hoá học người Ireland Robert Boyle (1627 – 1691) tìm ra bằng thực nghiệm năm 1662.</div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Đường đẳng nhiệt (Hình 9.5 và 9.6)</h2>
+        <div class="inline">
+          <div style="flex:1;min-width:200px"><label for="sT1">Nhiệt độ T₁: <b id="vT1"></b></label><input type="range" id="sT1" min="200" max="400" step="5" value="270" style="width:100%"></div>
+          <div style="flex:1;min-width:200px"><label for="sT2">Nhiệt độ T₂ (lớn hơn T₁): <b id="vT2"></b></label><input type="range" id="sT2" min="210" max="450" step="5" value="330" style="width:100%"></div>
+          <div style="flex:1;min-width:200px"><label for="sVp">Thể tích V: <b id="vVp"></b></label><input type="range" id="sVp" min="1.5" max="6" step="0.1" value="3" style="width:100%"></div>
+        </div>
+        <canvas id="gIso" width="1280" height="560" aria-label="Các đường đẳng nhiệt p theo V"></canvas>
+        <div style="height:10px"></div>
+        <canvas id="gInv" width="1280" height="520" aria-label="Đồ thị p theo 1/V"></canvas>
+        <div class="readouts" style="margin-top:12px">
+          <div class="ro h"><span>p tại V (đường T₂)</span><b id="i_p2">–</b></div>
+          <div class="ro c"><span>p tại V (đường T₁)</span><b id="i_p1">–</b></div>
+          <div class="ro"><span>p·V trên đường T₁</span><b id="i_k1">–</b></div>
+          <div class="ro"><span>p·V trên đường T₂</span><b id="i_k2">–</b></div>
+        </div>
+        <ul class="tight">
+          <li>Đồ thị biểu diễn định luật Boyle (p theo V) là một nhánh của đường hypebol.</li>
+          <li>Các đường đẳng nhiệt của cùng một lượng khí ứng với các nhiệt độ khác nhau thì khác nhau: đường ứng với T₂ lớn hơn nằm cao hơn.</li>
+          <li>Vẽ p theo 1/V ta được đường thẳng đi qua gốc toạ độ, vì p = hằng số · (1/V).</li>
+        </ul>
+      </section>
+
+      <section class="panel">
+        <h2>Bài tập vận dụng p₁V₁ = p₂V₂</h2>
+        <div class="btnrow" style="margin-top:0"><button class="sec" id="exSgk" type="button">Bài tập ví dụ trong SGK</button><button class="pri" id="exNew" type="button">Đề mới để tự giải</button></div>
+        <div id="exStmt" class="result" style="margin-top:10px"></div>
+        <div class="inline">
+          <div><label for="in_ex">V₂ (L) của em</label><input id="in_ex" type="number" step="0.01" inputmode="decimal"></div>
+          <button class="pri" id="exCheck" type="button">Kiểm tra</button>
+          <button class="sec" id="exSol" type="button">Xem lời giải</button>
+        </div>
+        <div id="exRes" class="result" style="display:none"></div>
+      </section>
+    </div>
+
+    <!-- ===== TAB 4 ===== -->
+    <div id="p_t4" class="stack" style="display:none">
+      <section class="panel">
+        <h2>Câu hỏi ôn tập</h2>
+        <div id="qz"></div>
+        <div class="btnrow"><button class="sec" id="qzReset" type="button">Làm lại</button><span class="status" id="qzScore"></span></div>
+      </section>
+    </div>
+  </div>
+
+  <div class="stack">
+    <section class="panel">
+      <h2>Số liệu thí nghiệm (đổi để giảng dạy)</h2>
+      <div id="controls"></div>
+      <div class="grp">Hiển thị</div>
+      <label class="chk"><input type="checkbox" id="chHide"> Ẩn cột p·V và nhận xét (để học sinh tự tính)</label>
+      <label class="chk"><input type="checkbox" id="chCurve" checked> Vẽ đường lí thuyết đi qua các điểm đo</label>
+    </section>
+    <section class="panel">
+      <h2>Ghi nhớ</h2>
+      <div class="result">
+        <div class="eq">T không đổi:  p·V = hằng số</div>
+        <div class="eq">p₁V₁ = p₂V₂  ⇒  V₂ = p₁V₁ / p₂</div>
+        <div style="font-size:13.5px">Khi V giảm bao nhiêu lần thì p tăng bấy nhiêu lần (ở cùng nhiệt độ, cùng khối lượng khí).</div>
+      </div>
+      <details><summary>Gợi ý các bước lên lớp</summary><ol>
+        <li>Tab 1: nêu bốn đại lượng xác định lượng khí, cho học sinh tìm đẳng quá trình.</li>
+        <li>Tab 2: dịch chuyển pit-tông, ghi số liệu, tính p·V, vẽ đồ thị, phát biểu mối quan hệ.</li>
+        <li>Tab 3: quan sát đường đẳng nhiệt, so sánh T₁ và T₂, giải bài tập p₁V₁ = p₂V₂.</li>
+        <li>Tab 4: làm câu hỏi ôn tập.</li>
+      </ol></details>
+      <details><summary>Câu hỏi thảo luận</summary><ul>
+        <li>Vì sao số liệu thật không cho p·V đúng bằng một hằng số tuyệt đối?</li>
+        <li>Nếu vẽ p theo 1/V thì đồ thị có dạng gì? Tại sao?</li>
+        <li>Tìm ví dụ về quá trình đẳng nhiệt trong đời sống (chậm, tiếp xúc nhiệt tốt với môi trường).</li>
+        <li>Tăng nhiệt độ, đường đẳng nhiệt dịch chuyển như thế nào?</li>
+      </ul></details>
+    </section>
+  </div>
+</main>
+<footer>Ứng dụng mô phỏng do thầy Đàng Năng Soạn biên soạn · Trường THPT Phạm Văn Đồng – Phước Hậu · Vật lí THPT</footer>
+<script>
+(function(){
+"use strict";
+
+function $(id){return document.getElementById(id);}
+function fmt(x,d){if(d===undefined)d=1;return Number(x).toFixed(d).replace(".",",");}
+function css(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();}
+function clamp(x,a,b){return Math.max(a,Math.min(b,x));}
+function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();}
+function decs(step){return (String(step).split(".")[1]||"").length;}
+
+function buildControls(box,SPEC,P,onChange){
+  SPEC.forEach(function(s){
+    if(s.grp){var g=document.createElement("div");g.className="grp";g.textContent=s.grp;box.appendChild(g);return;}
+    var f=document.createElement("div");f.className="field";
+    var lb=document.createElement("label");lb.textContent=s.label;lb.setAttribute("for","in_"+s.id);f.appendChild(lb);
+    if(s.type==="select"){
+      var sel=document.createElement("select");sel.id="in_"+s.id;
+      s.options.forEach(function(o){var op=document.createElement("option");op.value=o;op.textContent=o;sel.appendChild(op);});
+      sel.value=P[s.id];
+      sel.addEventListener("change",function(){P[s.id]=sel.value;onChange(s.id);});
+      f.style.gridTemplateColumns="1fr";f.appendChild(sel);
+    } else {
+      var w=document.createElement("div");w.className="num";
+      var n=document.createElement("input");n.type="number";n.id="in_"+s.id;n.min=s.min;n.max=s.max;n.step=s.step;n.value=P[s.id];
+      var u=document.createElement("span");u.className="u";u.textContent=s.unit;
+      w.appendChild(n);w.appendChild(u);f.appendChild(w);
+      var r=document.createElement("input");r.type="range";r.id="rg_"+s.id;r.min=s.min;r.max=s.max;r.step=s.step;r.value=P[s.id];
+      r.setAttribute("aria-label",s.label);f.appendChild(r);
+      var apply=function(v){
+        v=parseFloat(v);if(isNaN(v))return;
+        v=clamp(v,s.min,s.max);v=Number(v.toFixed(decs(s.step)+1));
+        P[s.id]=v;onChange(s.id);
+      };
+      n.addEventListener("change",function(){apply(n.value);});
+      r.addEventListener("input",function(){apply(r.value);});
+    }
+    box.appendChild(f);
+  });
+  return function(){
+    SPEC.forEach(function(s){
+      if(!s.id)return;
+      var a=$("in_"+s.id),b=$("rg_"+s.id);
+      if(s.type==="select"){a.value=P[s.id];return;}
+      if(document.activeElement!==a)a.value=P[s.id];
+      if(b)b.value=P[s.id];
+    });
+  };
+}
+
+/* Vẽ đồ thị: o={xmin,xmax,xstep,ymin,ymax,ystep,xlabel,ylabel,series:[{pts,color,label,tail}],hlines:[{y,color,label}]} */
+function plot(c,W,H,o){
+  c.setTransform(2,0,0,2,0,0);c.clearRect(0,0,W,H);
+  var ink=css("--ink"),muted=css("--muted"),grid=css("--grid");
+  c.fillStyle=css("--canvas");c.fillRect(0,0,W,H);
+  var L=54,R=W-16,T=16,B=H-36;
+  function X(v){return L+(R-L)*(v-o.xmin)/(o.xmax-o.xmin);}
+  function Y(v){return B-(B-T)*(v-o.ymin)/(o.ymax-o.ymin);}
+  c.strokeStyle=grid;c.lineWidth=.7;c.fillStyle=muted;c.font="11px sans-serif";c.textAlign="right";
+  for(var v=o.ymin;v<=o.ymax+1e-9;v+=o.ystep){c.beginPath();c.moveTo(L,Y(v));c.lineTo(R,Y(v));c.stroke();c.fillText(Math.round(v*10)/10,L-6,Y(v)+4);}
+  c.textAlign="center";
+  for(var x=o.xmin;x<=o.xmax+1e-9;x+=o.xstep){c.beginPath();c.moveTo(X(x),T);c.lineTo(X(x),B);c.stroke();c.fillText(Math.round(x*100)/100,X(x),B+14);}
+  c.strokeStyle=ink;c.lineWidth=1.2;c.beginPath();c.moveTo(L,T);c.lineTo(L,B);c.lineTo(R,B);c.stroke();
+  c.fillStyle=muted;c.fillText(o.xlabel,(L+R)/2,H-6);
+  c.save();c.translate(12,(T+B)/2);c.rotate(-Math.PI/2);c.fillText(o.ylabel,0,0);c.restore();
+  (o.hlines||[]).forEach(function(h){
+    if(h.y<o.ymin||h.y>o.ymax)return;
+    c.setLineDash([5,4]);c.strokeStyle=h.color;c.lineWidth=1.2;c.beginPath();c.moveTo(L,Y(h.y));c.lineTo(R,Y(h.y));c.stroke();c.setLineDash([]);
+    c.fillStyle=h.color;c.textAlign="right";c.font="11px sans-serif";c.fillText(h.label,R-4,Y(h.y)-5);
+  });
+  o.series.forEach(function(s){
+    if(!s.pts.length)return;
+    c.strokeStyle=s.color;c.lineWidth=2.2;c.beginPath();
+    s.pts.forEach(function(p,i){if(i===0)c.moveTo(X(p[0]),Y(p[1]));else c.lineTo(X(p[0]),Y(p[1]));});
+    if(s.tail)c.lineTo(X(s.tail[0]),Y(s.tail[1]));
+    c.stroke();
+    if(s.pts.length===1){c.fillStyle=s.color;c.beginPath();c.arc(X(s.pts[0][0]),Y(s.pts[0][1]),4,0,7);c.fill();}
+  });
+  c.textAlign="left";c.font="12px sans-serif";
+  var lx=L+10;
+  o.series.forEach(function(s){c.fillStyle=s.color;c.fillRect(lx,T+6,14,3);c.fillStyle=s.color;c.fillText(s.label,lx+20,T+11);lx+=26+s.label.length*6.6;});
+}
+
+$("themeBtn").addEventListener("click",function(){
+  var cur=document.documentElement.getAttribute("data-theme");
+  var dark=cur?cur==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;
+  document.documentElement.setAttribute("data-theme",dark?"light":"dark");
+});
+
+
+
+var P={n:1,T:300};
+var SPEC=[
+  {grp:"Lượng khí trong xi lanh (tab 2)"},
+  {id:"n",label:"Lượng khí (tương đối, 1 = thí nghiệm Bảng 9.1)",unit:"",min:0.5,max:1.5,step:0.1},
+  {id:"T",label:"Nhiệt độ khí T (giữ không đổi)",unit:"K",min:250,max:350,step:5}
+];
+var sync=buildControls($("controls"),SPEC,P,function(){sync();recomputeLab();});
+
+function on(id){var e=$(id);return !!(e&&e.checked);}
+function niceStep(range,target){
+  var raw=range/target,mag=Math.pow(10,Math.floor(Math.log(raw)/Math.LN10)),nm=raw/mag;
+  return (nm<1.5?1:nm<3?2:nm<7?5:10)*mag;
+}
+function arrow(c,x1,y1,x2,y2,w,col){
+  var len=Math.hypot(x2-x1,y2-y1);if(len<3)return;
+  var ang=Math.atan2(y2-y1,x2-x1),hs=Math.min(len*0.6,5+w*1.5);
+  c.strokeStyle=col;c.fillStyle=col;c.lineWidth=w;c.lineCap="round";
+  c.beginPath();c.moveTo(x1,y1);c.lineTo(x2-Math.cos(ang)*hs*0.6,y2-Math.sin(ang)*hs*0.6);c.stroke();
+  c.beginPath();c.moveTo(x2,y2);c.lineTo(x2-hs*Math.cos(ang-0.42),y2-hs*Math.sin(ang-0.42));c.lineTo(x2-hs*Math.cos(ang+0.42),y2-hs*Math.sin(ang+0.42));c.closePath();c.fill();
+}
+function txt(c,s,x,y,col,al,font){c.fillStyle=col;c.textAlign=al||"left";c.font=font||"12px sans-serif";c.fillText(s,x,y);}
+function axes(c,o){
+  var ink=css("--ink"),muted=css("--muted"),grid=css("--grid");
+  c.setTransform(2,0,0,2,0,0);c.clearRect(0,0,o.W,o.H);c.fillStyle=css("--canvas");c.fillRect(0,0,o.W,o.H);
+  function X(v){return o.L+(o.R-o.L)*(v-o.x0)/(o.x1-o.x0);}
+  function Y(v){return o.B-(o.B-o.T)*(v-o.y0)/(o.y1-o.y0);}
+  var v;
+  c.lineWidth=.7;c.strokeStyle=grid;c.fillStyle=muted;c.font="10px sans-serif";c.textAlign="right";
+  for(v=Math.ceil(o.y0/o.ys-1e-9)*o.ys;v<=o.y1+1e-9;v+=o.ys){c.beginPath();c.moveTo(o.L,Y(v));c.lineTo(o.R,Y(v));c.stroke();c.fillText(Math.round(v*100)/100,o.L-5,Y(v)+3);}
+  c.textAlign="center";
+  for(v=Math.ceil(o.x0/o.xs-1e-9)*o.xs;v<=o.x1+1e-9;v+=o.xs){c.beginPath();c.moveTo(X(v),o.T);c.lineTo(X(v),o.B);c.stroke();c.fillText(Math.round(v*100)/100,X(v),o.B+13);}
+  c.strokeStyle=ink;c.lineWidth=1.4;
+  c.beginPath();c.moveTo(o.L,o.T-4);c.lineTo(o.L,o.B);c.lineTo(o.R+4,o.B);c.stroke();
+  txt(c,o.yl,o.L+6,o.T-6,ink,"left","11px sans-serif");
+  txt(c,o.xl,o.R,o.B-6,ink,"right","11px sans-serif");
+  return {X:X,Y:Y};
+}
+function rrr(c,x,y,w,h,r){rr(c,x,y,w,h,r);}
+
+/* ---------- tab ---------- */
+var S={tab:0};
+var tabIds=["t1","t2","t3","t4"];
+function showTab(i){
+  S.tab=i;
+  tabIds.forEach(function(id,j){$("p_"+id).style.display=(j===i)?"":"none";$("tb_"+id).setAttribute("aria-selected",String(j===i));});
+}
+tabIds.forEach(function(id,i){$("tb_"+id).addEventListener("click",function(){showTab(i);});});
+var AT=0,lastTs=null;
+
+/* ======== TAB 1 ======== */
+var RGAS=8.314,NMOL=0.4;
+var B={T:300,V:10},S1=null,S2=null;
+function pB(st){return NMOL*RGAS*st.T/(st.V/1000);}
+$("sT").addEventListener("input",function(){B.T=parseFloat($("sT").value);});
+$("sV").addEventListener("input",function(){B.V=parseFloat($("sV").value);});
+$("ansTool").addEventListener("click",function(){$("ansToolTxt").style.display="";});
+$("ansBall").addEventListener("click",function(){$("ansBallTxt").style.display="";});
+function fmtP(p){return fmt(p/1e5,2)+" × 10⁵ Pa";}
+function cardTxt(s,label){return "<b>"+label+"</b><small>p = "+fmtP(pB(s))+"</small><small>V = "+fmt(s.V,1)+" L</small><small>T = "+fmt(s.T,0)+" K</small>";}
+function updProc(){
+  $("st1").innerHTML=S1?cardTxt(S1,"Trạng thái 1"):"Trạng thái 1<small>chưa lưu</small>";
+  $("st2").innerHTML=S2?cardTxt(S2,"Trạng thái 2"):"Trạng thái 2<small>chưa lưu</small>";
+  var el=$("procTxt");
+  if(!S1||!S2){el.className="result";el.innerHTML="Quá trình biến đổi từ trạng thái 1 sang trạng thái 2 gọi tắt là quá trình. Trong hầu hết các quá trình, cả ba thông số p, V, T đều biến đổi. Quá trình chỉ có hai thông số biến đổi còn một thông số không đổi gọi là đẳng quá trình.";return;}
+  var p1=pB(S1),p2=pB(S2);
+  var sameT=Math.abs(S2.T-S1.T)<0.5,sameV=Math.abs(S2.V-S1.V)<0.01,sameP=Math.abs(p2-p1)/p1<0.01;
+  var h="",done=true;
+  if(sameT&&sameV)h="Hai trạng thái trùng nhau, chưa có quá trình biến đổi.";
+  else if(sameT){h="<b>Quá trình đẳng nhiệt</b>: T không đổi, p và V thay đổi. Kiểm tra: p₁V₁ = "+fmt(p1*S1.V/1000/1e5,3)+" và p₂V₂ = "+fmt(p2*S2.V/1000/1e5,3)+" (×10⁵ Pa·m³).";}
+  else if(sameV)h="<b>Quá trình đẳng tích</b>: V không đổi, p và T thay đổi.";
+  else if(sameP)h="<b>Quá trình đẳng áp</b>: p không đổi, V và T thay đổi.";
+  else h="Cả ba thông số p, V, T đều biến đổi: đây là một quá trình bất kì, không phải đẳng quá trình.";
+  el.className="result "+(done?"done":"");el.innerHTML=h;
+}
+$("save1").addEventListener("click",function(){S1={T:B.T,V:B.V};updProc();});
+$("save2").addEventListener("click",function(){S2={T:B.T,V:B.V};updProc();});
+$("clr12").addEventListener("click",function(){S1=null;S2=null;updProc();});
+
+var cb=$("box").getContext("2d"),cball=$("ball").getContext("2d");
+var parts=[];for(var pi=0;pi<46;pi++)parts.push({x:Math.random()*100,y:Math.random()*80,a:Math.random()*6.283});
+function drawBox(dt){
+  var c=cb,W=640,H=300;
+  c.setTransform(2,0,0,2,0,0);c.clearRect(0,0,W,H);
+  var ink=css("--ink"),muted=css("--muted"),hot=css("--hot"),acc=css("--accent");
+  c.fillStyle=css("--canvas");c.fillRect(0,0,W,H);
+  var s=Math.cbrt(B.V/10),fw=150*s,fh=104*s,dd=42*s,x0=60,yb=246,xt=x0,yt=yb-fh;
+  // mặt sau/trên/phải
+  c.fillStyle="rgba(120,160,200,.12)";c.strokeStyle=ink;c.lineWidth=1.6;
+  c.beginPath();c.moveTo(x0,yt);c.lineTo(x0+dd,yt-dd*0.7);c.lineTo(x0+fw+dd,yt-dd*0.7);c.lineTo(x0+fw,yt);c.closePath();c.fill();c.stroke();
+  c.beginPath();c.moveTo(x0+fw,yt);c.lineTo(x0+fw+dd,yt-dd*0.7);c.lineTo(x0+fw+dd,yb-dd*0.7);c.lineTo(x0+fw,yb);c.closePath();c.fill();c.stroke();
+  c.fillStyle="rgba(120,160,200,.18)";rr(c,x0,yt,fw,fh,2);c.fill();c.stroke();
+  // hạt khí
+  var sp=85*Math.sqrt(B.T/300);
+  c.fillStyle="hsla("+(220-clamp((B.T-250)/200,0,1)*220)+",85%,52%,.95)";
+  parts.forEach(function(p){
+    p.x+=Math.cos(p.a)*sp*dt;p.y+=Math.sin(p.a)*sp*dt;
+    if(p.x<3){p.x=3;p.a=Math.PI-p.a;}if(p.x>fw-3){p.x=fw-3;p.a=Math.PI-p.a;}
+    if(p.y<3){p.y=3;p.a=-p.a;}if(p.y>fh-3){p.y=fh-3;p.a=-p.a;}
+    c.beginPath();c.arc(x0+Math.min(p.x,fw-3),yt+Math.min(p.y,fh-3),2.6,0,7);c.fill();
+  });
+  // thước đo
+  c.strokeStyle=muted;c.lineWidth=1;c.fillStyle="rgba(240,220,160,.5)";rr(c,x0,yb+8,fw,12,2);c.fill();c.stroke();
+  for(var i=0;i<=10;i++){c.beginPath();c.moveTo(x0+fw*i/10,yb+8);c.lineTo(x0+fw*i/10,yb+(i%5===0?16:13));c.stroke();}
+  txt(c,"Thước đo",x0+fw/2,yb+36,ink,"center","11px sans-serif");
+  // nhiệt kế
+  var thx=x0+fw*0.28,thy=yt-dd*0.35;
+  c.fillStyle="rgba(255,255,255,.55)";c.strokeStyle=ink;c.lineWidth=1.4;rr(c,thx-4,thy-62,8,66,4);c.fill();c.stroke();
+  var fr=clamp((B.T-250)/200,0,1);
+  c.fillStyle=hot;rr(c,thx-2,thy-2-56*fr,4,56*fr+4,2);c.fill();c.beginPath();c.arc(thx,thy+3,5,0,7);c.fill();
+  txt(c,"Nhiệt kế",thx-12,thy-66,ink,"right","11px sans-serif");
+  // áp kế
+  var dcx=x0+fw+dd+92,dcy=yb-70,dr=40;
+  c.strokeStyle=muted;c.lineWidth=3;c.beginPath();c.moveTo(x0+fw+dd,yb-dd*0.7-fh*0.4);c.lineTo(dcx-dr*0.5,yb-dd*0.7-fh*0.4);c.lineTo(dcx-dr*0.5,dcy+dr+6);c.stroke();
+  c.fillStyle="rgba(255,255,255,.7)";c.strokeStyle=ink;c.lineWidth=1.8;c.beginPath();c.arc(dcx,dcy,dr,0,7);c.fill();c.stroke();
+  c.lineWidth=1;
+  for(i=0;i<=8;i++){var an=Math.PI*0.8+(Math.PI*1.4)*i/8;c.beginPath();c.moveTo(dcx+Math.cos(an)*(dr-8),dcy+Math.sin(an)*(dr-8));c.lineTo(dcx+Math.cos(an)*(dr-2),dcy+Math.sin(an)*(dr-2));c.stroke();}
+  var pk=pB(B)/1000,frp=clamp(pk/800,0,1),ang=Math.PI*0.8+Math.PI*1.4*frp;
+  c.strokeStyle=hot;c.lineWidth=2.4;c.beginPath();c.moveTo(dcx,dcy);c.lineTo(dcx+Math.cos(ang)*(dr-8),dcy+Math.sin(ang)*(dr-8));c.stroke();
+  c.fillStyle=ink;c.beginPath();c.arc(dcx,dcy,3,0,7);c.fill();
+  txt(c,"Áp kế",dcx,dcy-dr-8,ink,"center","11px sans-serif");
+  txt(c,fmt(pk,0)+" kPa",dcx,dcy+dr+18,ink,"center","bold 11px sans-serif");
+  txt(c,"Khí trong bình kín",x0+fw/2,yt-dd*0.7-8,ink,"center","bold 12px sans-serif");
+}
+function drawBall(){
+  var c=cball,W=640,H=170;
+  c.setTransform(2,0,0,2,0,0);c.clearRect(0,0,W,H);
+  var ink=css("--ink"),muted=css("--muted");
+  c.fillStyle=css("--canvas");c.fillRect(0,0,W,H);
+  function balloon(cx,cy,r,col,lab,sub){
+    c.fillStyle=col;c.strokeStyle=ink;c.lineWidth=1.4;
+    c.beginPath();c.ellipse(cx,cy,r*0.9,r,0,0,7);c.fill();c.stroke();
+    c.fillStyle="rgba(255,255,255,.45)";c.beginPath();c.ellipse(cx-r*0.3,cy-r*0.35,r*0.18,r*0.28,0.5,0,7);c.fill();
+    c.strokeStyle=ink;c.beginPath();c.moveTo(cx,cy+r);c.lineTo(cx-4,cy+r+10);c.lineTo(cx+4,cy+r+10);c.closePath();c.stroke();
+    txt(c,lab,cx,H-24,ink,"center","bold 12px sans-serif");txt(c,sub,cx,H-8,muted,"center","11px sans-serif");
+  }
+  balloon(190,66,44,"hsl(330,70%,52%)","a) Trong bóng mát","T thấp hơn");
+  balloon(450,64,52,"hsl(335,75%,64%)","b) Ngoài nắng","T cao hơn, bóng căng hơn");
+  txt(c,"So sánh p, V, T của khí trong bóng",W/2,16,ink,"center","11px sans-serif");
+}
+
+/* ======== TAB 2 ======== */
+var E={V:3},rows=[],CC=3;
+function recomputeLab(){CC=3.0*P.n*(P.T/300);}
+recomputeLab();
+function pTrue(V){return CC/V;}
+$("sVe").addEventListener("input",function(){E.V=parseFloat($("sVe").value);});
+function round05(x){return Math.round(x/0.05)*0.05;}
+$("rec").addEventListener("click",function(){
+  if(rows.length>=14)return;
+  var p=pTrue(E.V);
+  if(on("chNoise"))p+=(Math.random()*2-1)*0.05;
+  rows.push({V:E.V,p:round05(p)});renderRows();
+});
+$("load91").addEventListener("click",function(){
+  rows=[{V:3,p:1.0},{V:2.5,p:1.2},{V:2.0,p:1.5},{V:1.5,p:1.9}];renderRows();
+});
+$("clrRows").addEventListener("click",function(){rows=[];renderRows();});
+$("chHide").addEventListener("change",renderRows);
+$("stmt").addEventListener("click",function(){$("stmtTxt").style.display="";});
+function meanK(){if(!rows.length)return null;var s=0;rows.forEach(function(r){s+=r.p*r.V;});return s/rows.length;}
+function renderRows(){
+  var tb=$("rows"),hd=on("chHide");
+  if(!rows.length){tb.innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--muted)">Chưa có số liệu. Dịch chuyển pit-tông rồi bấm “Ghi số liệu”.</td></tr>';$("anaTxt").className="result";$("anaTxt").textContent="Ghi ít nhất 3 lần đo để rút ra nhận xét.";return;}
+  tb.innerHTML=rows.map(function(r,i){return "<tr><td>"+(i+1)+"</td><td>"+fmt(r.V,1)+"</td><td>"+fmt(r.p,2)+"</td><td>"+(hd?"?":fmt(r.p*r.V,2))+"</td></tr>";}).join("");
+  var el=$("anaTxt");
+  if(rows.length<3){el.className="result";el.textContent="Ghi ít nhất 3 lần đo để rút ra nhận xét.";return;}
+  if(hd){el.className="result";el.textContent="Đang ẩn nhận xét. Hãy tự tính p·V rồi bỏ chọn “Ẩn cột p·V” để đối chiếu.";return;}
+  var m=meanK(),mx=0;rows.forEach(function(r){mx=Math.max(mx,Math.abs(r.p*r.V-m)/m);});
+  el.className="result done";
+  el.innerHTML="Giá trị trung bình p·V ≈ <b>"+fmt(m,2)+"</b> (×10⁵ Pa·cm³); lệch lớn nhất so với trung bình "+fmt(mx*100,1)+"%. Tích p·V gần như không đổi, nên khi V giảm thì p tăng tương ứng: <b>p tỉ lệ nghịch với V</b>. Sự lệch nhỏ do sai số của dụng cụ đo (áp kế chia nhỏ nhất 0,05×10⁵ Pa, xi lanh chia nhỏ nhất 0,5 cm³).";
+}
+var cl=$("lab").getContext("2d"),cg=$("gExp").getContext("2d");
+function drawLab(){
+  var c=cl,W=640,H=330;
+  c.setTransform(2,0,0,2,0,0);c.clearRect(0,0,W,H);
+  var ink=css("--ink"),muted=css("--muted"),hot=css("--hot"),acc=css("--accent");
+  c.fillStyle=css("--canvas");c.fillRect(0,0,W,H);
+  // giá đỡ
+  var rx=96;
+  c.fillStyle="#3b3f46";rr(c,rx-70,H-26,150,14,5);c.fill();
+  c.fillStyle="#9aa3ad";c.fillRect(rx-3,36,6,H-62);
+  // kẹp
+  c.fillStyle="#e8742a";rr(c,rx-4,104,150,22,3);c.fill();rr(c,rx-4,206,150,18,3);c.fill();
+  // xi lanh
+  var cx=215,bot=282,sc=38,wcy=26;
+  c.fillStyle="rgba(200,230,250,.35)";c.strokeStyle=ink;c.lineWidth=1.6;rr(c,cx-wcy/2,bot-5.2*sc,wcy,5.2*sc,2);c.fill();c.stroke();
+  var Vv=E.V,gtop=bot-Vv*sc;
+  c.fillStyle="hsla(205,70%,60%,.45)";c.fillRect(cx-wcy/2+1,gtop,wcy-2,Vv*sc);
+  // pit-tông
+  c.fillStyle="#555b63";rr(c,cx-wcy/2+1,gtop-16,wcy-2,16,2);c.fill();c.stroke();
+  c.fillStyle=ink;c.fillRect(cx-3,gtop-60,6,46);
+  c.fillStyle="#d9482b";rr(c,cx-12,gtop-72,24,14,4);c.fill();
+  // thước đo
+  var tx=cx+wcy/2+8;
+  c.fillStyle="rgba(240,220,160,.65)";c.strokeStyle=muted;c.lineWidth=1;rr(c,tx,bot-5.2*sc,30,5.2*sc,2);c.fill();c.stroke();
+  c.fillStyle=ink;c.font="9px sans-serif";c.textAlign="left";
+  for(var i=0;i<=10;i++){var yy=bot-i*0.5*sc;c.beginPath();c.moveTo(tx,yy);c.lineTo(tx+(i%2===0?14:8),yy);c.stroke();if(i%2===0)c.fillText(i/2,tx+16,yy+3);}
+  txt(c,"cm³",tx+16,bot-5.2*sc-4,muted,"left","9px sans-serif");
+  // ống nối tới áp kế
+  var dcx=430,dcy=108,dr=66;
+  c.strokeStyle="#b9c2cc";c.lineWidth=4;c.beginPath();c.moveTo(cx+wcy/2,gtop-9);c.lineTo(cx+wcy/2+10,gtop-9);c.lineTo(cx+wcy/2+10,dcy+dr+28);c.lineTo(dcx,dcy+dr+28);c.lineTo(dcx,dcy+dr);c.stroke();
+  // áp kế (0-3,0 ×10^5 Pa)
+  c.fillStyle="rgba(255,255,255,.85)";c.strokeStyle=ink;c.lineWidth=2;c.beginPath();c.arc(dcx,dcy,dr,0,7);c.fill();c.stroke();
+  var a0=Math.PI*0.75,sw=Math.PI*1.5,pmax=3;
+  c.lineWidth=1;c.font="9px sans-serif";c.textAlign="center";c.fillStyle=ink;
+  for(i=0;i<=60;i++){
+    var an=a0+sw*i/60,major=(i%10===0),mid=(i%5===0);
+    var r1=dr-(major?12:mid?9:6);
+    c.strokeStyle=ink;c.beginPath();c.moveTo(dcx+Math.cos(an)*r1,dcy+Math.sin(an)*r1);c.lineTo(dcx+Math.cos(an)*(dr-3),dcy+Math.sin(an)*(dr-3));c.stroke();
+    if(major){c.fillText(fmt(i/20,1),dcx+Math.cos(an)*(dr-22),dcy+Math.sin(an)*(dr-22)+3);}
+  }
+  txt(c,"10⁵ Pa",dcx,dcy+26,muted,"center","10px sans-serif");
+  var pt=pTrue(E.V),fp=clamp(pt/pmax,0,1),ap=a0+sw*fp;
+  c.strokeStyle=ink;c.lineWidth=2.6;c.beginPath();c.moveTo(dcx,dcy);c.lineTo(dcx+Math.cos(ap)*(dr-8),dcy+Math.sin(ap)*(dr-8));c.stroke();
+  c.fillStyle=hot;c.beginPath();c.arc(dcx,dcy,4,0,7);c.fill();
+  if(pt>pmax)txt(c,"Vượt thang đo!",dcx,dcy-dr-8,hot,"center","bold 11px sans-serif");
+  // số chú thích (1)-(5)
+  function tag(n,x,y){c.fillStyle="#fff";c.strokeStyle=ink;c.lineWidth=1;c.beginPath();c.arc(x,y,8,0,7);c.fill();c.stroke();txt(c,String(n),x,y+4,ink,"center","bold 11px sans-serif");}
+  tag(1,cx-34,bot-60);tag(2,cx-34,gtop-8);tag(3,dcx+dr+14,dcy);tag(4,rx+22,70);tag(5,tx+48,bot-40);
+  txt(c,"1: xi lanh  2: pit-tông  3: áp kế  4: giá đỡ  5: thước đo",10,16,muted,"left","11px sans-serif");
+  txt(c,"Nhiệt độ khí giữ không đổi: T = "+fmt(P.T,0)+" K",W-10,H-8,ink,"right","bold 11px sans-serif");
+  // vạch đọc
+  c.setLineDash([3,3]);c.strokeStyle=hot;c.lineWidth=1;c.beginPath();c.moveTo(cx-40,gtop);c.lineTo(tx+30,gtop);c.stroke();c.setLineDash([]);
+}
+function drawExpGraph(){
+  var mode=$("grSel").value,m=meanK(),Cf=(m!==null&&on("chCurve"))?m:null;
+  var pts=rows.map(function(r){return {V:r.V,p:r.p};});
+  var ax,c=cg,i,x,y;
+  var Cref=Cf!==null?Cf:CC;
+  if(mode==="pv"){
+    var ymax=Math.max(3.2,Math.ceil(Cref/1.3*10)/10);
+    ax=axes(c,{W:640,H:260,L:60,R:622,T:26,B:218,x0:0,x1:6,y0:0,y1:ymax,xs:1,ys:niceStep(ymax,6),xl:"V (cm³)",yl:"p (10⁵ Pa)"});
+    if(Cf!==null){c.strokeStyle=css("--accent");c.lineWidth=2;c.beginPath();var f=true;for(x=0.5;x<=6;x+=0.05){y=Cf/x;if(y>ymax)continue;if(f){c.moveTo(ax.X(x),ax.Y(y));f=false;}else c.lineTo(ax.X(x),ax.Y(y));}c.stroke();}
+    pts.forEach(function(p){c.fillStyle=css("--hot");c.beginPath();c.arc(ax.X(p.V),ax.Y(p.p),5,0,7);c.fill();});
+  } else if(mode==="pi"){
+    ax=axes(c,{W:640,H:260,L:60,R:622,T:26,B:218,x0:0,x1:0.8,y0:0,y1:Math.max(3.2,Math.ceil(Cref*0.8*1.1*10)/10),xs:0.1,ys:0.5,xl:"1/V (cm⁻³)",yl:"p (10⁵ Pa)"});
+    if(Cf!==null){c.strokeStyle=css("--accent");c.lineWidth=2;c.beginPath();c.moveTo(ax.X(0),ax.Y(0));c.lineTo(ax.X(0.8),ax.Y(Cf*0.8));c.stroke();}
+    pts.forEach(function(p){c.fillStyle=css("--hot");c.beginPath();c.arc(ax.X(1/p.V),ax.Y(p.p),5,0,7);c.fill();});
+    txt(c,"Các điểm nằm gần một đường thẳng đi qua gốc toạ độ",622,18,css("--ink"),"right","bold 11px sans-serif");
+  } else {
+    var top=Math.max(4,Math.ceil(Cref*1.6));
+    ax=axes(c,{W:640,H:260,L:60,R:622,T:26,B:218,x0:0,x1:6,y0:0,y1:top,xs:1,ys:niceStep(top,6),xl:"V (cm³)",yl:"p·V (10⁵ Pa·cm³)"});
+    if(Cf!==null){c.setLineDash([5,4]);c.strokeStyle=css("--accent");c.lineWidth=2;c.beginPath();c.moveTo(ax.X(0),ax.Y(Cf));c.lineTo(ax.X(6),ax.Y(Cf));c.stroke();c.setLineDash([]);}
+    pts.forEach(function(p){c.fillStyle=css("--hot");c.beginPath();c.arc(ax.X(p.V),ax.Y(p.p*p.V),5,0,7);c.fill();});
+    txt(c,"p·V gần như không đổi khi V thay đổi",622,18,css("--ink"),"right","bold 11px sans-serif");
+  }
+  if(on("chHide")&&mode!=="pv")txt(c,"(đang ở chế độ tự tính)",62,18,css("--muted"),"left","11px sans-serif");
+}
+function renderLab(){
+  var p=round05(pTrue(E.V));
+  $("vVe").textContent=fmt(E.V,1)+" cm³";
+  $("e_V").textContent=fmt(E.V,1)+" cm³";
+  $("e_p").textContent=fmt(p,2)+" ×10⁵ Pa";
+  $("e_pv").textContent=on("chHide")?"?":fmt(p*E.V,2);
+  $("e_T").textContent=fmt(P.T,0)+" K";
+}
+
+/* ======== TAB 3 ======== */
+var I={T1:270,T2:330,V:3};
+var cI=$("gIso").getContext("2d"),cIv=$("gInv").getContext("2d");
+function kOf(T){return 3.0*P.n*(T/300);}
+$("sT1").addEventListener("input",function(){I.T1=parseFloat($("sT1").value);if(I.T2<I.T1+10){I.T2=I.T1+10;$("sT2").value=I.T2;}});
+$("sT2").addEventListener("input",function(){I.T2=parseFloat($("sT2").value);if(I.T2<I.T1+10){I.T2=I.T1+10;$("sT2").value=I.T2;}});
+$("sVp").addEventListener("input",function(){I.V=parseFloat($("sVp").value);});
+function drawIso(){
+  var c=cI,k1=kOf(I.T1),k2=kOf(I.T2),ymax=Math.max(5,Math.ceil(k2/1.2*1.1));
+  var ax=axes(c,{W:640,H:280,L:60,R:622,T:26,B:236,x0:0,x1:7,y0:0,y1:ymax,xs:1,ys:niceStep(ymax,6),xl:"V (cm³)",yl:"p (10⁵ Pa)"});
+  function curve(k,col,lab){
+    c.strokeStyle=col;c.lineWidth=2.6;c.beginPath();var f=true,lastx=7,lasty=0;
+    for(var x=0.3;x<=7;x+=0.05){var y=k/x;if(y>ymax)continue;if(f){c.moveTo(ax.X(x),ax.Y(y));f=false;}else c.lineTo(ax.X(x),ax.Y(y));lastx=x;lasty=y;}
+    c.stroke();txt(c,lab,ax.X(6.9),ax.Y(k/6.9)-8,col,"right","bold 12px sans-serif");
+  }
+  curve(k1,css("--cold"),"T₁ = "+fmt(I.T1,0)+" K");curve(k2,css("--hot"),"T₂ = "+fmt(I.T2,0)+" K");
+  var p1=k1/I.V,p2=k2/I.V;
+  c.setLineDash([3,3]);c.strokeStyle=css("--muted");c.lineWidth=1;c.beginPath();c.moveTo(ax.X(I.V),ax.Y(0));c.lineTo(ax.X(I.V),ax.Y(Math.min(p2,ymax)));c.stroke();c.setLineDash([]);
+  [[p1,css("--cold")],[p2,css("--hot")]].forEach(function(q){if(q[0]<=ymax){c.fillStyle=q[1];c.beginPath();c.arc(ax.X(I.V),ax.Y(q[0]),5.5,0,7);c.fill();}});
+  txt(c,"Mỗi đường là một nhánh hypebol; đường ứng với T₂ lớn hơn nằm cao hơn",622,18,css("--ink"),"right","bold 11px sans-serif");
+  $("vT1").textContent=fmt(I.T1,0)+" K";$("vT2").textContent=fmt(I.T2,0)+" K";$("vVp").textContent=fmt(I.V,1)+" cm³";
+  $("i_p1").textContent=fmt(p1,2)+" ×10⁵ Pa";$("i_p2").textContent=fmt(p2,2)+" ×10⁵ Pa";
+  $("i_k1").textContent=fmt(p1*I.V,2);$("i_k2").textContent=fmt(p2*I.V,2);
+}
+function drawInv(){
+  var c=cIv,k1=kOf(I.T1),k2=kOf(I.T2),xm=0.7,ymax=Math.max(5,Math.ceil(k2*xm*1.1));
+  var ax=axes(c,{W:640,H:260,L:60,R:622,T:26,B:218,x0:0,x1:xm,y0:0,y1:ymax,xs:0.1,ys:niceStep(ymax,6),xl:"1/V (cm⁻³)",yl:"p (10⁵ Pa)"});
+  [[k1,css("--cold"),"T₁"],[k2,css("--hot"),"T₂"]].forEach(function(q){
+    c.strokeStyle=q[1];c.lineWidth=2.6;c.beginPath();c.moveTo(ax.X(0),ax.Y(0));c.lineTo(ax.X(xm),ax.Y(Math.min(q[0]*xm,ymax)));c.stroke();
+    txt(c,q[2],ax.X(xm)-6,ax.Y(q[0]*xm)+14,q[1],"right","bold 12px sans-serif");
+    c.fillStyle=q[1];c.beginPath();c.arc(ax.X(1/I.V),ax.Y(q[0]/I.V),5,0,7);c.fill();
+  });
+  txt(c,"Đồ thị p theo 1/V: đường thẳng đi qua gốc toạ độ",622,18,css("--ink"),"right","bold 11px sans-serif");
+}
+
+/* bài tập */
+var EX={p1:1,V1:10,p2:1.25,ans:8};
+function showEx(){
+  $("exStmt").className="result";
+  $("exStmt").innerHTML="Một lượng khí có thể tích là <b>"+fmt(EX.V1,0)+" lít</b> ở áp suất <b>"+fmt(EX.p1,2)+" × 10⁵ Pa</b>. Tính thể tích của lượng khí này ở áp suất <b>"+fmt(EX.p2,2)+" × 10⁵ Pa</b>. Biết nhiệt độ của khí không đổi.";
+  $("in_ex").value="";$("exRes").style.display="none";
+}
+$("exSgk").addEventListener("click",function(){EX={p1:1,V1:10,p2:1.25,ans:8};showEx();});
+$("exNew").addEventListener("click",function(){
+  var p1=[1,1.2,1.5,2][Math.floor(Math.random()*4)],V1=[6,8,10,12,15,20][Math.floor(Math.random()*6)],f=[1.25,1.5,2,0.8,0.5][Math.floor(Math.random()*5)];
+  var p2=Math.round(p1*f*100)/100;
+  EX={p1:p1,V1:V1,p2:p2,ans:p1*V1/p2};showEx();
+});
+$("exCheck").addEventListener("click",function(){
+  var v=parseFloat($("in_ex").value.replace(",","."));var el=$("exRes");el.style.display="";
+  if(isNaN(v)){el.className="result";el.textContent="Hãy nhập V₂ (lít).";return;}
+  var ok=Math.abs(v-EX.ans)<=0.02*EX.ans;
+  el.className="result "+(ok?"done":"");
+  el.innerHTML=ok?"<b class='good'>Đúng.</b> V₂ = "+fmt(EX.ans,2)+" L.":"<b class='bad'>Chưa đúng.</b> Gợi ý: nhiệt độ không đổi nên p₁V₁ = p₂V₂, suy ra V₂ = p₁V₁ / p₂.";
+});
+$("exSol").addEventListener("click",function(){
+  var el=$("exRes");el.style.display="";el.className="result done";
+  el.innerHTML="<ol class='steps'><li>Xác định quá trình: nhiệt độ không đổi nên đây là <b>quá trình đẳng nhiệt</b>.</li>"+
+  "<li>Xác định các trạng thái: trạng thái 1: p₁ = "+fmt(EX.p1,2)+" × 10⁵ Pa, V₁ = "+fmt(EX.V1,0)+" L; trạng thái 2: p₂ = "+fmt(EX.p2,2)+" × 10⁵ Pa, V₂ = ?</li>"+
+  "<li>Áp dụng định luật Boyle p₁V₁ = p₂V₂, suy ra V₂ = p₁V₁ / p₂ = "+fmt(EX.p1,2)+" · "+fmt(EX.V1,0)+" / "+fmt(EX.p2,2)+" = <b>"+fmt(EX.ans,2)+" L</b>.</li></ol>";
+});
+
+/* ======== TAB 4: quiz ======== */
+var QZ=[
+  {q:"Một lượng khí đựng trong bình kín được xác định bởi những đại lượng nào?",
+   o:["Chỉ thể tích và áp suất","Khối lượng, thể tích, nhiệt độ và áp suất","Chỉ nhiệt độ và áp suất","Khối lượng và màu sắc của khí"],a:1,
+   w:"Bốn đại lượng: khối lượng m, thể tích V, nhiệt độ T và áp suất p."},
+  {q:"Đơn vị trong hệ SI của áp suất, thể tích và nhiệt độ lần lượt là",
+   o:["atm, lít, °C","Pa, m³, K","N, cm³, °C","bar, mL, K"],a:1,
+   w:"p đo bằng pascal (Pa), V bằng mét khối (m³), T bằng kelvin (K)."},
+  {q:"Quá trình đẳng nhiệt là quá trình biến đổi trạng thái của một khối lượng khí xác định khi",
+   o:["Áp suất không đổi","Thể tích không đổi","Nhiệt độ không đổi","Cả ba thông số đều không đổi"],a:2,
+   w:"Đẳng nhiệt nghĩa là nhiệt độ giữ không đổi, còn p và V thay đổi."},
+  {q:"Nội dung định luật Boyle là:",
+   o:["Ở nhiệt độ không đổi, áp suất khí tỉ lệ thuận với thể tích","Ở nhiệt độ không đổi, áp suất khí tỉ lệ nghịch với thể tích","Ở thể tích không đổi, áp suất tỉ lệ nghịch với nhiệt độ","Áp suất khí luôn không đổi"],a:1,
+   w:"Khi nhiệt độ của một khối lượng khí xác định không đổi thì p tỉ lệ nghịch với V, tức p·V = hằng số."},
+  {q:"Đồ thị biểu diễn p theo V trong quá trình đẳng nhiệt có dạng",
+   o:["Đường thẳng đi qua gốc toạ độ","Một nhánh của đường hypebol","Đường thẳng song song trục V","Một đường tròn"],a:1,
+   w:"Đồ thị p theo V là một nhánh của đường hypebol (đường đẳng nhiệt)."},
+  {q:"Hai đường đẳng nhiệt của cùng một lượng khí ứng với T₁ < T₂. Đường nào nằm cao hơn trên đồ thị p – V?",
+   o:["Đường ứng với T₁","Đường ứng với T₂","Hai đường trùng nhau","Phụ thuộc vào cách chọn trục"],a:1,
+   w:"Nhiệt độ cao hơn thì với cùng V, áp suất lớn hơn nên đường T₂ nằm cao hơn."},
+  {q:"Vẽ đồ thị p theo 1/V trong quá trình đẳng nhiệt thì được",
+   o:["Một nhánh hypebol","Đường thẳng đi qua gốc toạ độ","Đường parabol","Đường thẳng không đi qua gốc toạ độ"],a:1,
+   w:"p = hằng số · (1/V), tức p tỉ lệ thuận với 1/V nên đồ thị là đường thẳng qua gốc toạ độ."},
+  {q:"Một lượng khí có thể tích 6 L ở áp suất 2·10⁵ Pa. Nén đẳng nhiệt đến áp suất 3·10⁵ Pa thì thể tích là",
+   o:["9 L","4 L","3 L","12 L"],a:1,
+   w:"V₂ = p₁V₁ / p₂ = (2·6) / 3 = 4 L."},
+  {q:"Vì sao nói áp suất chất khí là áp suất trung bình của các phân tử tác dụng lên thành bình?",
+   o:["Vì số va chạm và vận tốc của các phân tử thay đổi theo thời gian, nên áp suất ở các thời điểm khác nhau có thể khác nhau","Vì chỉ có một phân tử va chạm vào thành bình","Vì phân tử khí đứng yên","Vì áp suất luôn bằng áp suất khí quyển"],a:0,
+   w:"Các phân tử khí chuyển động hỗn loạn nên áp suất tức thời thay đổi, ta dùng giá trị trung bình."}
+];
+var qDone={};
+function renderQuiz(){
+  var box=$("qz");box.innerHTML="";qDone={};
+  QZ.forEach(function(it,qi){
+    var d=document.createElement("div");d.className="q";
+    var p=document.createElement("p");p.textContent=(qi+1)+". "+it.q;d.appendChild(p);
+    var fb=document.createElement("div");
+    it.o.forEach(function(op,oi){
+      var lab=document.createElement("label");lab.className="opt";
+      var r=document.createElement("input");r.type="radio";r.name="q"+qi;
+      r.addEventListener("change",function(){
+        qDone[qi]=(oi===it.a);
+        fb.className="fb "+(oi===it.a?"ok":"no");
+        fb.textContent=(oi===it.a?"Đúng. ":"Chưa đúng. ")+it.w;
+        updScore();
+      });
+      var s=document.createElement("span");s.textContent=op;
+      lab.appendChild(r);lab.appendChild(s);d.appendChild(lab);
+    });
+    d.appendChild(fb);box.appendChild(d);
+  });
+  updScore();
+}
+function updScore(){
+  var ok=0,done=0;Object.keys(qDone).forEach(function(k){done++;if(qDone[k])ok++;});
+  $("qzScore").textContent="Đã trả lời "+done+"/"+QZ.length+" · đúng "+ok;
+}
+$("qzReset").addEventListener("click",renderQuiz);
+
+/* ======== vòng lặp ======== */
+function loop(ts){
+  if(lastTs===null)lastTs=ts;
+  var dt=Math.min(.05,(ts-lastTs)/1000);lastTs=ts;AT+=dt;
+  if(S.tab===0){
+    $("vT").textContent=fmt(B.T,0)+" K ("+fmt(B.T-273.15,0)+" °C)";$("vV").textContent=fmt(B.V,1)+" L";
+    $("o_T").textContent=fmt(B.T,0)+" K";$("o_V").textContent=fmt(B.V,1)+" L";$("o_p").textContent=fmtP(pB(B));
+    drawBox(dt);drawBall();
+  } else if(S.tab===1){renderLab();drawLab();drawExpGraph();}
+  else if(S.tab===2){drawIso();drawInv();}
+  requestAnimationFrame(loop);
+}
+updProc();renderRows();showEx();renderQuiz();
+requestAnimationFrame(loop);
+
+})();
+</script>
+</body>
+</html>

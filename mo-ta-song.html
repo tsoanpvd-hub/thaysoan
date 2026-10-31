@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mô tả sóng (Bài 8 – Vật lí 11) – Thầy Soạn-STK</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#eef3f4; --panel:#ffffff; --ink:#14292f; --muted:#5a7077; --line:#cfdcdf;
+  --accent:#0b6e7f; --accent-ink:#ffffff; --hot:#d9482b; --cold:#2467c9; --ice:#1b93b8; --ok:#1d8a4e; --warn:#b36b00;
+  --grid:#dbe6e8; --canvas:#f8fbfb; --good-bg:#e4f4ea; --info-bg:#e6f1f4;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1b1f; --panel:#17272c; --ink:#e6f0f2; --muted:#94aab0; --line:#2b4148;
+    --accent:#3fb6cb; --accent-ink:#06222a; --hot:#ff7a59; --cold:#6aa3ff; --ice:#7fdcf2; --ok:#5fd08d; --warn:#f0b455;
+    --grid:#233a41; --canvas:#122227; --good-bg:#153324; --info-bg:#173039;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1b1f; --panel:#17272c; --ink:#e6f0f2; --muted:#94aab0; --line:#2b4148;
+  --accent:#3fb6cb; --accent-ink:#06222a; --hot:#ff7a59; --cold:#6aa3ff; --ice:#7fdcf2; --ok:#5fd08d; --warn:#f0b455;
+  --grid:#233a41; --canvas:#122227; --good-bg:#153324; --info-bg:#173039;
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:"Be Vietnam Pro","Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;line-height:1.5;font-size:15px}
+header{padding:16px 20px 6px;max-width:1280px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:10px}
+h1{margin:0;font-size:24px;font-weight:700;letter-spacing:-.01em}
+.brand{color:var(--accent)}
+header p{margin:2px 0 0;color:var(--muted);font-size:14px}
+header p.back{margin:0 0 6px;font-size:13.5px}
+header p.back a{color:var(--accent);text-decoration:none;font-weight:600}
+header p.who{font-weight:600;color:var(--ink)}
+.themebtn{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:6px 10px;cursor:pointer;font:inherit;font-size:13px}
+main{max-width:1280px;margin:0 auto;padding:12px 20px 30px;display:grid;grid-template-columns:minmax(0,1fr) 350px;gap:16px}
+@media (max-width:960px){main{grid-template-columns:1fr}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}
+.panel h2{margin:0 0 10px;font-size:15px;font-weight:700}
+canvas{width:100%;height:auto;display:block;border-radius:8px;background:var(--canvas);border:1px solid var(--line)}
+.stack{display:flex;flex-direction:column;gap:16px;min-width:0}
+.btnrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;align-items:center}
+button.pri{background:var(--accent);color:var(--accent-ink);border:0;border-radius:8px;padding:10px 16px;font:inherit;font-weight:600;cursor:pointer}
+button.sec{background:transparent;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:10px 14px;font:inherit;cursor:pointer}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.status{margin-left:auto;font-size:13px;color:var(--muted)}
+.field{display:grid;grid-template-columns:1fr auto;gap:2px 8px;align-items:center;margin-bottom:10px}
+.field label{font-size:13.5px}
+.field .num{display:flex;align-items:center;gap:4px}
+.field input[type=number],select{width:84px;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:4px 6px;font:inherit;text-align:right}
+select{width:100%;text-align:left}
+.field .u{color:var(--muted);font-size:12.5px;min-width:30px}
+.field input[type=range]{grid-column:1 / -1;width:100%;accent-color:var(--accent)}
+.grp{font-size:13px;font-weight:700;color:var(--accent);margin:14px 0 8px;padding-top:10px;border-top:1px dashed var(--line)}
+.grp:first-child{border-top:0;margin-top:0;padding-top:0}
+.chk{display:flex;gap:8px;align-items:center;font-size:13.5px;margin:6px 0}
+.result{background:var(--info-bg);border-radius:10px;padding:12px 14px;font-size:14px}
+.result.done{background:var(--good-bg)}
+.result .big{font-size:21px;font-weight:700}
+.result .eq{font-family:"Cambria Math","Latin Modern Math",Georgia,serif;font-size:15px;margin:6px 0;overflow-x:auto;white-space:nowrap}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:10px}
+.ro{border:1px solid var(--line);border-radius:8px;padding:6px 10px}
+.ro span{display:block;font-size:12px;color:var(--muted)}
+.ro b{font-size:18px;font-variant-numeric:tabular-nums}
+.ro.h b{color:var(--hot)} .ro.c b{color:var(--cold)} .ro.i b{color:var(--ice)}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}
+th,td{border-bottom:1px solid var(--line);padding:5px 8px;text-align:right;white-space:nowrap}
+th{color:var(--muted);font-weight:600}
+th:first-child,td:first-child{text-align:left}
+details{margin-top:4px}
+summary{cursor:pointer;font-weight:600;font-size:14px}
+details ol,details ul{margin:8px 0 0;padding-left:20px;font-size:14px}
+details li{margin-bottom:4px}
+footer{text-align:center;color:var(--muted);font-size:13px;padding:0 20px 24px}
+
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.tab{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:10px;padding:9px 14px;font:inherit;font-weight:600;cursor:pointer;font-size:14px}
+.tab[aria-selected="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.prog{display:flex;align-items:center;gap:10px;margin-top:10px;font-size:13.5px}
+.prog input{flex:1;accent-color:var(--accent)}
+.note{font-size:14px;margin:0 0 8px}
+.note b{color:var(--accent)}
+.q{margin-bottom:16px;padding-bottom:12px;border-bottom:1px dashed var(--line)}
+.q p{margin:0 0 6px;font-weight:600;font-size:14.5px}
+.opt{display:flex;gap:8px;align-items:flex-start;margin:4px 0;font-size:14px;cursor:pointer}
+.opt input{margin-top:4px}
+.fb{margin-top:6px;font-size:13.5px;padding:6px 10px;border-radius:8px}
+.fb.ok{background:var(--good-bg);color:var(--ok)}
+.fb.no{background:var(--info-bg);color:var(--warn)}
+.chal{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:10px 0}
+.chal label{font-size:13px;color:var(--muted);display:block}
+.chal input{width:100%;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:6px 8px;font:inherit}
+.bad{color:var(--warn)} .good{color:var(--ok)}
+ul.tight{margin:6px 0 0;padding-left:20px;font-size:14px} ul.tight li{margin-bottom:4px}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <p class="back"><a href="https://claude.ai/artifact/JiPRaSUaFAmceEk8cdMj7P" target="_blank" rel="noopener">← Về trang Học Vật Lý cùng Thầy Soạn-STK</a></p>
+    <h1>Mô tả sóng (Bài 8 – Vật lí 11) <span class="brand">· Thầy Soạn-STK</span></h1>
+    <p>Thí nghiệm tạo sóng mặt nước, đồ thị li độ – toạ độ, đo biên độ, bước sóng, chu kì, tốc độ truyền sóng và giải thích sự tạo thành sóng.</p>
+    <p class="who">Thầy Đàng Năng Soạn · Trường THPT Phạm Văn Đồng – Phước Hậu · Vật lí THPT</p>
+  </div>
+  <button class="themebtn" id="themeBtn" type="button">Đổi sáng/tối</button>
+</header>
+<main>
+  <div class="stack">
+    <section class="panel">
+      <div class="tabs" role="tablist">
+        <button class="tab" id="tb_t1" role="tab" aria-selected="true" type="button">1. Thí nghiệm tạo sóng mặt nước</button>
+        <button class="tab" id="tb_t2" role="tab" aria-selected="false" type="button">2. Giải thích sự tạo thành sóng</button>
+        <button class="tab" id="tb_t3" role="tab" aria-selected="false" type="button">3. Ôn tập và thử thách đo</button>
+      </div>
+    </section>
+
+    <!-- ===== TAB 1 ===== -->
+    <div id="p_t1" class="stack">
+      <section class="panel">
+        <h2>Kênh tạo sóng (mô phỏng Hình 8.1)</h2>
+        <canvas id="scene1" width="1280" height="600" aria-label="Kênh tạo sóng mặt nước"></canvas>
+        <div class="btnrow">
+          <button class="pri" id="play1" type="button">Bắt đầu tạo sóng</button>
+          <button class="sec" id="reset1" type="button">Về lúc đầu</button>
+          <label style="font-size:13.5px">Tốc độ
+            <select id="sp1" style="width:auto"><option value="0.25">0,25×</option><option value="0.5">0,5×</option><option value="1" selected>1×</option><option value="2">2×</option></select>
+          </label>
+          <span class="status" id="status1"></span>
+        </div>
+        <div class="prog"><label for="prog1">Thời gian</label><input type="range" id="prog1" min="0" max="1000" value="0"><b id="progTxt1" style="min-width:64px;text-align:right">0 s</b></div>
+        <div class="readouts" style="margin-top:12px">
+          <div class="ro"><span>Thời gian t</span><b id="r_t">0 s</b></div>
+          <div class="ro v"><span>Bước sóng λ = v·T</span><b id="r_l">–</b></div>
+          <div class="ro"><span>Tần số f = 1/T</span><b id="r_f">–</b></div>
+          <div class="ro h"><span>Li độ miếng xốp C</span><b id="r_u">0 cm</b></div>
+          <div class="ro"><span>Vị trí ngang của C</span><b id="r_x">–</b></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Đồ thị li độ – toạ độ (u – x) tại thời điểm t (Hình 8.2)</h2>
+        <canvas id="g82" width="1280" height="520" aria-label="Đồ thị u theo x"></canvas>
+        <div style="font-size:13px;color:var(--muted);margin-top:6px">Giống một bức ảnh chụp mặt nước tại thời điểm t. Dừng hoặc kéo thanh thời gian để đo.</div>
+      </section>
+
+      <section class="panel">
+        <h2>Đồ thị li độ – thời gian (u – t) của miếng xốp C</h2>
+        <canvas id="gT" width="1280" height="520" aria-label="Đồ thị u theo t của miếng xốp C"></canvas>
+      </section>
+
+      <section class="panel">
+        <h2>Kết quả quan sát</h2>
+        <ul class="tight">
+          <li>Nhìn qua thành kênh, mặt cắt của nước có dạng hình sin.</li>
+          <li>Miếng xốp C chỉ dao động lên xuống tại chỗ. Cái lan truyền ra xa là sự biến dạng của mặt nước, nhờ đó ta thấy hình ảnh sóng.</li>
+          <li><b>O</b> là nguồn sóng, <b>nước</b> là môi trường truyền sóng, <b>đường thẳng OC</b> là phương truyền sóng.</li>
+          <li>Đồ thị sóng có dạng hình sin như ở đồ thị u – x phía trên.</li>
+        </ul>
+        <h2 style="margin-top:14px">Đề xuất cách đo các đại lượng đặc trưng</h2>
+        <ul class="tight">
+          <li><b>Biên độ sóng A:</b> khoảng cách từ trục x đến ngọn sóng trên đồ thị u – x.</li>
+          <li><b>Bước sóng λ:</b> khoảng cách giữa hai ngọn sóng liên tiếp.</li>
+          <li><b>Chu kì T:</b> thời gian giữa hai lần liên tiếp miếng xốp lên tới vị trí cao nhất (đồ thị u – t).</li>
+          <li><b>Tốc độ truyền sóng v:</b> quãng đường đỉnh sóng đi được chia thời gian, hoặc v = λ / T.</li>
+        </ul>
+      </section>
+    </div>
+
+    <!-- ===== TAB 2 ===== -->
+    <div id="p_t2" class="stack" style="display:none">
+      <section class="panel">
+        <h2>Truyền dao động giữa các phần tử môi trường (mô phỏng Hình 8.3)</h2>
+        <canvas id="chain" width="1280" height="520" aria-label="Các phần tử môi trường dao động lần lượt"></canvas>
+        <div class="btnrow">
+          <button class="pri" id="play2" type="button">Bắt đầu</button>
+          <button class="sec" id="reset2" type="button">Về lúc đầu</button>
+          <span style="font-size:13.5px;color:var(--muted)">Nhảy tới:</span>
+          <button class="sec" id="fa" type="button">a) T/4</button>
+          <button class="sec" id="fb" type="button">b) T/2</button>
+          <button class="sec" id="fc" type="button">c) 3T/4</button>
+          <button class="sec" id="fd" type="button">d) T</button>
+          <label style="font-size:13.5px">Tốc độ
+            <select id="sp2" style="width:auto"><option value="0.25">0,25×</option><option value="0.5" selected>0,5×</option><option value="1">1×</option></select>
+          </label>
+        </div>
+        <div class="prog"><label for="prog2">Thời gian</label><input type="range" id="prog2" min="0" max="1000" value="0"><b id="progTxt2" style="min-width:90px;text-align:right">0 s</b></div>
+        <div class="result" id="stateTxt" style="margin-top:10px"></div>
+      </section>
+
+      <section class="panel">
+        <h2>Các thời điểm T/4, T/2, 3T/4, T (Hình 8.3)</h2>
+        <canvas id="snap" width="1280" height="1040" aria-label="Bốn thời điểm truyền sóng trên dây"></canvas>
+        <div style="font-size:13px;color:var(--muted);margin-top:6px">Mũi tên đỏ là vận tốc dao động của phần tử tại O, M, N, P. Khoảng cách giữa các điểm liên tiếp là λ/4.</div>
+      </section>
+
+      <section class="panel">
+        <h2>Giải thích sự tạo thành sóng</h2>
+        <ul class="tight">
+          <li>Các phần tử nước sát nguồn O dao động theo phương thẳng đứng.</li>
+          <li>Nhờ có <b>lực liên kết</b> giữa các phần tử nước, các phần tử ở M lân cận O dao động theo. Đến lượt các phần tử ở N lân cận M dao động. Ta nói có sự <b>truyền dao động</b> từ điểm này sang điểm khác, tạo nên sóng mặt nước.</li>
+          <li>Như vậy có hai nguyên nhân tạo nên sóng truyền trong một môi trường: <b>nguồn dao động</b> từ bên ngoài tác dụng lên môi trường tại O, và <b>lực liên kết</b> giữa các phần tử của môi trường.</li>
+          <li>Các phần tử môi trường chỉ dao động trong một phạm vi không gian rất hẹp quanh vị trí cân bằng, trong khi sóng truyền đi rất xa.</li>
+        </ul>
+        <div class="result" style="margin-top:10px">
+          <b>Câu hỏi:</b> Quan sát chuyển động của miếng xốp trong thí nghiệm Hình 8.1, miếng xốp có chuyển động ra xa nguồn cùng với sóng không?
+          <div style="margin-top:6px"><button class="sec" id="ans1" type="button">Xem gợi ý</button></div>
+          <div id="ans1txt" style="margin-top:6px;display:none"><b>Không.</b> Miếng xốp chỉ dao động lên xuống quanh vị trí cân bằng của nó. Chỉ có dạng sóng (trạng thái dao động) truyền đi.</div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ===== TAB 3 ===== -->
+    <div id="p_t3" class="stack" style="display:none">
+      <section class="panel">
+        <h2>Câu hỏi ôn tập</h2>
+        <div id="qz"></div>
+        <div class="btnrow"><button class="sec" id="qzReset" type="button">Làm lại</button><span class="status" id="qzScore"></span></div>
+      </section>
+
+      <section class="panel">
+        <h2>Thử thách đo: đọc đồ thị để tìm các đại lượng đặc trưng của sóng</h2>
+        <p class="note">Hai đồ thị dưới đây thuộc cùng một sóng có thông số ẩn. Hãy đọc A, λ, T trên đồ thị, tính v = λ / T rồi bấm “Kiểm tra”.</p>
+        <canvas id="chX" width="1280" height="520" aria-label="Đồ thị u theo x cần đo"></canvas>
+        <div style="height:10px"></div>
+        <canvas id="chT" width="1280" height="520" aria-label="Đồ thị u theo t cần đo"></canvas>
+        <div class="chal">
+          <div><label for="in_cA">Biên độ A (cm)</label><input id="in_cA" type="number" step="0.1" inputmode="decimal"></div>
+          <div><label for="in_cL">Bước sóng λ (cm)</label><input id="in_cL" type="number" step="0.1" inputmode="decimal"></div>
+          <div><label for="in_cT">Chu kì T (s)</label><input id="in_cT" type="number" step="0.01" inputmode="decimal"></div>
+          <div><label for="in_cV">Tốc độ truyền sóng v (cm/s)</label><input id="in_cV" type="number" step="0.1" inputmode="decimal"></div>
+        </div>
+        <div class="btnrow"><button class="pri" id="chCheck" type="button">Kiểm tra</button><button class="sec" id="chNew" type="button">Đề mới</button></div>
+        <div class="result" id="chRes" style="margin-top:10px">Cho phép sai lệch khoảng 8%.</div>
+      </section>
+    </div>
+  </div>
+
+  <div class="stack">
+    <section class="panel">
+      <h2>Số liệu thí nghiệm (đổi để giảng dạy)</h2>
+      <div id="controls"></div>
+      <div class="grp">Hiển thị</div>
+      <label class="chk"><input type="checkbox" id="chLab" checked> Ghi chú trên đồ thị u – x (ngọn sóng, lõm sóng, λ, A)</label>
+      <label class="chk"><input type="checkbox" id="chCrest" checked> Đánh dấu một đỉnh sóng đang lan truyền</label>
+      <label class="chk"><input type="checkbox" id="chSpr" checked> Hiện lực liên kết giữa các phần tử (lò xo)</label>
+      <label class="chk"><input type="checkbox" id="chVel" checked> Hiện vectơ vận tốc của O, M, N, P</label>
+      <label class="chk"><input type="checkbox" id="chFree"> Chế độ đo: ẩn giá trị λ, f (để học sinh tự đo)</label>
+    </section>
+    <section class="panel">
+      <h2>Ghi nhớ</h2>
+      <div class="result">
+        <div class="eq">λ = v · T = v / f</div>
+        <div style="font-size:13.5px">Sóng là sự lan truyền dao động trong môi trường. Phần tử môi trường dao động tại chỗ, còn dạng sóng truyền đi với tốc độ v. Sau mỗi chu kì T, dạng sóng truyền thêm một bước sóng λ.</div>
+      </div>
+      <details><summary>Gợi ý các bước lên lớp</summary><ol>
+        <li>Cho học sinh quan sát tab 1, mô tả chuyển động của miếng xốp C và của dạng mặt nước.</li>
+        <li>Dừng hình, dùng đồ thị u – x để đo A và λ, dùng đồ thị u – t để đo T, rồi tính v.</li>
+        <li>Sang tab 2, kéo thanh thời gian: quan sát dao động truyền lần lượt từ O đến M, N, P.</li>
+        <li>Làm câu hỏi ôn tập và thử thách đo ở tab 3.</li>
+      </ol></details>
+      <details><summary>Câu hỏi thảo luận</summary><ul>
+        <li>Tăng T thì λ thay đổi thế nào khi v không đổi?</li>
+        <li>Tăng biên độ A có làm đổi tốc độ truyền sóng không?</li>
+        <li>Khi sóng đến C, miếng xốp bắt đầu dao động từ lúc nào so với nguồn O?</li>
+        <li>Vì sao nói sóng không mang theo các phần tử môi trường?</li>
+      </ul></details>
+    </section>
+  </div>
+</main>
+<footer>Ứng dụng mô phỏng do thầy Đàng Năng Soạn biên soạn · Trường THPT Phạm Văn Đồng – Phước Hậu · Vật lí THPT</footer>
+<script>
+(function(){
+"use strict";
+
+function $(id){return document.getElementById(id);}
+function fmt(x,d){if(d===undefined)d=1;return Number(x).toFixed(d).replace(".",",");}
+function css(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();}
+function clamp(x,a,b){return Math.max(a,Math.min(b,x));}
+function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();}
+function decs(step){return (String(step).split(".")[1]||"").length;}
+
+function buildControls(box,SPEC,P,onChange){
+  SPEC.forEach(function(s){
+    if(s.grp){var g=document.createElement("div");g.className="grp";g.textContent=s.grp;box.appendChild(g);return;}
+    var f=document.createElement("div");f.className="field";
+    var lb=document.createElement("label");lb.textContent=s.label;lb.setAttribute("for","in_"+s.id);f.appendChild(lb);
+    if(s.type==="select"){
+      var sel=document.createElement("select");sel.id="in_"+s.id;
+      s.options.forEach(function(o){var op=document.createElement("option");op.value=o;op.textContent=o;sel.appendChild(op);});
+      sel.value=P[s.id];
+      sel.addEventListener("change",function(){P[s.id]=sel.value;onChange(s.id);});
+      f.style.gridTemplateColumns="1fr";f.appendChild(sel);
+    } else {
+      var w=document.createElement("div");w.className="num";
+      var n=document.createElement("input");n.type="number";n.id="in_"+s.id;n.min=s.min;n.max=s.max;n.step=s.step;n.value=P[s.id];
+      var u=document.createElement("span");u.className="u";u.textContent=s.unit;
+      w.appendChild(n);w.appendChild(u);f.appendChild(w);
+      var r=document.createElement("input");r.type="range";r.id="rg_"+s.id;r.min=s.min;r.max=s.max;r.step=s.step;r.value=P[s.id];
+      r.setAttribute("aria-label",s.label);f.appendChild(r);
+      var apply=function(v){
+        v=parseFloat(v);if(isNaN(v))return;
+        v=clamp(v,s.min,s.max);v=Number(v.toFixed(decs(s.step)+1));
+        P[s.id]=v;onChange(s.id);
+      };
+      n.addEventListener("change",function(){apply(n.value);});
+      r.addEventListener("input",function(){apply(r.value);});
+    }
+    box.appendChild(f);
+  });
+  return function(){
+    SPEC.forEach(function(s){
+      if(!s.id)return;
+      var a=$("in_"+s.id),b=$("rg_"+s.id);
+      if(s.type==="select"){a.value=P[s.id];return;}
+      if(document.activeElement!==a)a.value=P[s.id];
+      if(b)b.value=P[s.id];
+    });
+  };
+}
+
+/* Vẽ đồ thị: o={xmin,xmax,xstep,ymin,ymax,ystep,xlabel,ylabel,series:[{pts,color,label,tail}],hlines:[{y,color,label}]} */
+function plot(c,W,H,o){
+  c.setTransform(2,0,0,2,0,0);c.clearRect(0,0,W,H);
+  var ink=css("--ink"),muted=css("--muted"),grid=css("--grid");
+  c.fillStyle=css("--canvas");c.fillRect(0,0,W,H);
+  var L=54,R=W-16,T=16,B=H-36;
+  function X(v){return L+(R-L)*(v-o.xmin)/(o.xmax-o.xmin);}
+  function Y(v){return B-(B-T)*(v-o.ymin)/(o.ymax-o.ymin);}
+  c.strokeStyle=grid;c.lineWidth=.7;c.fillStyle=muted;c.font="11px sans-serif";c.textAlign="right";
+  for(var v=o.ymin;v<=o.ymax+1e-9;v+=o.ystep){c.beginPath();c.moveTo(L,Y(v));c.lineTo(R,Y(v));c.stroke();c.fillText(Math.round(v*10)/10,L-6,Y(v)+4);}
+  c.textAlign="center";
+  for(var x=o.xmin;x<=o.xmax+1e-9;x+=o.xstep){c.beginPath();c.moveTo(X(x),T);c.lineTo(X(x),B);c.stroke();c.fillText(Math.round(x*100)/100,X(x),B+14);}
+  c.strokeStyle=ink;c.lineWidth=1.2;c.beginPath();c.moveTo(L,T);c.lineTo(L,B);c.lineTo(R,B);c.stroke();
+  c.fillStyle=muted;c.fillText(o.xlabel,(L+R)/2,H-6);
+  c.save();c.translate(12,(T+B)/2);c.rotate(-Math.PI/2);c.fillText(o.ylabel,0,0);c.restore();
+  (o.hlines||[]).forEach(function(h){
+    if(h.y<o.ymin||h.y>o.ymax)return;
+    c.setLineDash([5,4]);c.strokeStyle=h.color;c.lineWidth=1.2;c.beginPath();c.moveTo(L,Y(h.y));c.lineTo(R,Y(h.y));c.stroke();c.setLineDash([]);
+    c.fillStyle=h.color;c.textAlign="right";c.font="11px sans-serif";c.fillText(h.label,R-4,Y(h.y)-5);
+  });
+  o.series.forEach(function(s){
+    if(!s.pts.length)return;
+    c.strokeStyle=s.color;c.lineWidth=2.2;c.beginPath();
+    s.pts.forEach(function(p,i){if(i===0)c.moveTo(X(p[0]),Y(p[1]));else c.lineTo(X(p[0]),Y(p[1]));});
+    if(s.tail)c.lineTo(X(s.tail[0]),Y(s.tail[1]));
+    c.stroke();
+    if(s.pts.length===1){c.fillStyle=s.color;c.beginPath();c.arc(X(s.pts[0][0]),Y(s.pts[0][1]),4,0,7);c.fill();}
+  });
+  c.textAlign="left";c.font="12px sans-serif";
+  var lx=L+10;
+  o.series.forEach(function(s){c.fillStyle=s.color;c.fillRect(lx,T+6,14,3);c.fillStyle=s.color;c.fillText(s.label,lx+20,T+11);lx+=26+s.label.length*6.6;});
+}
+
+$("themeBtn").addEventListener("click",function(){
+  var cur=document.documentElement.getAttribute("data-theme");
+  var dark=cur?cur==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;
+  document.documentElement.setAttribute("data-theme",dark?"light":"dark");
+});
+
+
+var P={A:2,T:1,v:20,xC:60};
+var LX=120;
+var SPEC=[
+  {grp:"Nguồn sóng O"},
+  {id:"A",label:"Biên độ dao động A",unit:"cm",min:0.5,max:5,step:0.1},
+  {id:"T",label:"Chu kì dao động T",unit:"s",min:0.6,max:3,step:0.1},
+  {grp:"Môi trường (nước)"},
+  {id:"v",label:"Tốc độ truyền sóng v",unit:"cm/s",min:10,max:40,step:1},
+  {id:"xC",label:"Vị trí miếng xốp C cách O",unit:"cm",min:10,max:110,step:1}
+];
+var sync=buildControls($("controls"),SPEC,P,function(){sync();resetAll();});
+
+function lam(){return P.v*P.T;}
+function om(){return 2*Math.PI/P.T;}
+function uAt(x,t){var tau=t-x/P.v;return tau<=0?0:P.A*Math.sin(om()*tau);}
+function vyAt(x,t){var tau=t-x/P.v;return tau<=0?0:P.A*om()*Math.cos(om()*tau);}
+function on(id){var e=$(id);return !!(e&&e.checked);}
+function niceStep(range,target){
+  var raw=range/target,mag=Math.pow(10,Math.floor(Math.log(raw)/Math.LN10)),nm=raw/mag;
+  return (nm<1.5?1:nm<3?2:nm<7?5:10)*mag;
+}
+function arrow(c,x1,y1,x2,y2,w,col){
+  var len=Math.hypot(x2-x1,y2-y1);if(len<3)return;
+  var ang=Math.atan2(y2-y1,x2-x1),hs=Math.min(len*0.6,5+w*1.5);
+  c.strokeStyle=col;c.fillStyle=col;c.lineWidth=w;c.lineCap="round";
+  c.beginPath();c.moveTo(x1,y1);c.lineTo(x2-Math.cos(ang)*hs*0.6,y2-Math.sin(ang)*hs*0.6);c.stroke();
+  c.beginPath();c.moveTo(x2,y2);c.lineTo(x2-hs*Math.cos(ang-0.42),y2-hs*Math.sin(ang-0.42));c.lineTo(x2-hs*Math.cos(ang+0.42),y2-hs*Math.sin(ang+0.42));c.closePath();c.fill();
+}
+function txt(c,s,x,y,col,al,font){c.fillStyle=col;c.textAlign=al||"left";c.font=font||"12px sans-serif";c.fillText(s,x,y);}
+function axes(c,o){
+  var ink=css("--ink"),muted=css("--muted"),grid=css("--grid");
+  c.setTransform(2,0,0,2,0,0);c.clearRect(0,0,o.W,o.H);c.fillStyle=css("--canvas");c.fillRect(0,0,o.W,o.H);
+  function X(v){return o.L+(o.R-o.L)*(v-o.x0)/(o.x1-o.x0);}
+  function Y(v){return o.B-(o.B-o.T)*(v-o.y0)/(o.y1-o.y0);}
+  var v;
+  c.lineWidth=.7;c.strokeStyle=grid;c.fillStyle=muted;c.font="10px sans-serif";c.textAlign="right";
+  for(v=Math.ceil(o.y0/o.ys-1e-9)*o.ys;v<=o.y1+1e-9;v+=o.ys){c.beginPath();c.moveTo(o.L,Y(v));c.lineTo(o.R,Y(v));c.stroke();c.fillText(Math.round(v*100)/100,o.L-5,Y(v)+3);}
+  c.textAlign="center";
+  for(v=Math.ceil(o.x0/o.xs-1e-9)*o.xs;v<=o.x1+1e-9;v+=o.xs){c.beginPath();c.moveTo(X(v),o.T);c.lineTo(X(v),o.B);c.stroke();c.fillText(Math.round(v*100)/100,X(v),o.B+13);}
+  c.strokeStyle=ink;c.lineWidth=1.4;
+  c.beginPath();c.moveTo(o.L,o.T-4);c.lineTo(o.L,o.B);c.stroke();
+  c.beginPath();c.moveTo(o.L,Y(0));c.lineTo(o.R+4,Y(0));c.stroke();
+  txt(c,o.yl,o.L+6,o.T-6,ink,"left","11px sans-serif");
+  txt(c,o.xl,o.R,Y(0)-6,ink,"right","11px sans-serif");
+  return {X:X,Y:Y};
+}
+
+/* ---------- trạng thái ---------- */
+var S={t1:0,p1:false,t2:0,p2:false,tab:0,hold:0};
+var AT=0,lastTs=null;
+function tEnd1(){return LX/P.v+3*P.T;}
+function resetAll(){S.t1=0;S.p1=false;S.t2=0;S.p2=false;$("play1").textContent="Bắt đầu tạo sóng";$("play2").textContent="Bắt đầu";}
+
+var tabIds=["t1","t2","t3"];
+function showTab(i){
+  S.tab=i;
+  tabIds.forEach(function(id,j){
+    $("p_"+id).style.display=(j===i)?"":"none";
+    $("tb_"+id).setAttribute("aria-selected",String(j===i));
+  });
+}
+tabIds.forEach(function(id,i){$("tb_"+id).addEventListener("click",function(){showTab(i);});});
+
+$("play1").addEventListener("click",function(){
+  if(S.p1){S.p1=false;}else{S.p1=true;}
+  $("play1").textContent=S.p1?"Tạm dừng":"Tiếp tục";
+});
+$("reset1").addEventListener("click",function(){S.t1=0;S.p1=false;$("play1").textContent="Bắt đầu tạo sóng";});
+$("prog1").addEventListener("input",function(){S.p1=false;S.t1=$("prog1").value/1000*tEnd1();$("play1").textContent="Tiếp tục";});
+
+$("play2").addEventListener("click",function(){
+  if(S.p2){S.p2=false;}else{if(S.t2>=2*P.T-1e-6)S.t2=0;S.p2=true;}
+  $("play2").textContent=S.p2?"Tạm dừng":"Tiếp tục";
+});
+$("reset2").addEventListener("click",function(){S.t2=0;S.p2=false;$("play2").textContent="Bắt đầu";});
+$("prog2").addEventListener("input",function(){S.p2=false;S.t2=$("prog2").value/1000*2*P.T;$("play2").textContent="Tiếp tục";});
+[["fa",1],["fb",2],["fc",3],["fd",4]].forEach(function(p){
+  $(p[0]).addEventListener("click",function(){S.p2=false;S.t2=p[1]*P.T/4;$("play2").textContent="Tiếp tục";});
+});
+$("ans1").addEventListener("click",function(){$("ans1txt").style.display="";});
+
+/* ---------- TAB 1: kênh tạo sóng ---------- */
+var c1=$("scene1").getContext("2d"),c82=$("g82").getContext("2d"),cT=$("gT").getContext("2d");
+
+function drawScene1(){
+  var c=c1,W=640,H=300,px0=70,px1=622,y0=165,sy=12,bot=250;
+  c.setTransform(2,0,0,2,0,0);c.clearRect(0,0,W,H);
+  var ink=css("--ink"),muted=css("--muted"),acc=css("--accent"),hot=css("--hot"),cold=css("--cold");
+  c.fillStyle=css("--canvas");c.fillRect(0,0,W,H);
+  function X(x){return px0+x/LX*(px1-px0);}
+  var t=S.t1,A=P.A;
+  // nước
+  c.beginPath();c.moveTo(px0,bot);
+  for(var x=0;x<=LX+0.01;x+=1){c.lineTo(X(x),y0-uAt(x,t)*sy);}
+  c.lineTo(px1,bot);c.closePath();
+  c.fillStyle="hsla(205,75%,58%,.62)";c.fill();
+  c.beginPath();
+  for(x=0;x<=LX+0.01;x+=1){var yy=y0-uAt(x,t)*sy;if(x===0)c.moveTo(X(x),yy);else c.lineTo(X(x),yy);}
+  c.strokeStyle="hsl(205,80%,40%)";c.lineWidth=2;c.stroke();
+  // tấm chống phản xạ
+  c.fillStyle="rgba(120,130,140,.55)";c.beginPath();c.moveTo(px1-46,bot);c.lineTo(px1,bot);c.lineTo(px1,bot-34);c.closePath();c.fill();
+  txt(c,"Tấm chống phản xạ",px1-4,bot+28,muted,"right","11px sans-serif");
+  // kênh kính
+  c.strokeStyle=ink;c.lineWidth=2.2;c.beginPath();c.moveTo(px0-3,100);c.lineTo(px0-3,bot+3);c.lineTo(px1+2,bot+3);c.lineTo(px1+2,100);c.stroke();
+  // vạch chia
+  c.strokeStyle=muted;c.lineWidth=1;c.fillStyle=muted;c.font="10px sans-serif";c.textAlign="center";
+  var sx=niceStep(LX,8);
+  for(x=0;x<=LX+1e-6;x+=sx){c.beginPath();c.moveTo(X(x),bot+3);c.lineTo(X(x),bot+8);c.stroke();c.fillText(x,X(x),bot+19);}
+  txt(c,"cm",px1+2,bot+19,muted,"left","10px sans-serif");
+  // vật tạo sóng O + đĩa D
+  var uO=uAt(0,t),pyO=y0-uO*sy;
+  c.fillStyle=muted;c.strokeStyle=ink;c.lineWidth=1.4;rr(c,px0-20,pyO-20,17,40,3);c.fill();c.stroke();
+  var dcx=px0-46,dcy=46,dr=19,ph=om()*t;
+  c.fillStyle="rgba(150,160,170,.35)";c.beginPath();c.arc(dcx,dcy,dr,0,7);c.fill();c.stroke();
+  var pinx=dcx+10*Math.cos(ph-Math.PI/2),piny=dcy-10*Math.sin(ph);
+  c.fillStyle=ink;c.beginPath();c.arc(pinx,piny,3,0,7);c.fill();
+  c.lineWidth=2;c.beginPath();c.moveTo(pinx,piny);c.lineTo(px0-12,pyO-20);c.stroke();
+  txt(c,"Đĩa D",dcx,dcy-dr-6,ink,"center","11px sans-serif");
+  txt(c,"Vật tạo sóng O",px0-10,bot+36,ink,"center","11px sans-serif");
+  // đỉnh sóng đang lan truyền
+  if(on("chCrest")){
+    var xc=P.v*t-P.v*P.T/4;
+    if(xc>=0&&xc<=LX){
+      var cx=X(xc),cy=y0-A*sy-16;
+      c.fillStyle=hot;c.beginPath();c.moveTo(cx,cy+11);c.lineTo(cx-6,cy);c.lineTo(cx+6,cy);c.closePath();c.fill();
+      txt(c,"đỉnh sóng",cx,cy-4,hot,"center","10px sans-serif");
+    }
+  }
+  // miếng xốp C
+  var xcC=X(P.xC),uC=uAt(P.xC,t),yC=y0-uC*sy;
+  c.setLineDash([3,3]);c.strokeStyle=muted;c.lineWidth=1;c.beginPath();c.moveTo(xcC,y0-A*sy-6);c.lineTo(xcC,y0+A*sy+6);c.stroke();c.setLineDash([]);
+  c.fillStyle="#222";c.strokeStyle="#fff";c.lineWidth=1;c.beginPath();c.ellipse(xcC,yC-3,8,4,0,0,7);c.fill();c.stroke();
+  txt(c,"C",xcC+11,yC-6,ink,"left","bold 12px sans-serif");
+  txt(c,"Miếng xốp nhỏ",xcC,y0-A*sy-20,ink,"center","10px sans-serif");
+  // phương truyền sóng OC
+  arrow(c,X(0)+4,bot-12,xcC,bot-12,1.4,ink);
+  txt(c,"O",X(0)-2,bot-17,ink,"center","bold 12px sans-serif");
+  txt(c,"phương truyền sóng OC",(X(0)+xcC)/2,bot-18,ink,"center","11px sans-serif");
+  // đầu sóng
+  var fx=P.v*t;
+  if(fx<=LX&&t>0){c.setLineDash([2,4]);c.strokeStyle=cold;c.beginPath();c.moveTo(X(fx),y0-30);c.lineTo(X(fx),bot);c.stroke();c.setLineDash([]);txt(c,"đầu sóng",X(fx),y0-34,cold,"center","10px sans-serif");}
+  txt(c,"t = "+fmt(t,2)+" s",W-10,18,ink,"right","bold 12px sans-serif");
+  txt(c,"Nước: môi trường truyền sóng",W-10,34,muted,"right","11px sans-serif");
+}
+
+function drawG82(){
+  var c=c82,W=640,H=260,A=P.A,Ay=1.35*A,t=S.t1;
+  var o={W:W,H:H,L:60,R:622,T:26,B:218,x0:0,x1:LX,y0:-Ay,y1:Ay,xs:niceStep(LX,8),ys:niceStep(2*Ay,6),xl:"x (cm)",yl:"Li độ u (cm)"};
+  var ax=axes(c,o),X=ax.X,Y=ax.Y;
+  var ink=css("--ink"),acc=css("--accent"),hot=css("--hot"),muted=css("--muted");
+  c.strokeStyle=acc;c.lineWidth=2.6;c.beginPath();
+  for(var x=0;x<=LX+0.01;x+=0.5){var yy=Y(uAt(x,t));if(x===0)c.moveTo(X(x),yy);else c.lineTo(X(x),yy);}
+  c.stroke();
+  txt(c,"O",o.L-6,Y(0)+14,ink,"right","bold 12px sans-serif");
+  txt(c,"t = "+fmt(t,2)+" s",o.R,o.T-8,ink,"right","bold 12px sans-serif");
+  if(!on("chLab"))return;
+  var L=lam(),fx=P.v*t,xr=null,k;
+  for(k=0;k<400;k++){var xk=fx-P.v*P.T/4-k*L;if(xk<0)break;if(xk<=LX){xr=xk;break;}}
+  if(xr===null){txt(c,"Chờ sóng truyền tới...",(o.L+o.R)/2,Y(0)-30,muted,"center","12px sans-serif");return;}
+  var xl=xr-L,hasL=xl>=0;
+  if(hasL){
+    arrow(c,X(xr),Y(A),X(xl),Y(A),1.6,hot);arrow(c,X(xl),Y(A),X(xr),Y(A),1.6,hot);
+    txt(c,"Bước sóng λ",(X(xl)+X(xr))/2,Y(A)-8,hot,"center","bold 12px sans-serif");
+    txt(c,"Ngọn sóng",X(xl),Y(A)-8-14,ink,"center","11px sans-serif");
+  } else txt(c,"Ngọn sóng",X(xr),Y(A)-8,ink,"center","11px sans-serif");
+  arrow(c,X(xr)+6,Y(0),X(xr)+6,Y(A),1.6,hot);
+  txt(c,"Biên độ sóng A",X(xr)+12,(Y(0)+Y(A))/2+4,hot,"left","bold 11px sans-serif");
+  var xt=xr-L/2;
+  if(xt>=0)txt(c,"Lõm sóng",X(xt),Y(-A)+16,ink,"center","11px sans-serif");
+  arrow(c,o.R-130,o.B-6,o.R-40,o.B-6,1.6,ink);
+  txt(c,"Phương truyền sóng",o.R-135,o.B-10,ink,"right","11px sans-serif");
+}
+
+function drawGT(){
+  var c=cT,W=640,H=260,A=P.A,Ay=1.35*A,T=P.T,t=S.t1;
+  var t0=Math.max(0,t-4*T),t1=t0+5*T;
+  var o={W:W,H:H,L:60,R:622,T:26,B:218,x0:t0,x1:t1,y0:-Ay,y1:Ay,xs:niceStep(5*T,8),ys:niceStep(2*Ay,6),xl:"t (s)",yl:"Li độ u của C (cm)"};
+  var ax=axes(c,o),X=ax.X,Y=ax.Y;
+  var ink=css("--ink"),acc=css("--cold"),hot=css("--hot");
+  c.strokeStyle=acc;c.lineWidth=2.6;c.beginPath();
+  var first=true;
+  for(var tt=t0;tt<=t+1e-9;tt+=T/60){var yy=Y(uAt(P.xC,tt));if(first){c.moveTo(X(tt),yy);first=false;}else c.lineTo(X(tt),yy);}
+  c.stroke();
+  c.fillStyle=hot;c.beginPath();c.arc(X(t),Y(uAt(P.xC,t)),5,0,7);c.fill();
+  var ton=P.xC/P.v;
+  if(t>=ton)txt(c,"C bắt đầu dao động lúc t = "+fmt(ton,2)+" s",o.L+8,o.T+10,ink,"left","11px sans-serif");
+  else txt(c,"Sóng chưa tới C (tới lúc t = "+fmt(ton,2)+" s)",o.L+8,o.T+10,ink,"left","11px sans-serif");
+  if(on("chLab")){
+    var peaks=[],k;
+    for(k=0;k<200;k++){var pk=ton+T/4+k*T;if(pk>t)break;if(pk>=t0)peaks.push(pk);}
+    if(peaks.length>=2){
+      var a=peaks[peaks.length-2],b=peaks[peaks.length-1];
+      arrow(c,X(a),Y(A)-0,X(b),Y(A),1.6,hot);arrow(c,X(b),Y(A),X(a),Y(A),1.6,hot);
+      txt(c,"Chu kì T",(X(a)+X(b))/2,Y(A)-8,hot,"center","bold 12px sans-serif");
+    }
+  }
+}
+
+function renderRead1(){
+  var t=S.t1,L=lam(),free=on("chFree");
+  $("r_t").textContent=fmt(t,2)+" s";
+  $("r_l").textContent=free?"?":fmt(L,1)+" cm";
+  $("r_f").textContent=free?"?":fmt(1/P.T,2)+" Hz";
+  $("r_u").textContent=fmt(uAt(P.xC,t),2)+" cm";
+  $("r_x").textContent=fmt(P.xC,0)+" cm (không đổi)";
+  $("prog1").value=Math.round(clamp(t/tEnd1(),0,1)*1000);
+  $("progTxt1").textContent=fmt(t,2)+" s";
+  $("status1").textContent=S.p1?"Đang tạo sóng":t>0?"Tạm dừng":"Sẵn sàng";
+}
+
+/* ---------- TAB 2: chuỗi phần tử ---------- */
+var c2=$("chain").getContext("2d"),cS=$("snap").getContext("2d");
+function drawChain(){
+  var c=c2,W=640,H=260,ox=64,right=620,y0=128;
+  c.setTransform(2,0,0,2,0,0);c.clearRect(0,0,W,H);
+  var ink=css("--ink"),muted=css("--muted"),acc=css("--accent"),hot=css("--hot");
+  c.fillStyle=css("--canvas");c.fillRect(0,0,W,H);
+  var L=lam(),Wx=2*L,sxp=(right-ox)/Wx,sy=Math.min(12,52/P.A),t=S.t2,n=32,dx=Wx/n;
+  function X(x){return ox+x*sxp;}
+  // vị trí cân bằng
+  c.strokeStyle=css("--grid");c.lineWidth=1;c.beginPath();c.moveTo(ox-20,y0);c.lineTo(right+6,y0);c.stroke();
+  // vạch O, M, N, P
+  var marks=[["O",0],["M",L/4],["N",L/2],["P",3*L/4]];
+  marks.forEach(function(m){
+    c.setLineDash([3,4]);c.strokeStyle=muted;c.lineWidth=1;c.beginPath();c.moveTo(X(m[1]),34);c.lineTo(X(m[1]),H-30);c.stroke();c.setLineDash([]);
+    txt(c,m[0],X(m[1]),26,ink,"center","bold 13px sans-serif");
+  });
+  arrow(c,X(0),H-16,X(L/4),H-16,1.2,muted);arrow(c,X(L/4),H-16,X(0),H-16,1.2,muted);
+  txt(c,"λ/4",X(L/8),H-20,muted,"center","10px sans-serif");
+  arrow(c,X(L/4),H-16,X(L/2),H-16,1.2,muted);arrow(c,X(L/2),H-16,X(L/4),H-16,1.2,muted);
+  txt(c,"λ/4",X(3*L/8),H-20,muted,"center","10px sans-serif");
+  // đầu sóng
+  var fx=P.v*t;
+  if(t>0&&fx<=Wx){c.setLineDash([2,3]);c.strokeStyle=hot;c.lineWidth=1.3;c.beginPath();c.moveTo(X(fx),40);c.lineTo(X(fx),H-30);c.stroke();c.setLineDash([]);txt(c,"x = v·t",X(fx),H-34,hot,"center","bold 11px sans-serif");}
+  // lò xo
+  var spr=on("chSpr"),i,xi,yi,prev=null;
+  for(i=0;i<=n;i++){
+    xi=i*dx;yi=y0-uAt(xi,t)*sy;
+    if(prev){c.strokeStyle=spr?acc:muted;c.lineWidth=spr?2:1;c.globalAlpha=spr?0.75:0.5;c.beginPath();c.moveTo(prev[0],prev[1]);c.lineTo(X(xi),yi);c.stroke();c.globalAlpha=1;}
+    prev=[X(xi),yi];
+  }
+  // phần tử
+  for(i=0;i<=n;i++){
+    xi=i*dx;yi=y0-uAt(xi,t)*sy;
+    var reached=(t-xi/P.v)>0||(i===0&&t>0);
+    c.fillStyle=reached?acc:muted;c.strokeStyle=ink;c.lineWidth=1;
+    c.beginPath();c.arc(X(xi),yi,4.2,0,7);c.fill();c.stroke();
+  }
+  // vectơ vận tốc
+  if(on("chVel")){
+    var vmax=P.A*om();
+    marks.forEach(function(m){
+      var vy=vyAt(m[1],t);if(Math.abs(vy)<0.04*vmax)return;
+      var len=vy/vmax*34,py=y0-uAt(m[1],t)*sy;
+      arrow(c,X(m[1]),py,X(m[1]),py-len,2,hot);
+    });
+  }
+  // nguồn
+  c.fillStyle=muted;c.strokeStyle=ink;c.lineWidth=1.3;rr(c,ox-24,y0-uAt(0,t)*sy-9,16,18,3);c.fill();c.stroke();
+  txt(c,"Nguồn dao động",ox-32,H-44,ink,"left","10px sans-serif");
+  txt(c,"t = "+fmt(t,2)+" s  (T = "+fmt(P.T,1)+" s)",W-10,16,ink,"right","bold 12px sans-serif");
+  txt(c,"Chấm xanh: phần tử đã dao động; chấm xám: chưa có dao động truyền tới",10,16,muted,"left","10px sans-serif");
+}
+function drawSnap(){
+  var c=cS,W=640,H=520,ox=80,right=612,rowH=130;
+  c.setTransform(2,0,0,2,0,0);c.clearRect(0,0,W,H);
+  var ink=css("--ink"),muted=css("--muted"),acc=css("--accent"),hot=css("--hot");
+  c.fillStyle=css("--canvas");c.fillRect(0,0,W,H);
+  var L=lam(),xm=1.25*L,sxp=(right-ox)/xm,sy=Math.min(10,34/P.A),k,i;
+  function X(x){return ox+x*sxp;}
+  var letters=["a)","b)","c)","d)"],names=["T/4","T/2","3T/4","T"];
+  var marks=[["O",0],["M",L/4],["N",L/2],["P",3*L/4]];
+  for(k=0;k<4;k++){
+    var t=(k+1)*P.T/4,top=k*rowH,y0=top+76;
+    if(Math.abs(S.t2-t)<P.T/40){c.strokeStyle=acc;c.lineWidth=2;c.strokeRect(6,top+4,W-12,rowH-8);}
+    c.strokeStyle=css("--line");c.lineWidth=1;if(k>0){c.beginPath();c.moveTo(0,top);c.lineTo(W,top);c.stroke();}
+    txt(c,letters[k],14,top+22,ink,"left","bold 14px sans-serif");
+    txt(c,"t = "+names[k],14,top+40,muted,"left","11px sans-serif");
+    c.strokeStyle=muted;c.lineWidth=1;c.beginPath();c.moveTo(ox-10,y0);c.lineTo(right+4,y0);c.stroke();
+    marks.forEach(function(m){
+      c.setLineDash([3,4]);c.beginPath();c.moveTo(X(m[1]),top+14);c.lineTo(X(m[1]),top+rowH-14);c.stroke();c.setLineDash([]);
+      txt(c,m[0],X(m[1]),y0+16,ink,"center","bold 12px sans-serif");
+    });
+    c.strokeStyle=acc;c.lineWidth=2.6;c.beginPath();
+    var fx=P.v*t,first=true;
+    for(var x=0;x<=Math.min(fx,xm)+1e-9;x+=xm/200){var yy=y0-uAt(x,t)*sy;if(first){c.moveTo(X(x),yy);first=false;}else c.lineTo(X(x),yy);}
+    c.stroke();
+    if(on("chVel")){
+      var vmax=P.A*om();
+      marks.forEach(function(m){
+        if(m[1]>fx+1e-9)return;
+        var vy=vyAt(m[1],t);if(Math.abs(vy)<0.05*vmax)return;
+        var py=y0-uAt(m[1],t)*sy;arrow(c,X(m[1]),py,X(m[1]),py-vy/vmax*30,2,hot);
+      });
+    }
+    arrow(c,right-90,top+22,right-36,top+22,2,ink);txt(c,"v",right-30,top+26,ink,"left","italic 13px sans-serif");
+    if(fx<=xm){txt(c,"x = v·t",X(fx),top+rowH-6,hot,"center","bold 11px sans-serif");}
+    if(k===1){arrow(c,X(0),top+rowH-20,X(L/4),top+rowH-20,1.2,muted);arrow(c,X(L/4),top+rowH-20,X(0),top+rowH-20,1.2,muted);arrow(c,X(L/4),top+rowH-20,X(L/2),top+rowH-20,1.2,muted);arrow(c,X(L/2),top+rowH-20,X(L/4),top+rowH-20,1.2,muted);txt(c,"λ/4",X(L/8),top+rowH-24,muted,"center","10px sans-serif");txt(c,"λ/4",X(3*L/8),top+rowH-24,muted,"center","10px sans-serif");}
+    if(k===3){arrow(c,X(0),top+rowH-20,X(L),top+rowH-20,1.4,ink);arrow(c,X(L),top+rowH-20,X(0),top+rowH-20,1.4,ink);txt(c,"λ",X(L/2),top+rowH-24,ink,"center","bold 12px sans-serif");}
+  }
+}
+function renderState2(){
+  var t=S.t2,L=lam(),names=["O","M","N","P"],pos=[0,L/4,L/2,3*L/4],reached=[];
+  pos.forEach(function(p,i){if((i===0&&t>0)||t-p/P.v>0)reached.push(names[i]);});
+  var el=$("stateTxt");
+  el.className="result";
+  el.innerHTML="<b>t = "+fmt(t,2)+" s = "+fmt(t/P.T,2)+" T.</b> Dao động đã truyền tới: "+(reached.length?reached.join(", "):"chưa có điểm nào")+". Đầu sóng cách O: "+fmt(Math.min(P.v*t,99999),1)+" cm ("+fmt(P.v*t/L,2)+" λ). Mỗi phần tử chỉ dao động lên xuống quanh vị trí cân bằng.";
+  $("prog2").value=Math.round(clamp(t/(2*P.T),0,1)*1000);
+  $("progTxt2").textContent=fmt(t,2)+" s";
+}
+
+/* ---------- TAB 3: câu hỏi ---------- */
+var QZ=[
+  {q:"Trong thí nghiệm tạo sóng mặt nước, miếng xốp nhỏ C chuyển động như thế nào khi sóng truyền qua?",
+   o:["Chuyển động ra xa nguồn cùng với sóng","Dao động lên xuống tại chỗ quanh vị trí cân bằng","Đứng yên hoàn toàn","Chuyển động tròn quanh nguồn O"],a:1,
+   w:"Miếng xốp chỉ dao động tại chỗ. Cái truyền đi là dạng sóng (trạng thái dao động)."},
+  {q:"Trong thí nghiệm ở Hình 8.1, đâu là nguồn sóng, môi trường truyền sóng và phương truyền sóng?",
+   o:["Nguồn: nước; môi trường: vật tạo sóng O; phương: thẳng đứng","Nguồn: vật tạo sóng O; môi trường: nước; phương: đường thẳng OC","Nguồn: miếng xốp C; môi trường: nước; phương: đường thẳng OC","Nguồn: đĩa D; môi trường: không khí; phương: nằm ngang"],a:1,
+   w:"O là nguồn sóng, nước là môi trường truyền sóng, đường thẳng OC là phương truyền sóng."},
+  {q:"Có mấy nguyên nhân tạo nên sóng truyền trong một môi trường?",
+   o:["Một: chỉ cần nguồn dao động","Một: chỉ cần lực liên kết giữa các phần tử","Hai: nguồn dao động bên ngoài và lực liên kết giữa các phần tử môi trường","Ba: nguồn, môi trường và người quan sát"],a:2,
+   w:"Cần nguồn dao động tác dụng lên môi trường tại O và lực liên kết giữa các phần tử của môi trường."},
+  {q:"Trên đồ thị li độ – toạ độ (u – x) của một sóng hình sin, bước sóng λ là khoảng cách giữa",
+   o:["Hai ngọn sóng liên tiếp","Ngọn sóng và trục x","Nguồn O và miếng xốp C","Một ngọn sóng và một lõm sóng liên tiếp"],a:0,
+   w:"Bước sóng λ là khoảng cách giữa hai ngọn sóng liên tiếp (cũng bằng khoảng cách giữa hai lõm sóng liên tiếp)."},
+  {q:"Ở mốc t = T/4 (hình a, Hình 8.3), dao động của nguồn O đã truyền tới điểm nào?",
+   o:["Điểm M, cách O một khoảng λ/4","Điểm N, cách O một khoảng λ/2","Điểm P, cách O một khoảng 3λ/4","Chưa truyền tới điểm nào"],a:0,
+   w:"Sau T/4 sóng truyền được quãng đường v·T/4 = λ/4, tức là tới M."},
+  {q:"Điều nào đúng về các phần tử môi trường khi sóng truyền đi rất xa?",
+   o:["Chúng bị cuốn đi xa theo sóng","Chúng chỉ dao động trong một phạm vi không gian rất hẹp quanh vị trí cân bằng","Chúng đứng yên, chỉ có nguồn dao động","Chúng chuyển động nhanh hơn sóng"],a:1,
+   w:"Phần tử môi trường chỉ dao động tại chỗ, còn sóng truyền đi rất xa."}
+];
+var qDone={};
+function renderQuiz(){
+  var box=$("qz");box.innerHTML="";qDone={};
+  QZ.forEach(function(it,qi){
+    var d=document.createElement("div");d.className="q";
+    var p=document.createElement("p");p.textContent=(qi+1)+". "+it.q;d.appendChild(p);
+    var fb=document.createElement("div");
+    it.o.forEach(function(op,oi){
+      var lab=document.createElement("label");lab.className="opt";
+      var r=document.createElement("input");r.type="radio";r.name="q"+qi;
+      r.addEventListener("change",function(){
+        qDone[qi]=(oi===it.a);
+        fb.className="fb "+(oi===it.a?"ok":"no");
+        fb.textContent=(oi===it.a?"Đúng. ":"Chưa đúng. ")+it.w;
+        updScore();
+      });
+      var s=document.createElement("span");s.textContent=op;
+      lab.appendChild(r);lab.appendChild(s);d.appendChild(lab);
+    });
+    d.appendChild(fb);box.appendChild(d);
+  });
+  updScore();
+}
+function updScore(){
+  var ok=0,done=0;Object.keys(qDone).forEach(function(k){done++;if(qDone[k])ok++;});
+  $("qzScore").textContent="Đã trả lời "+done+"/"+QZ.length+" · đúng "+ok;
+}
+$("qzReset").addEventListener("click",renderQuiz);
+
+/* ---------- TAB 3: thử thách đo ---------- */
+var cX=$("chX").getContext("2d"),cTT=$("chT").getContext("2d"),CH=null;
+function pick(a){return a[Math.floor(Math.random()*a.length)];}
+function newChallenge(){
+  var prev=CH;
+  do{CH={A:pick([1,1.5,2,2.5,3]),T:pick([0.8,1,1.2,1.5,2]),v:pick([12,15,20,24,30])};}while(prev&&prev.A===CH.A&&prev.T===CH.T&&prev.v===CH.v);
+  ["in_cA","in_cL","in_cT","in_cV"].forEach(function(id){$(id).value="";});
+  $("chRes").className="result";$("chRes").textContent="Cho phép sai lệch khoảng 8%.";
+  drawChallenge();
+}
+function chU(x,t){var tau=t-x/CH.v;return tau<=0?0:CH.A*Math.sin(2*Math.PI*tau/CH.T);}
+function drawChallenge(){
+  if(!CH)return;
+  var L=CH.v*CH.T,Wx=3*L,A=CH.A,Ay=1.4*A,tc=3*CH.T+0.37*CH.T;
+  var ax=axes(cX,{W:640,H:260,L:60,R:622,T:26,B:218,x0:0,x1:Wx,y0:-Ay,y1:Ay,xs:niceStep(Wx,10),ys:niceStep(2*Ay,8),xl:"x (cm)",yl:"Li độ u (cm)"});
+  cX.strokeStyle=css("--accent");cX.lineWidth=2.6;cX.beginPath();
+  for(var x=0;x<=Wx+1e-9;x+=Wx/300){var yy=ax.Y(chU(x,tc));if(x===0)cX.moveTo(ax.X(x),yy);else cX.lineTo(ax.X(x),yy);}
+  cX.stroke();
+  txt(cX,"Đồ thị u – x tại một thời điểm",622,18,css("--ink"),"right","bold 11px sans-serif");
+  var xC=0.5*L,tw=4.5*CH.T;
+  var ay=axes(cTT,{W:640,H:260,L:60,R:622,T:26,B:218,x0:0,x1:tw,y0:-Ay,y1:Ay,xs:niceStep(tw,10),ys:niceStep(2*Ay,8),xl:"t (s)",yl:"Li độ u (cm)"});
+  cTT.strokeStyle=css("--cold");cTT.lineWidth=2.6;cTT.beginPath();
+  for(var tt=0;tt<=tw+1e-9;tt+=tw/300){var y2=ay.Y(chU(xC,tt));if(tt===0)cTT.moveTo(ay.X(tt),y2);else cTT.lineTo(ay.X(tt),y2);}
+  cTT.stroke();
+  txt(cTT,"Đồ thị u – t của một phần tử môi trường",622,18,css("--ink"),"right","bold 11px sans-serif");
+}
+$("chNew").addEventListener("click",newChallenge);
+$("chCheck").addEventListener("click",function(){
+  if(!CH)return;
+  var L=CH.v*CH.T,ans=[["A (cm)","in_cA",CH.A],["λ (cm)","in_cL",L],["T (s)","in_cT",CH.T],["v (cm/s)","in_cV",CH.v]];
+  var ok=0,h="";
+  ans.forEach(function(a){
+    var v=parseFloat($(a[1]).value.replace(",","."));
+    var good=!isNaN(v)&&Math.abs(v-a[2])<=0.08*a[2];
+    if(good)ok++;
+    h+='<div>'+a[0]+': '+(isNaN(v)?"chưa nhập":fmt(v,2))+' → <b class="'+(good?"good":"bad")+'">'+(good?"đạt":"chưa đạt")+'</b> (đáp án '+fmt(a[2],2)+')</div>';
+  });
+  h='<div><b>'+ok+'/4 đại lượng đạt.</b> '+(ok===4?"Rất tốt!":"Gợi ý: λ là khoảng cách giữa hai ngọn sóng trên đồ thị u – x, T là khoảng cách giữa hai ngọn trên đồ thị u – t, v = λ / T.")+'</div>'+h;
+  $("chRes").className=ok===4?"result done":"result";$("chRes").innerHTML=h;
+});
+
+/* ---------- vòng lặp ---------- */
+function loop(ts){
+  if(lastTs===null)lastTs=ts;
+  var dt=Math.min(.05,(ts-lastTs)/1000);lastTs=ts;AT+=dt;
+  if(S.p1){
+    S.t1+=dt*parseFloat($("sp1").value);
+    if(S.t1>tEnd1())S.t1-=2*P.T;
+  }
+  if(S.p2){
+    S.t2+=dt*parseFloat($("sp2").value);
+    if(S.t2>=2*P.T){S.t2=2*P.T;S.p2=false;$("play2").textContent="Chạy lại";}
+  }
+  if(S.tab===0){drawScene1();drawG82();drawGT();renderRead1();}
+  else if(S.tab===1){drawChain();drawSnap();renderState2();}
+  else{drawChallenge();}
+  requestAnimationFrame(loop);
+}
+renderQuiz();newChallenge();
+requestAnimationFrame(loop);
+
+})();
+</script>
+</body>
+</html>
