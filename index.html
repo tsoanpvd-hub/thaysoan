@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Học Vật Lý cùng Thầy Soạn-STK · Vật lí THPT · THPT Phạm Văn Đồng - Phước Hậu</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap">
+<style>
+:root{
+  --bg:#f3f6fb; --panel:#ffffff; --ink:#12213d; --muted:#586a8a; --line:#d5dded;
+  --brand:#1b3f8f; --brand-ink:#ffffff; --spark:#e8590c;
+  --app:#0b7a8a; --doc:#b7791f; --quiz:#6d4fc2;
+  --grid:rgba(27,63,143,.07); --chip:#e6ecf8; --focus:#1b3f8f;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0c1426; --panel:#142039; --ink:#e8eefb; --muted:#9db0d3; --line:#25365a;
+    --brand:#7fa6ff; --brand-ink:#0a1530; --spark:#ff8a4c;
+    --app:#4fd0e0; --doc:#f2bf5e; --quiz:#b49cff;
+    --grid:rgba(127,166,255,.08); --chip:#1c2c4d; --focus:#7fa6ff;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0c1426; --panel:#142039; --ink:#e8eefb; --muted:#9db0d3; --line:#25365a;
+  --brand:#7fa6ff; --brand-ink:#0a1530; --spark:#ff8a4c;
+  --app:#4fd0e0; --doc:#f2bf5e; --quiz:#b49cff;
+  --grid:rgba(127,166,255,.08); --chip:#1c2c4d; --focus:#7fa6ff;
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 64px);scroll-behavior:smooth}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:"Be Vietnam Pro","Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;line-height:1.6;font-size:16px}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--focus);outline-offset:3px;border-radius:6px}
+
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.top .in{max-width:1180px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:16px}
+.logo{font-weight:800;font-size:15px;text-decoration:none;letter-spacing:-.01em}
+.logo span{color:var(--spark)}
+.top nav{margin-left:auto;display:flex;gap:18px;align-items:center;font-size:14px}
+.top nav a{text-decoration:none;color:var(--muted);font-weight:500}
+.top nav a:hover{color:var(--ink)}
+.tbtn{border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:8px;padding:5px 10px;font:inherit;font-size:13px;cursor:pointer}
+@media (max-width:560px){.top nav a{display:none}}
+
+.hero{background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:28px 28px;border-bottom:1px solid var(--line)}
+.hero .in{max-width:1180px;margin:0 auto;padding:44px 20px 40px;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:32px;align-items:center}
+@media (max-width:860px){.hero .in{grid-template-columns:1fr;padding-top:28px}}
+h1{margin:0;font-size:clamp(34px,5.4vw,58px);line-height:1.08;font-weight:800;letter-spacing:-.025em}
+h1 .by{display:block;color:var(--brand);margin-top:6px}
+.teacher{margin:18px 0 0;font-weight:600;line-height:1.5;border-left:4px solid var(--spark);padding-left:12px}
+.lead{margin:14px 0 0;max-width:34em;color:var(--muted);font-size:17px}
+.cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
+.btn{display:inline-block;border-radius:10px;padding:12px 20px;font-weight:600;text-decoration:none;font-size:15px;border:1px solid transparent}
+.btn.p{background:var(--brand);color:var(--brand-ink)}
+.btn.s{border-color:var(--line);background:var(--panel)}
+.stats{display:flex;gap:26px;margin-top:28px;flex-wrap:wrap}
+.stats div{font-size:13px;color:var(--muted)}
+.stats b{display:block;font-size:24px;color:var(--ink);font-variant-numeric:tabular-nums}
+.stage{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px}
+.stage canvas{width:100%;height:auto;display:block}
+.stage figcaption{font-size:12.5px;color:var(--muted);padding:4px 6px 2px}
+.stage{margin:0}
+
+section.lib{max-width:1180px;margin:0 auto;padding:44px 20px 20px}
+h2{margin:0;font-size:28px;letter-spacing:-.015em;font-weight:800}
+.sub{margin:4px 0 20px;color:var(--muted)}
+.tools{display:flex;flex-direction:column;gap:12px;margin-bottom:18px}
+.search{position:relative;max-width:520px}
+.search input{width:100%;padding:12px 14px 12px 42px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font:inherit}
+.search svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chips .lbl{font-size:13px;color:var(--muted);margin-right:2px}
+.chip{border:1px solid var(--line);background:var(--chip);color:var(--ink);border-radius:999px;padding:5px 14px;font:inherit;font-size:14px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
+.count{font-size:14px;color:var(--muted);margin:0 0 12px}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-left:5px solid var(--c);border-radius:12px;padding:16px 16px 14px;display:flex;flex-direction:column;gap:8px;--c:var(--app)}
+.card.doc{--c:var(--doc)} .card.quiz{--c:var(--quiz)}
+.card .kind{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--c);font-weight:700}
+.card h3{margin:0;font-size:18px;line-height:1.3}
+.card p{margin:0;color:var(--muted);font-size:14.5px;flex:1}
+.meta{display:flex;flex-wrap:wrap;gap:6px;font-size:12.5px}
+.meta span{background:var(--chip);border-radius:6px;padding:2px 8px;color:var(--muted)}
+.card .go{margin-top:6px;align-self:flex-start;border-radius:8px;padding:8px 14px;font-weight:600;font-size:14px;text-decoration:none;background:var(--c);color:#fff}
+:root[data-theme="dark"] .card .go{color:#08121f}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .card .go{color:#08121f}}
+.card .soon{margin-top:6px;align-self:flex-start;font-size:13px;color:var(--muted);border:1px dashed var(--line);border-radius:8px;padding:7px 12px}
+.gsec{margin:6px 0 34px;scroll-margin-top:76px}
+.ghead{display:flex;align-items:center;gap:12px;padding:10px 0 12px;margin-bottom:10px;border-bottom:2px solid var(--brand)}
+.ghead h3{margin:0;font-size:26px;letter-spacing:-.01em}
+.ghead .gn{font-size:13.5px;color:var(--muted)}
+.ghead .badge{background:var(--brand);color:var(--brand-ink);border-radius:10px;padding:2px 12px;font-weight:800;font-size:22px}
+.topic{margin:18px 0 10px;font-size:15px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.empty{padding:34px 16px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:12px}
+
+.about{max-width:1180px;margin:0 auto;padding:30px 20px 10px}
+.about .box{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px;display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:20px}
+.about h3{margin:0 0 4px;font-size:16px}
+.about p{margin:0;color:var(--muted);font-size:14.5px}
+footer{max-width:1180px;margin:0 auto;padding:26px 20px 34px;color:var(--muted);font-size:13.5px;text-align:center}
+
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="in">
+    <a class="logo" href="#top">Học Vật Lý <span>cùng</span> Thầy Soạn-STK</a>
+    <nav aria-label="Điều hướng">
+      <a href="#lop-10">Lớp 10</a>
+      <a href="#lop-11">Lớp 11</a>
+      <a href="#lop-12">Lớp 12</a>
+      <a href="#thay">Giới thiệu</a>
+      <a href="#gioi-thieu">Cách học</a>
+      <button class="tbtn" id="theme" type="button">Sáng/Tối</button>
+    </nav>
+  </div>
+</header>
+
+<div class="hero" id="top">
+  <div class="in">
+    <div>
+      <h1>Học Vật Lý <span class="by">cùng Thầy Soạn-STK</span></h1>
+      <p class="teacher">Thầy Đàng Năng Soạn<br>Giáo viên Vật lí, Trường THPT Phạm Văn Đồng – Phước Hậu</p>
+      <p class="lead">Trang web dạy và học môn Vật lí THPT: mô phỏng thí nghiệm, tài liệu và bài tập cho lớp 10, 11, 12. Mở lên, thay số liệu, quan sát hiện tượng rồi tự rút ra quy luật.</p>
+      <div class="cta">
+        <a class="btn p" href="#kho">Vào kho học liệu</a>
+        <a class="btn s" href="#gioi-thieu">Cách học hiệu quả</a>
+      </div>
+      <div class="stats" aria-label="Thống kê">
+        <div><b id="nApp">0</b>app mô phỏng</div>
+        <div><b id="nDoc">0</b>tài liệu</div>
+        <div><b id="nQuiz">0</b>bài tập, đề</div>
+      </div>
+    </div>
+    <figure class="stage">
+      <canvas id="proj" width="1120" height="720" role="img" aria-label="Quỹ đạo ném xiên với các góc 30, 45, 60 và 75 độ"></canvas>
+      <figcaption>Ném xiên với cùng vận tốc đầu: các chấm cách nhau những khoảng thời gian bằng nhau. Tầm xa lớn nhất ở góc 45°.</figcaption>
+    </figure>
+  </div>
+</div>
+
+<section class="lib" id="kho" aria-labelledby="khoTitle">
+  <h2 id="khoTitle">Kho học liệu</h2>
+  <p class="sub">Học liệu được xếp theo từng lớp. Em chọn đúng lớp của mình, hoặc gõ từ khoá để tìm nhanh.</p>
+  <div class="tools">
+    <div class="search">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="q" type="search" placeholder="Tìm theo tên, chủ đề, từ khoá..." aria-label="Tìm học liệu" autocomplete="off">
+    </div>
+    <div class="chips" id="gradeChips" role="group" aria-label="Lọc theo lớp"></div>
+    <div class="chips" id="typeChips" role="group" aria-label="Lọc theo loại"></div>
+  </div>
+  <p class="count" id="count" aria-live="polite"></p>
+  <div id="byGrade"></div>
+</section>
+
+<section class="about" id="thay" aria-labelledby="thayTitle" style="padding-bottom:0">
+  <div class="box" style="grid-template-columns:1fr">
+    <div>
+      <h2 id="thayTitle" style="font-size:22px;margin-bottom:6px">Giới thiệu</h2>
+      <p style="font-size:15.5px;color:var(--ink)">Trang học liệu dành cho học sinh <b>Trường THPT Phạm Văn Đồng – Phước Hậu</b>, do thầy <b>Đàng Năng Soạn</b> biên soạn. Các app mô phỏng và tài liệu bám theo chương trình Vật lí THPT, giúp các em nhìn thấy hiện tượng, tự thay số liệu và hiểu bản chất thay vì chỉ học thuộc công thức.</p>
+    </div>
+  </div>
+</section>
+
+<section class="about" id="gioi-thieu" aria-labelledby="aboutTitle">
+  <h2 id="aboutTitle" style="margin-bottom:14px">Cách học hiệu quả với các app</h2>
+  <div class="box">
+    <div><h3>Dự đoán trước</h3><p>Trước khi bấm chạy, hãy đoán kết quả sẽ ra sao và ghi lại. Đoán sai cũng có ích vì bạn sẽ nhớ lâu hơn.</p></div>
+    <div><h3>Thay số liệu</h3><p>Đổi từng thông số một, giữ nguyên các thông số còn lại, rồi xem kết quả thay đổi thế nào.</p></div>
+    <div><h3>Tính lại bằng công thức</h3><p>Lấy số liệu trên màn hình, tự tính bằng công thức rồi so với app để kiểm tra mình hiểu đúng chưa.</p></div>
+    <div><h3>Hỏi thầy</h3><p>Chỗ nào chưa rõ, ghi lại hiện tượng và số liệu em đã thử để hỏi thầy trên lớp.</p></div>
+  </div>
+</section>
+
+<footer>Học Vật Lý cùng Thầy Soạn-STK<br>Thầy Đàng Năng Soạn · Trường THPT Phạm Văn Đồng – Phước Hậu · Vật lí THPT</footer>
+
+<script>
+/* =====================================================================
+   HƯỚNG DẪN THÊM BÀI (dành cho thầy)
+   Mỗi học liệu là một khối { ... } trong danh sách RESOURCES bên dưới.
+   - type   : "app" (mô phỏng) | "doc" (tài liệu) | "quiz" (bài tập, đề)
+   - grades : danh sách lớp, ví dụ [10] hoặc [10, 11]
+   - topic  : chủ đề, ví dụ "Cơ học", "Nhiệt học", "Điện học"...
+   - url    : đường dẫn tới app hoặc tài liệu (để "" nếu chưa có)
+   - status : "live" (đã có) | "soon" (sắp ra mắt, nút bị khoá)
+   Để thêm bài mới: sao chép một khối, sửa nội dung, nhớ có dấu phẩy.
+   ===================================================================== */
+var RESOURCES = [
+  {
+    title: "Thí nghiệm nhiệt dung riêng",
+    desc: "Thả vật nóng vào nhiệt lượng kế, đo nhiệt độ cân bằng rồi tính nhiệt dung riêng. Thay được khối lượng, nhiệt độ, chất liệu.",
+    type: "app", grades: [12], topic: "Vật lí nhiệt",
+    url: "https://claude.ai/artifact/SgU6vMmqc4TC3m17271BPy", status: "live"
+  },
+  {
+    title: "Thí nghiệm nhiệt nóng chảy riêng",
+    desc: "Thả nước đá vào nước nóng, quan sát đá tan trong khi nhiệt độ đá giữ 0 °C, rồi tính nhiệt nóng chảy riêng λ.",
+    type: "app", grades: [12], topic: "Vật lí nhiệt",
+    url: "https://claude.ai/artifact/Evr8XMyfxLMm55kaNJK6wb", status: "live"
+  },
+  {
+    title: "Thí nghiệm nhiệt hoá hơi riêng",
+    desc: "Đun sôi chất lỏng bằng bếp điện đặt trên cân, ghi điện năng và khối lượng hoá hơi để tính nhiệt hoá hơi riêng L.",
+    type: "app", grades: [12], topic: "Vật lí nhiệt",
+    url: "https://claude.ai/artifact/RYBy7tPviVrt6UuuF6GT7U", status: "live"
+  },
+  {
+    title: "Định luật I nhiệt động lực học",
+    desc: "Khí trong xilanh nhận nhiệt và nhận công. Quan sát quá trình đẳng tích, đẳng áp, đẳng nhiệt, đoạn nhiệt trên đồ thị p – V và kiểm tra ΔU = A + Q.",
+    type: "app", grades: [12], topic: "Vật lí nhiệt",
+    url: "https://claude.ai/artifact/1Dui7UtA3g5qDDT2fS5PbX", status: "live"
+  },
+  {
+    title: "Định luật Boyle (Bài 9 – Vật lí 12)",
+    desc: "Thông số trạng thái và quá trình, thí nghiệm đẳng nhiệt với xi lanh và áp kế, bảng số liệu, đồ thị p – V, p – 1/V, đường đẳng nhiệt và bài tập p₁V₁ = p₂V₂.",
+    type: "app", grades: [12], topic: "Khí lí tưởng",
+    url: "https://claude.ai/artifact/1JVMbmAh8VxUZ25d6SboAV", status: "live"
+  },
+  {
+    title: "Mô tả sóng (Bài 8 – Vật lí 11)",
+    desc: "Thí nghiệm tạo sóng mặt nước, đồ thị u – x và u – t, đo biên độ, bước sóng, chu kì, tốc độ truyền sóng; giải thích sự tạo thành sóng và câu hỏi ôn tập.",
+    type: "app", grades: [11], topic: "Sóng",
+    url: "https://claude.ai/artifact/LfjudZGy2UF32Xz36oZBZr", status: "live"
+  },
+  {
+    title: "Thí nghiệm ném ngang và tầm ném xa",
+    desc: "Ném vật theo phương ngang từ độ cao h. Phân tích hai chuyển động thành phần, so sánh với vật rơi tự do, tính thời gian rơi và tầm ném xa.",
+    type: "app", grades: [10], topic: "Cơ học",
+    url: "https://claude.ai/artifact/R8ThKxzzG9171NFQsoQivP", status: "live"
+  },
+  {
+    title: "Thí nghiệm ném xiên và tầm ném xa",
+    desc: "Thay góc ném, vận tốc đầu, độ cao và hành tinh. Xem quỹ đạo, độ cao cực đại, tầm xa, góc tối ưu và thử bắn trúng bia.",
+    type: "app", grades: [10], topic: "Cơ học",
+    url: "https://claude.ai/artifact/L7Y5sCkw3qjyMp2DVwzeLJ", status: "live"
+  },
+  {
+    title: "Tóm tắt công thức Cơ học 10",
+    desc: "Bảng công thức và những lỗi thường gặp trong chương động học và động lực học.",
+    type: "doc", grades: [10], topic: "Cơ học",
+    url: "", status: "soon"
+  },
+  {
+    title: "Bài tập cân bằng nhiệt có đáp án",
+    desc: "Các bài từ cơ bản đến nâng cao về phương trình cân bằng nhiệt, có hướng dẫn giải.",
+    type: "quiz", grades: [12], topic: "Vật lí nhiệt",
+    url: "", status: "soon"
+  }
+];
+/* ===================================================================== */
+
+var TYPES = {app:"Mô phỏng", doc:"Tài liệu", quiz:"Bài tập, đề"};
+var ICONS = {
+  app:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6M10 3v6L5 19a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-10V3"/></svg>',
+  doc:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>',
+  quiz:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg>'
+};
+var CTA = {app:"Mở app", doc:"Xem tài liệu", quiz:"Làm bài"};
+
+(function(){
+"use strict";
+function $(id){return document.getElementById(id);}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+function norm(s){return String(s).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/đ/g,"d");}
+function safeUrl(u){ return /^https?:\/\//i.test(u) ? u : ""; }
+
+var state = {q:"", grade:"all", type:"all"};
+
+/* thống kê */
+["app","doc","quiz"].forEach(function(t){
+  var n = RESOURCES.filter(function(r){return r.type===t && r.status==="live";}).length;
+  $({app:"nApp",doc:"nDoc",quiz:"nQuiz"}[t]).textContent = n;
+});
+
+/* chip lọc */
+function makeChips(boxId, label, items, key){
+  var box=$(boxId);
+  box.innerHTML='<span class="lbl">'+label+'</span>';
+  items.forEach(function(it){
+    var b=document.createElement("button");
+    b.type="button"; b.className="chip"; b.textContent=it.text;
+    b.setAttribute("aria-pressed", String(state[key]===it.val));
+    b.addEventListener("click",function(){
+      state[key]=it.val;
+      Array.prototype.forEach.call(box.querySelectorAll(".chip"),function(c,i){
+        c.setAttribute("aria-pressed", String(items[i].val===state[key]));
+      });
+      render();
+    });
+    box.appendChild(b);
+  });
+}
+var grades=[10,11,12];
+makeChips("gradeChips","Lớp",[{text:"Tất cả",val:"all"}].concat(grades.map(function(g){return {text:"Lớp "+g,val:g};})),"grade");
+makeChips("typeChips","Loại",[{text:"Tất cả",val:"all"}].concat(Object.keys(TYPES).map(function(k){return {text:TYPES[k],val:k};})),"type");
+
+$("q").addEventListener("input",function(e){state.q=norm(e.target.value.trim());render();});
+
+var TOPIC_ORDER={10:["Cơ học"],11:["Sóng"],12:["Vật lí nhiệt","Khí lí tưởng"]};
+var TITLE_ORDER=["Thí nghiệm ném ngang và tầm ném xa","Thí nghiệm ném xiên và tầm ném xa","Mô tả sóng (Bài 8 – Vật lí 11)","Định luật I nhiệt động lực học","Thí nghiệm nhiệt dung riêng","Thí nghiệm nhiệt nóng chảy riêng","Thí nghiệm nhiệt hoá hơi riêng","Định luật Boyle (Bài 9 – Vật lí 12)"];
+function cardHtml(r){
+  var url=safeUrl(r.url||"");
+  var live = r.status==="live" && url;
+  var action = live
+    ? '<a class="go" href="'+esc(url)+'" target="_blank" rel="noopener">'+CTA[r.type]+'</a>'
+    : '<span class="soon">Sắp ra mắt</span>';
+  var also = r.grades.length>1 ? '<div class="meta"><span>Dùng cho lớp '+r.grades.join(", ")+'</span></div>' : '';
+  return '<article class="card '+r.type+'">'
+    +'<div class="kind">'+ICONS[r.type]+TYPES[r.type]+'</div>'
+    +'<h3>'+esc(r.title)+'</h3>'
+    +'<p>'+esc(r.desc)+'</p>'+also+action+'</article>';
+}
+function rankOf(g,r){
+  var t=(TOPIC_ORDER[g]||[]).indexOf(r.topic); if(t<0)t=50;
+  var live=(r.status==="live"&&r.url)?0:1;
+  var ti=TITLE_ORDER.indexOf(r.title); if(ti<0)ti=99;
+  return t*1000+live*500+ti;
+}
+function render(){
+  var filtered=RESOURCES.filter(function(r){
+    if(state.type!=="all" && r.type!==state.type) return false;
+    if(state.q){
+      var hay=norm([r.title,r.desc,r.topic,TYPES[r.type]].join(" "));
+      if(hay.indexOf(state.q)<0) return false;
+    }
+    return true;
+  });
+  var anyFilter=!!(state.q||state.type!=="all"),html="",shown={},nSec=0;
+  grades.forEach(function(g){
+    if(state.grade!=="all" && state.grade!==g) return;
+    var items=filtered.filter(function(r){return r.grades.indexOf(g)>=0;});
+    items.sort(function(a,b){return rankOf(g,a)-rankOf(g,b);});
+    if(!items.length && anyFilter) return;
+    nSec++;
+    var live=items.filter(function(r){return r.status==="live"&&r.url;}).length;
+    html+='<section class="gsec" id="lop-'+g+'" aria-labelledby="h-lop-'+g+'">'
+      +'<div class="ghead"><span class="badge">'+g+'</span><h3 id="h-lop-'+g+'">Lớp '+g+'</h3><span class="gn">'+(items.length?live+' học liệu đã có'+(items.length>live?', '+(items.length-live)+' sắp ra mắt':''):'')+'</span></div>';
+    if(!items.length){
+      html+='<div class="empty">Đang cập nhật thêm học liệu cho lớp '+g+'.</div>';
+    } else {
+      var order=[];
+      items.forEach(function(r){if(order.indexOf(r.topic)<0)order.push(r.topic);});
+      order.forEach(function(tp){
+        html+='<h4 class="topic">'+esc(tp)+'</h4><div class="grid">'
+          +items.filter(function(r){return r.topic===tp;}).map(cardHtml).join("")+'</div>';
+      });
+      items.forEach(function(r){shown[r.title]=1;});
+    }
+    html+='</section>';
+  });
+  var total=0;
+  RESOURCES.forEach(function(r){if(shown[r.title]&&r.status==="live"&&r.url)total++;});
+  $("count").textContent = total ? "Có "+total+" học liệu đã sẵn sàng." : "";
+  $("byGrade").innerHTML = nSec ? html : '<div class="empty">Chưa có học liệu phù hợp. Hãy thử bỏ bớt bộ lọc hoặc đổi từ khoá.</div>';
+}
+render();
+
+/* giao diện sáng/tối */
+$("theme").addEventListener("click",function(){
+  var root=document.documentElement, cur=root.getAttribute("data-theme");
+  var dark = cur ? cur==="dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  root.setAttribute("data-theme", dark?"light":"dark");
+  drawStatic();
+});
+
+/* ---------- hoạt ảnh ném xiên ---------- */
+var cv=$("proj"), c=cv.getContext("2d");
+var W=560,H=360,OX=36,OY=322;
+var V2=430, G=1, V=Math.sqrt(V2), DT=2.2;
+var ANG=[30,45,60,75], KEYS=["--app","--brand","--spark","--quiz"];
+function css(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();}
+function pos(a,t){var r=a*Math.PI/180; return {x:OX+V*Math.cos(r)*t, y:OY-(V*Math.sin(r)*t-0.5*G*t*t)};}
+function flight(a){return 2*V*Math.sin(a*Math.PI/180)/G;}
+function base(){
+  c.setTransform(2,0,0,2,0,0); c.clearRect(0,0,W,H);
+  var muted=css("--muted"), line=css("--line");
+  c.strokeStyle=line; c.lineWidth=.8;
+  for(var x=OX;x<W;x+=50){c.beginPath();c.moveTo(x,10);c.lineTo(x,OY);c.stroke();}
+  for(var y=OY;y>10;y-=50){c.beginPath();c.moveTo(OX,y);c.lineTo(W-6,y);c.stroke();}
+  c.strokeStyle=css("--ink"); c.lineWidth=1.6; c.beginPath(); c.moveTo(OX,8); c.lineTo(OX,OY); c.lineTo(W-6,OY); c.stroke();
+  c.fillStyle=muted; c.font="12px sans-serif"; c.textAlign="left";
+  c.fillText("x",W-14,OY+16); c.fillText("y",OX+6,16);
+  // đường quỹ đạo mờ
+  ANG.forEach(function(a,i){
+    c.strokeStyle=css(KEYS[i]); c.globalAlpha=.22; c.lineWidth=1.5; c.setLineDash([4,5]); c.beginPath();
+    var T=flight(a);
+    for(var t=0;t<=T;t+=0.5){var p=pos(a,t); if(t===0)c.moveTo(p.x,p.y); else c.lineTo(p.x,p.y);}
+    var e=pos(a,T); c.lineTo(e.x,e.y); c.stroke(); c.setLineDash([]); c.globalAlpha=1;
+  });
+}
+function dots(tn){
+  ANG.forEach(function(a,i){
+    var col=css(KEYS[i]), T=flight(a);
+    c.fillStyle=col;
+    for(var t=0;t<=Math.min(tn,T)+1e-6;t+=DT){var p=pos(a,t); c.beginPath(); c.arc(p.x,p.y,3.4,0,7); c.fill();}
+    if(tn>=T){var e=pos(a,T); c.beginPath(); c.arc(e.x,e.y,3.4,0,7); c.fill();}
+  });
+  // nhãn góc
+  c.font="bold 12px sans-serif"; c.textAlign="left";
+  ANG.forEach(function(a,i){
+    c.fillStyle=css(KEYS[i]);
+    var r=a*Math.PI/180, lx=OX+48*Math.cos(r), ly=OY-48*Math.sin(r);
+    c.fillText(a+"°",lx+4,ly+4);
+  });
+}
+function drawStatic(){ base(); dots(1e6); }
+var reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+if(reduce){ drawStatic(); }
+else{
+  var tn=0, last=null, hold=0, tmax=flight(75);
+  function frame(ts){
+    if(last===null) last=ts;
+    var dt=Math.min(.05,(ts-last)/1000); last=ts;
+    if(tn<tmax){ tn+=dt*9; } else { hold+=dt; if(hold>2.2){tn=0;hold=0;} }
+    base(); dots(tn);
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+})();
+</script>
+</body>
+</html>
