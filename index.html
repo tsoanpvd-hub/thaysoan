@@ -197,13 +197,13 @@ var RESOURCES = [
     title: "Thí nghiệm nhiệt dung riêng",
     desc: "Thả vật nóng vào nhiệt lượng kế, đo nhiệt độ cân bằng rồi tính nhiệt dung riêng. Thay được khối lượng, nhiệt độ, chất liệu.",
     type: "app", grades: [12], topic: "Vật lí nhiệt",
-    url: "nhiet-dung-rieng.html", status: "live"
+    url: "mo-ta-nhiet-dung-rieng.html", status: "live"
   },
   {
     title: "Thí nghiệm nhiệt nóng chảy riêng",
     desc: "Thả nước đá vào nước nóng, quan sát đá tan trong khi nhiệt độ đá giữ 0 °C, rồi tính nhiệt nóng chảy riêng λ.",
     type: "app", grades: [12], topic: "Vật lí nhiệt",
-    url: "nhiet-nong-chay-rieng.html", status: "live"
+    url: "thi-nghiem-nhiet-nong-chay-rieng.html", status: "live"
   },
   {
     title: "Thí nghiệm nhiệt hoá hơi riêng",
@@ -269,7 +269,9 @@ var CTA = {app:"Mở app", doc:"Xem tài liệu", quiz:"Làm bài"};
 function $(id){return document.getElementById(id);}
 function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
 function norm(s){return String(s).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/đ/g,"d");}
-function safeUrl(u){ return /^https?:\/\//i.test(u) ? u : ""; }
+
+// ĐÃ SỬA LỖI Ở ĐÂY: Chấp nhận mọi đường link hợp lệ bao gồm cả file html nội bộ
+function safeUrl(u){ return u ? String(u).trim() : ""; }
 
 var state = {q:"", grade:"all", type:"all"};
 
