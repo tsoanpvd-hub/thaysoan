@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sóng dừng (Bài 13 – Vật lí 11) – Thầy Soạn-STK</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#eef3f4; --panel:#ffffff; --ink:#14292f; --muted:#5a7077; --line:#cfdcdf;
+  --accent:#0b6e7f; --accent-ink:#ffffff; --hot:#d9482b; --cold:#2467c9; --ice:#1b93b8; --ok:#1d8a4e; --warn:#b36b00;
+  --grid:#dbe6e8; --canvas:#f8fbfb; --good-bg:#e4f4ea; --info-bg:#e6f1f4;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1b1f; --panel:#17272c; --ink:#e6f0f2; --muted:#94aab0; --line:#2b4148;
+    --accent:#3fb6cb; --accent-ink:#06222a; --hot:#ff7a59; --cold:#6aa3ff; --ice:#7fdcf2; --ok:#5fd08d; --warn:#f0b455;
+    --grid:#233a41; --canvas:#122227; --good-bg:#153324; --info-bg:#173039;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1b1f; --panel:#17272c; --ink:#e6f0f2; --muted:#94aab0; --line:#2b4148;
+  --accent:#3fb6cb; --accent-ink:#06222a; --hot:#ff7a59; --cold:#6aa3ff; --ice:#7fdcf2; --ok:#5fd08d; --warn:#f0b455;
+  --grid:#233a41; --canvas:#122227; --good-bg:#153324; --info-bg:#173039;
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:"Be Vietnam Pro","Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;line-height:1.5;font-size:15px}
+header{padding:16px 20px 6px;max-width:1280px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:10px}
+h1{margin:0;font-size:24px;font-weight:700;letter-spacing:-.01em}
+.brand{color:var(--accent)}
+header p{margin:2px 0 0;color:var(--muted);font-size:14px}
+header p.back{margin:0 0 6px;font-size:13.5px}
+header p.back a{color:var(--accent);text-decoration:none;font-weight:600}
+header p.who{font-weight:600;color:var(--ink)}
+.themebtn{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:6px 10px;cursor:pointer;font:inherit;font-size:13px}
+main{max-width:1280px;margin:0 auto;padding:12px 20px 30px;display:grid;grid-template-columns:minmax(0,1fr) 350px;gap:16px}
+@media (max-width:960px){main{grid-template-columns:1fr}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}
+.panel h2{margin:0 0 10px;font-size:15px;font-weight:700}
+canvas{width:100%;height:auto;display:block;border-radius:8px;background:var(--canvas);border:1px solid var(--line)}
+.stack{display:flex;flex-direction:column;gap:16px;min-width:0}
+.btnrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;align-items:center}
+button.pri{background:var(--accent);color:var(--accent-ink);border:0;border-radius:8px;padding:10px 16px;font:inherit;font-weight:600;cursor:pointer}
+button.sec{background:transparent;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:10px 14px;font:inherit;cursor:pointer}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.status{margin-left:auto;font-size:13px;color:var(--muted)}
+.field{display:grid;grid-template-columns:1fr auto;gap:2px 8px;align-items:center;margin-bottom:10px}
+.field label{font-size:13.5px}
+.field .num{display:flex;align-items:center;gap:4px}
+.field input[type=number],select{width:84px;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:4px 6px;font:inherit;text-align:right}
+select{width:100%;text-align:left}
+.field .u{color:var(--muted);font-size:12.5px;min-width:30px}
+.field input[type=range]{grid-column:1 / -1;width:100%;accent-color:var(--accent)}
+.grp{font-size:13px;font-weight:700;color:var(--accent);margin:14px 0 8px;padding-top:10px;border-top:1px dashed var(--line)}
+.grp:first-child{border-top:0;margin-top:0;padding-top:0}
+.chk{display:flex;gap:8px;align-items:center;font-size:13.5px;margin:6px 0}
+.result{background:var(--info-bg);border-radius:10px;padding:12px 14px;font-size:14px}
+.result.done{background:var(--good-bg)}
+.result .big{font-size:21px;font-weight:700}
+.result .eq{font-family:"Cambria Math","Latin Modern Math",Georgia,serif;font-size:15px;margin:6px 0;overflow-x:auto;white-space:nowrap}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:10px}
+.ro{border:1px solid var(--line);border-radius:8px;padding:6px 10px}
+.ro span{display:block;font-size:12px;color:var(--muted)}
+.ro b{font-size:18px;font-variant-numeric:tabular-nums}
+.ro.h b{color:var(--hot)} .ro.c b{color:var(--cold)} .ro.i b{color:var(--ice)}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}
+th,td{border-bottom:1px solid var(--line);padding:5px 8px;text-align:right;white-space:nowrap}
+th{color:var(--muted);font-weight:600}
+th:first-child,td:first-child{text-align:left}
+details{margin-top:4px}
+summary{cursor:pointer;font-weight:600;font-size:14px}
+details ol,details ul{margin:8px 0 0;padding-left:20px;font-size:14px}
+details li{margin-bottom:4px}
+footer{text-align:center;color:var(--muted);font-size:13px;padding:0 20px 24px}
+
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.tab{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:10px;padding:9px 14px;font:inherit;font-weight:600;cursor:pointer;font-size:14px}
+.tab[aria-selected="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.prog{display:flex;align-items:center;gap:10px;margin-top:10px;font-size:13.5px}
+.prog input{flex:1;accent-color:var(--accent)}
+.note{font-size:14px;margin:0 0 8px}
+.note b{color:var(--accent)}
+.q{margin-bottom:16px;padding-bottom:12px;border-bottom:1px dashed var(--line)}
+.q p{margin:0 0 6px;font-weight:600;font-size:14.5px}
+.opt{display:flex;gap:8px;align-items:flex-start;margin:4px 0;font-size:14px;cursor:pointer}
+.opt input{margin-top:4px}
+.fb{margin-top:6px;font-size:13.5px;padding:6px 10px;border-radius:8px}
+.fb.ok{background:var(--good-bg);color:var(--ok)}
+.fb.no{background:var(--info-bg);color:var(--warn)}
+.chal{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:10px 0}
+.chal label{font-size:13px;color:var(--muted);display:block}
+.chal input{width:100%;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:6px 8px;font:inherit}
+.bad{color:var(--warn)} .good{color:var(--ok)}
+ul.tight{margin:6px 0 0;padding-left:20px;font-size:14px} ul.tight li{margin-bottom:4px}
+
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.tab{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:10px;padding:9px 14px;font:inherit;font-weight:600;cursor:pointer;font-size:14px}
+.tab[aria-selected="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.prog{display:flex;align-items:center;gap:10px;margin-top:10px;font-size:13.5px}
+.prog input{flex:1;accent-color:var(--accent)}
+.note{font-size:14px;margin:0 0 8px}
+.q{margin-bottom:16px;padding-bottom:12px;border-bottom:1px dashed var(--line)}
+.q p{margin:0 0 6px;font-weight:600;font-size:14.5px}
+.opt{display:flex;gap:8px;align-items:flex-start;margin:4px 0;font-size:14px;cursor:pointer}
+.opt input{margin-top:4px}
+.fb{margin-top:6px;font-size:13.5px;padding:6px 10px;border-radius:8px}
+.fb.ok{background:var(--good-bg);color:var(--ok)}
+.fb.no{background:var(--info-bg);color:var(--warn)}
+.inline{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin:8px 0}
+.inline label{font-size:13px;color:var(--muted);display:block}
+.inline input[type=number]{width:120px;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:6px 8px;font:inherit}
+.bad{color:var(--warn)} .good{color:var(--ok)}
+ul.tight{margin:6px 0 0;padding-left:20px;font-size:14px} ul.tight li{margin-bottom:4px}
+.nbtn{min-width:46px;padding:8px 10px}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <p class="back"><a href="https://claude.ai/artifact/JiPRaSUaFAmceEk8cdMj7P" target="_blank" rel="noopener">← Về trang Học Vật Lý cùng Thầy Soạn-STK</a></p>
+    <h1>Sóng dừng (Bài 13 – Vật lí 11) <span class="brand">· Thầy Soạn-STK</span></h1>
+    <p>Thí nghiệm tạo sóng dừng trên sợi dây, giải thích bằng sóng tới và sóng phản xạ, điều kiện L = nλ/2, sóng dừng trong nhạc cụ dây.</p>
+    <p class="who">Thầy Đàng Năng Soạn · Trường THPT Phạm Văn Đồng – Phước Hậu · Vật lí THPT</p>
+  </div>
+  <button class="themebtn" id="themeBtn" type="button">Đổi sáng/tối</button>
+</header>
+<main>
+  <div class="stack">
+    <section class="panel">
+      <div class="tabs" role="tablist">
+        <button class="tab" id="tb_t1" role="tab" aria-selected="true" type="button">1. Thí nghiệm tạo sóng dừng</button>
+        <button class="tab" id="tb_t2" role="tab" aria-selected="false" type="button">2. Giải thích sự tạo thành sóng dừng</button>
+        <button class="tab" id="tb_t3" role="tab" aria-selected="false" type="button">3. Điều kiện có sóng dừng</button>
+        <button class="tab" id="tb_t4" role="tab" aria-selected="false" type="button">4. Sóng dừng trong nhạc cụ dây</button>
+        <button class="tab" id="tb_t5" role="tab" aria-selected="false" type="button">5. Ôn tập</button>
+      </div>
+    </section>
+
+    <!-- ===== TAB 1 ===== -->
+    <div id="p_t1" class="stack">
+      <section class="panel">
+        <h2>Bộ thí nghiệm tạo sóng dừng trên sợi dây (mô phỏng Hình 13.1)</h2>
+        <canvas id="sc1" width="1280" height="560" aria-label="Sợi dây đàn hồi PQ, bộ rung và máy phát âm tần"></canvas>
+        <div class="inline" style="margin-top:12px">
+          <div style="flex:1;min-width:260px"><label for="sf">Tần số f của bộ rung (máy phát âm tần): <b id="fTxt"></b></label><input type="range" id="sf" min="5" max="200" step="0.1" value="12" style="width:100%"></div>
+        </div>
+        <div class="btnrow" style="margin-top:4px">
+          <button class="pri" id="sweep" type="button">Quét tần số tự động</button>
+          <button class="sec" id="rec1" type="button">Ghi tần số vào bảng</button>
+          <label style="font-size:13.5px">Tốc độ hoạt ảnh
+            <select id="sp" style="width:auto"><option value="0.25">0,25×</option><option value="0.5">0,5×</option><option value="1" selected>1×</option><option value="2">2×</option></select>
+          </label>
+          <button class="sec" id="pp1" type="button">Tạm dừng hình</button>
+        </div>
+        <div id="hintBox" style="margin-top:6px">
+          <div class="btnrow" style="margin-top:6px"><span style="font-size:13.5px;color:var(--muted)">Gợi ý – đặt đúng tần số của lần cộng hưởng thứ:</span>
+            <button class="sec nbtn" data-n="1" type="button">1</button><button class="sec nbtn" data-n="2" type="button">2</button><button class="sec nbtn" data-n="3" type="button">3</button><button class="sec nbtn" data-n="4" type="button">4</button><button class="sec nbtn" data-n="5" type="button">5</button><button class="sec nbtn" data-n="6" type="button">6</button>
+          </div>
+        </div>
+        <div class="readouts" style="margin-top:12px">
+          <div class="ro h"><span>Tần số f</span><b id="o_f">–</b></div>
+          <div class="ro v"><span>Quan sát</span><b id="o_s" style="font-size:15px">–</b></div>
+          <div class="ro"><span>Biên độ lớn nhất của dây</span><b id="o_a">–</b></div>
+          <div class="ro c"><span>Chiều dài dây L</span><b id="o_L">–</b></div>
+        </div>
+        <p style="font-size:12.5px;color:var(--muted);margin:6px 0 0">Hoạt ảnh được làm chậm để nhìn thấy dao động. Biên độ vẽ phóng đại.</p>
+      </section>
+
+      <section class="panel" id="resPanel">
+        <h2>Biên độ dao động của dây theo tần số</h2>
+        <canvas id="gres" width="1280" height="480" aria-label="Đồ thị biên độ theo tần số"></canvas>
+        <div style="font-size:13px;color:var(--muted);margin-top:6px">Dây chỉ dao động mạnh ở một số tần số xác định. Chấm đỏ là tần số hiện tại.</div>
+      </section>
+
+      <section class="panel">
+        <h2>Bảng ghi các lần quan sát được sóng dừng</h2>
+        <div class="tablewrap"><table>
+          <thead><tr><th>Lần</th><th>f (Hz)</th><th>Số bụng n</th><th>Khoảng cách 2 nút liên tiếp d (m)</th><th>λ = 2d (m)</th><th>v = λ·f (m/s)</th><th>L / (λ/2)</th></tr></thead>
+          <tbody id="rows1"></tbody>
+        </table></div>
+        <div class="btnrow"><button class="sec" id="clr1" type="button">Xoá bảng</button><button class="sec" id="cond" type="button">Rút ra điều kiện để có sóng dừng</button></div>
+        <div id="condTxt" class="result" style="display:none;margin-top:8px"></div>
+      </section>
+    </div>
+
+    <!-- ===== TAB 2 ===== -->
+    <div id="p_t2" class="stack" style="display:none">
+      <section class="panel">
+        <h2>Sóng tới + sóng phản xạ = sóng dừng (mô phỏng Hình 13.2)</h2>
+        <canvas id="w2" width="1280" height="560" aria-label="Sóng tới, sóng phản xạ và sóng tổng hợp"></canvas>
+        <div class="btnrow">
+          <button class="pri" id="play2" type="button">Tạm dừng</button>
+          <button class="sec" id="fr2" type="button">Về t = 0</button>
+          <label style="font-size:13.5px">Tốc độ
+            <select id="sp2" style="width:auto"><option value="0.25">0,25×</option><option value="0.5" selected>0,5×</option><option value="1">1×</option></select>
+          </label>
+        </div>
+        <div class="prog"><label for="prog2">Thời gian</label><input type="range" id="prog2" min="0" max="1000" value="0"><b id="progTxt2" style="min-width:70px;text-align:right">0 T</b></div>
+        <div class="result" id="state2" style="margin-top:10px"></div>
+      </section>
+      <section class="panel">
+        <h2>Các thời điểm t = 0, T/4, T/2, 3T/4</h2>
+        <canvas id="snap2" width="1280" height="1100" aria-label="Bốn thời điểm của sóng tới, sóng phản xạ và sóng tổng hợp"></canvas>
+        <div style="font-size:13px;color:var(--muted);margin-top:6px">Xanh: sóng tới (truyền sang phải). Đỏ: sóng phản xạ (truyền sang trái). Tím đậm: sóng tổng hợp. Các điểm A, B, C, D, E là các nút sóng liên tiếp.</div>
+      </section>
+      <section class="panel">
+        <h2>Đặc điểm của sóng dừng</h2>
+        <ul class="tight">
+          <li>Sóng dừng được tạo thành khi có hai sóng <b>cùng biên độ, cùng bước sóng</b> lan truyền theo <b>hai hướng ngược nhau</b>. Hai sóng gặp nhau, giao thoa nhau tạo nên sóng tổng hợp là sóng dừng.</li>
+          <li>Điểm mà hai sóng <b>ngược pha</b> thì không dao động: đó là <b>nút sóng</b>.</li>
+          <li>Điểm mà hai sóng <b>đồng pha</b> thì dao động với biên độ cực đại (bằng 2A): đó là <b>bụng sóng</b>.</li>
+          <li>Trong thực tế ta thường gặp một trong hai sóng là <b>sóng phản xạ</b> của sóng kia. Sóng dừng là tổng hợp của nhiều sóng tới và sóng phản xạ.</li>
+        </ul>
+      </section>
+    </div>
+
+    <!-- ===== TAB 3 ===== -->
+    <div id="p_t3" class="stack" style="display:none">
+      <section class="panel">
+        <h2>Điều kiện để có sóng dừng trên sợi dây hai đầu cố định (Hình 13.3)</h2>
+        <canvas id="c3" width="1280" height="560" aria-label="Sóng dừng trên dây PQ"></canvas>
+        <div class="inline" style="margin-top:12px">
+          <div style="flex:1;min-width:260px"><label for="sLam">Bước sóng λ: <b id="lamTxt"></b></label><input type="range" id="sLam" min="0.2" max="2" step="0.005" value="0.667" style="width:100%"></div>
+        </div>
+        <div class="btnrow" style="margin-top:2px"><span style="font-size:13.5px;color:var(--muted)">Đặt λ = 2L/n với n =</span>
+          <button class="sec nbtn" data-m="1" type="button">1</button><button class="sec nbtn" data-m="2" type="button">2</button><button class="sec nbtn" data-m="3" type="button">3</button><button class="sec nbtn" data-m="4" type="button">4</button><button class="sec nbtn" data-m="5" type="button">5</button><button class="sec nbtn" data-m="6" type="button">6</button>
+          <button class="pri" id="f133" type="button">Hình 13.3 (n = 3)</button>
+        </div>
+        <div class="readouts" style="margin-top:12px">
+          <div class="ro"><span>L / (λ/2)</span><b id="m_ratio">–</b></div>
+          <div class="ro v"><span>Trạng thái</span><b id="m_state" style="font-size:15px">–</b></div>
+          <div class="ro h"><span>Số bụng</span><b id="m_b">–</b></div>
+          <div class="ro c"><span>Số nút (kể cả hai đầu)</span><b id="m_n">–</b></div>
+        </div>
+        <div class="result" id="m_txt" style="margin-top:10px"></div>
+      </section>
+      <section class="panel">
+        <h2>Các tần số cho sóng dừng trên dây này</h2>
+        <div class="tablewrap"><table>
+          <thead><tr><th>n</th><th>Số bụng</th><th>Số nút (kể cả 2 đầu)</th><th>λ = 2L/n (m)</th><th>f = n·v/(2L) (Hz)</th></tr></thead>
+          <tbody id="tbl3"></tbody>
+        </table></div>
+      </section>
+      <section class="panel">
+        <h2>Câu hỏi trong SGK</h2>
+        <div class="result">
+          <b>1.</b> Xác định số nút và số bụng của sóng dừng trên sợi dây Hình 13.3.
+          <div style="margin-top:6px"><button class="sec" id="a1" type="button">Xem gợi ý</button></div>
+          <div id="a1t" style="display:none;margin-top:6px">Hình 13.3 là trường hợp <b>n = 3</b>: có <b>3 bụng</b> và <b>4 nút</b> (kể cả hai nút ở hai đầu P và Q), L = 3λ/2.</div>
+        </div>
+        <div class="result" style="margin-top:10px">
+          <b>2.</b> Giải thích sự tạo thành sóng dừng trên dây PQ ở thí nghiệm Hình 13.1.
+          <div style="margin-top:6px"><button class="sec" id="a2" type="button">Xem gợi ý</button></div>
+          <div id="a2t" style="display:none;margin-top:6px">Sóng do bộ rung tạo ra truyền dọc dây tới đầu cố định rồi <b>phản xạ</b> và truyền ngược lại. Sóng tới và sóng phản xạ có cùng biên độ, cùng bước sóng, truyền ngược chiều nên giao thoa với nhau. Khi chiều dài dây bằng một số nguyên lần nửa bước sóng (L = nλ/2) thì hai đầu dây là nút, trên dây xuất hiện các nút và bụng cố định: đó là sóng dừng.</div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ===== TAB 4 ===== -->
+    <div id="p_t4" class="stack" style="display:none">
+      <section class="panel">
+        <h2>Sóng dừng trên dây đàn ghita</h2>
+        <canvas id="gt" width="1280" height="480" aria-label="Cần đàn ghita, dây đàn và hộp cộng hưởng"></canvas>
+        <div class="inline" style="margin-top:12px">
+          <div style="min-width:200px"><label for="gStr">Dây đàn</label>
+            <select id="gStr" style="width:100%"><option value="0">Dây 1 (E4) – 329,6 Hz</option><option value="1">Dây 2 (B3) – 246,9 Hz</option><option value="2">Dây 3 (G3) – 196,0 Hz</option><option value="3">Dây 4 (D3) – 146,8 Hz</option><option value="4">Dây 5 (A2) – 110,0 Hz</option><option value="5" selected>Dây 6 (E2) – 82,4 Hz</option></select></div>
+          <div style="flex:1;min-width:240px"><label for="gFret">Ấn ngón tay vào phím số: <b id="gFretTxt"></b></label><input type="range" id="gFret" min="0" max="12" step="1" value="0" style="width:100%"></div>
+          <div style="min-width:150px"><label for="gHar">Họa âm (n bụng)</label>
+            <select id="gHar" style="width:100%"><option value="1" selected>n = 1 (âm cơ bản)</option><option value="2">n = 2</option><option value="3">n = 3</option><option value="4">n = 4</option></select></div>
+        </div>
+        <div class="btnrow" style="margin-top:2px">
+          <button class="pri" id="pluck" type="button">Gảy đàn</button>
+          <label class="chk" style="margin:0 0 0 6px"><input type="checkbox" id="chSnd" checked> Bật âm thanh (nhớ bật loa)</label>
+        </div>
+        <div class="readouts" style="margin-top:12px">
+          <div class="ro c"><span>Chiều dài dây dao động L</span><b id="g_L">–</b></div>
+          <div class="ro"><span>Bước sóng λ = 2L/n</span><b id="g_l">–</b></div>
+          <div class="ro h"><span>Tần số âm f = v/λ</span><b id="g_f">–</b></div>
+          <div class="ro v"><span>So với dây buông</span><b id="g_r">–</b></div>
+        </div>
+        <div class="result" id="g_txt" style="margin-top:10px"></div>
+      </section>
+      <section class="panel">
+        <h2>Nhạc cụ dây</h2>
+        <ul class="tight">
+          <li>Với các nhạc cụ dây như đàn ghita, violon, đàn tính, đàn cò,... hai đầu dây đàn được giữ cố định. Khi gảy đàn, trên dây xuất hiện sóng dừng.</li>
+          <li>Theo L = nλ/2 với n = 1, dây phát ra âm có bước sóng <b>λ = 2L</b>, tức tần số <b>f = v / (2L)</b>.</li>
+          <li>Khi ấn ngón tay vào các phím khác nhau ta thay đổi chiều dài dây đàn, nên âm phát ra có độ cao, thấp khác nhau: dây ngắn hơn thì âm cao hơn.</li>
+          <li>Để khuếch đại âm, đàn ghita còn có thùng đàn đóng vai trò hộp cộng hưởng.</li>
+        </ul>
+      </section>
+    </div>
+
+    <!-- ===== TAB 5 ===== -->
+    <div id="p_t5" class="stack" style="display:none">
+      <section class="panel">
+        <h2>Câu hỏi ôn tập</h2>
+        <div id="qz"></div>
+        <div class="btnrow"><button class="sec" id="qzReset" type="button">Làm lại</button><span class="status" id="qzScore"></span></div>
+      </section>
+      <section class="panel">
+        <h2>Thử thách: tìm tốc độ truyền sóng</h2>
+        <div class="result" id="chTxt"></div>
+        <div class="inline">
+          <div><label for="in_lam">λ (m)</label><input id="in_lam" type="number" step="0.01" inputmode="decimal"></div>
+          <div><label for="in_v">v (m/s)</label><input id="in_v" type="number" step="0.1" inputmode="decimal"></div>
+          <button class="pri" id="chCheck" type="button">Kiểm tra</button>
+          <button class="sec" id="chNew" type="button">Đề mới</button>
+        </div>
+        <div class="result" id="chRes" style="display:none"></div>
+      </section>
+    </div>
+  </div>
+
+  <div class="stack">
+    <section class="panel">
+      <h2>Số liệu thí nghiệm (đổi để giảng dạy)</h2>
+      <div id="controls"></div>
+      <div class="grp">Hiển thị</div>
+      <label class="chk"><input type="checkbox" id="chNB" checked> Đánh dấu nút (đỏ) và bụng (xanh lá)</label>
+      <label class="chk"><input type="checkbox" id="chEnv" checked> Vẽ đường bao biên độ (nét đứt)</label>
+      <label class="chk"><input type="checkbox" id="chHide"> Chế độ tự dò: ẩn gợi ý và đồ thị cộng hưởng ở tab 1</label>
+    </section>
+    <section class="panel">
+      <h2>Ghi nhớ</h2>
+      <div class="result">
+        <div class="eq">L = n · λ/2   (n = 1, 2, 3, ...)</div>
+        <div class="eq">λ = 2L/n   ·   f = n · v/(2L)</div>
+        <div style="font-size:13.5px">Dây hai đầu cố định: hai đầu là nút. Khoảng cách giữa hai nút (hoặc hai bụng) liên tiếp là λ/2; từ nút đến bụng liền kề là λ/4.</div>
+      </div>
+      <details><summary>Gợi ý các bước lên lớp</summary><ol>
+        <li>Tab 1: cho học sinh tự quét tần số, tìm các tần số có sóng dừng và ghi vào bảng.</li>
+        <li>Rút ra điều kiện L = nλ/2 từ bảng số liệu (cột L / (λ/2) là số nguyên).</li>
+        <li>Tab 2: giải thích bằng sự giao thoa của sóng tới và sóng phản xạ.</li>
+        <li>Tab 3 và 4: vận dụng cho dây hai đầu cố định và dây đàn.</li>
+      </ol></details>
+      <details><summary>Câu hỏi thảo luận</summary><ul>
+        <li>Vì sao chỉ ở một số tần số xác định mới quan sát được sóng dừng?</li>
+        <li>Các tần số f₂, f₃, ... liên hệ thế nào với f₁?</li>
+        <li>Tăng lực căng dây (tăng v) thì các tần số cộng hưởng thay đổi thế nào?</li>
+        <li>Vì sao ấn phím cao hơn thì âm đàn cao hơn?</li>
+      </ul></details>
+    </section>
+  </div>
+</main>
+<footer>Ứng dụng mô phỏng do thầy Đàng Năng Soạn biên soạn · Trường THPT Phạm Văn Đồng – Phước Hậu · Vật lí THPT</footer>
+<script>
+(function(){
+"use strict";
+
+function $(id){return document.getElementById(id);}
+function fmt(x,d){if(d===undefined)d=1;return Number(x).toFixed(d).replace(".",",");}
+function css(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();}
+function clamp(x,a,b){return Math.max(a,Math.min(b,x));}
+function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();}
+function decs(step){return (String(step).split(".")[1]||"").length;}
+
+function buildControls(box,SPEC,P,onChange){
+  SPEC.forEach(function(s){
+    if(s.grp){var g=document.createElement("div");g.className="grp";g.textContent=s.grp;box.appendChild(g);return;}
+    var f=document.createElement("div");f.className="field";
+    var lb=document.createElement("label");lb.textContent=s.label;lb.setAttribute("for","in_"+s.id);f.appendChild(lb);
+    if(s.type==="select"){
+      var sel=document.createElement("select");sel.id="in_"+s.id;
+      s.options.forEach(function(o){var op=document.createElement("option");op.value=o;op.textContent=o;sel.appendChild(op);});
+      sel.value=P[s.id];
+      sel.addEventListener("change",function(){P[s.id]=sel.value;onChange(s.id);});
+      f.style.gridTemplateColumns="1fr";f.appendChild(sel);
+    } else {
+      var w=document.createElement("div");w.className="num";
+      var n=document.createElement("input");n.type="number";n.id="in_"+s.id;n.min=s.min;n.max=s.max;n.step=s.step;n.value=P[s.id];
+      var u=document.createElement("span");u.className="u";u.textContent=s.unit;
+      w.appendChild(n);w.appendChild(u);f.appendChild(w);
+      var r=document.createElement("input");r.type="range";r.id="rg_"+s.id;r.min=s.min;r.max=s.max;r.step=s.step;r.value=P[s.id];
+      r.setAttribute("aria-label",s.label);f.appendChild(r);
+      var apply=function(v){
+        v=parseFloat(v);if(isNaN(v))return;
+        v=clamp(v,s.min,s.max);v=Number(v.toFixed(decs(s.step)+1));
+        P[s.id]=v;onChange(s.id);
+      };
+      n.addEventListener("change",function(){apply(n.value);});
+      r.addEventListener("input",function(){apply(r.value);});
+    }
+    box.appendChild(f);
+  });
+  return function(){
+    SPEC.forEach(function(s){
+      if(!s.id)return;
+      var a=$("in_"+s.id),b=$("rg_"+s.id);
+      if(s.type==="select"){a.value=P[s.id];return;}
+      if(document.activeElement!==a)a.value=P[s.id];
+      if(b)b.value=P[s.id];
+    });
+  };
+}
+
+/* Vẽ đồ thị: o={xmin,xmax,xstep,ymin,ymax,ystep,xlabel,ylabel,series:[{pts,color,label,tail}],hlines:[{y,color,label}]} */
+function plot(c,W,H,o){
+  c.setTransform(2,0,0,2,0,0);c.clearRect(0,0,W,H);
+  var ink=css("--ink"),muted=css("--muted"),grid=css("--grid");
+  c.fillStyle=css("--canvas");c.fillRect(0,0,W,H);
+  var L=54,R=W-16,T=16,B=H-36;
+  function X(v){return L+(R-L)*(v-o.xmin)/(o.xmax-o.xmin);}
+  function Y(v){return B-(B-T)*(v-o.ymin)/(o.ymax-o.ymin);}
+  c.strokeStyle=grid;c.lineWidth=.7;c.fillStyle=muted;c.font="11px sans-serif";c.textAlign="right";
+  for(var v=o.ymin;v<=o.ymax+1e-9;v+=o.ystep){c.beginPath();c.moveTo(L,Y(v));c.lineTo(R,Y(v));c.stroke();c.fillText(Math.round(v*10)/10,L-6,Y(v)+4);}
+  c.textAlign="center";
+  for(var x=o.xmin;x<=o.xmax+1e-9;x+=o.xstep){c.beginPath();c.moveTo(X(x),T);c.lineTo(X(x),B);c.stroke();c.fillText(Math.round(x*100)/100,X(x),B+14);}
+  c.strokeStyle=ink;c.lineWidth=1.2;c.beginPath();c.moveTo(L,T);c.lineTo(L,B);c.lineTo(R,B);c.stroke();
+  c.fillStyle=muted;c.fillText(o.xlabel,(L+R)/2,H-6);
+  c.save();c.translate(12,(T+B)/2);c.rotate(-Math.PI/2);c.fillText(o.ylabel,0,0);c.restore();
+  (o.hlines||[]).forEach(function(h){
+    if(h.y<o.ymin||h.y>o.ymax)return;
+    c.setLineDash([5,4]);c.strokeStyle=h.color;c.lineWidth=1.2;c.beginPath();c.moveTo(L,Y(h.y));c.lineTo(R,Y(h.y));c.stroke();c.setLineDash([]);
+    c.fillStyle=h.color;c.textAlign="right";c.font="11px sans-serif";c.fillText(h.label,R-4,Y(h.y)-5);
+  });
+  o.series.forEach(function(s){
+    if(!s.pts.length)return;
+    c.strokeStyle=s.color;c.lineWidth=2.2;c.beginPath();
+    s.pts.forEach(function(p,i){if(i===0)c.moveTo(X(p[0]),Y(p[1]));else c.lineTo(X(p[0]),Y(p[1]));});
+    if(s.tail)c.lineTo(X(s.tail[0]),Y(s.tail[1]));
+    c.stroke();
+    if(s.pts.length===1){c.fillStyle=s.color;c.beginPath();c.arc(X(s.pts[0][0]),Y(s.pts[0][1]),4,0,7);c.fill();}
+  });
+  c.textAlign="left";c.font="12px sans-serif";
+  var lx=L+10;
+  o.series.forEach(function(s){c.fillStyle=s.color;c.fillRect(lx,T+6,14,3);c.fillStyle=s.color;c.fillText(s.label,lx+20,T+11);lx+=26+s.label.length*6.6;});
+}
+
+$("themeBtn").addEventListener("click",function(){
+  var cur=document.documentElement.getAttribute("data-theme");
+  var dark=cur?cur==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;
+  document.documentElement.setAttribute("data-theme",dark?"light":"dark");
+});
+
+
+
+var P={L:1.0,v:40};
+var SPEC=[
+  {grp:"Sợi dây PQ (tab 1 và 3)"},
+  {id:"L",label:"Chiều dài dây L",unit:"m",min:0.5,max:1.5,step:0.05},
+  {id:"v",label:"Tốc độ truyền sóng trên dây v",unit:"m/s",min:10,max:80,step:1}
+];
+var sync=buildControls($("controls"),SPEC,P,function(){sync();onParam();});
+function f1(){return P.v/(2*P.L);}
+function on(id){var e=$(id);return !!(e&&e.checked);}
+function niceStep(range,target){
+  var raw=range/target,mag=Math.pow(10,Math.floor(Math.log(raw)/Math.LN10)),nm=raw/mag;
+  return (nm<1.5?1:nm<3?2:nm<7?5:10)*mag;
+}
+function arrow(c,x1,y1,x2,y2,w,col){
+  var len=Math.hypot(x2-x1,y2-y1);if(len<3)return;
+  var ang=Math.atan2(y2-y1,x2-x1),hs=Math.min(len*0.6,5+w*1.5);
+  c.strokeStyle=col;c.fillStyle=col;c.lineWidth=w;c.lineCap="round";
+  c.beginPath();c.moveTo(x1,y1);c.lineTo(x2-Math.cos(ang)*hs*0.6,y2-Math.sin(ang)*hs*0.6);c.stroke();
+  c.beginPath();c.moveTo(x2,y2);c.lineTo(x2-hs*Math.cos(ang-0.42),y2-hs*Math.sin(ang-0.42));c.lineTo(x2-hs*Math.cos(ang+0.42),y2-hs*Math.sin(ang+0.42));c.closePath();c.fill();
+}
+function txt(c,s,x,y,col,al,font){c.fillStyle=col;c.textAlign=al||"left";c.font=font||"12px sans-serif";c.fillText(s,x,y);}
+function dot(c,x,y,r,col){c.fillStyle=col;c.beginPath();c.arc(x,y,r,0,7);c.fill();}
+function axesBasic(c,o){
+  var ink=css("--ink"),muted=css("--muted"),grid=css("--grid");
+  c.setTransform(2,0,0,2,0,0);c.clearRect(0,0,o.W,o.H);c.fillStyle=css("--canvas");c.fillRect(0,0,o.W,o.H);
+  function X(v){return o.L+(o.R-o.L)*(v-o.x0)/(o.x1-o.x0);}
+  function Y(v){return o.B-(o.B-o.T)*(v-o.y0)/(o.y1-o.y0);}
+  var v;
+  c.lineWidth=.7;c.strokeStyle=grid;c.fillStyle=muted;c.font="10px sans-serif";c.textAlign="right";
+  for(v=Math.ceil(o.y0/o.ys-1e-9)*o.ys;v<=o.y1+1e-9;v+=o.ys){c.beginPath();c.moveTo(o.L,Y(v));c.lineTo(o.R,Y(v));c.stroke();c.fillText(Math.round(v*100)/100,o.L-5,Y(v)+3);}
+  c.textAlign="center";
+  for(v=Math.ceil(o.x0/o.xs-1e-9)*o.xs;v<=o.x1+1e-9;v+=o.xs){c.beginPath();c.moveTo(X(v),o.T);c.lineTo(X(v),o.B);c.stroke();c.fillText(Math.round(v*100)/100,X(v),o.B+13);}
+  c.strokeStyle=ink;c.lineWidth=1.4;c.beginPath();c.moveTo(o.L,o.T-4);c.lineTo(o.L,o.B);c.lineTo(o.R+4,o.B);c.stroke();
+  txt(c,o.yl,o.L+6,o.T-6,ink,"left","11px sans-serif");txt(c,o.xl,o.R,o.B-6,ink,"right","11px sans-serif");
+  return {X:X,Y:Y};
+}
+
+var S={tab:0,run1:true,t2:0,play2:true,sweep:false};
+var AT=0,lastTs=null,vis1=0;
+var tabIds=["t1","t2","t3","t4","t5"];
+function showTab(i){
+  S.tab=i;
+  tabIds.forEach(function(id,j){$("p_"+id).style.display=(j===i)?"":"none";$("tb_"+id).setAttribute("aria-selected",String(j===i));});
+}
+tabIds.forEach(function(id,i){$("tb_"+id).addEventListener("click",function(){showTab(i);});});
+
+/* ================= TAB 1 ================= */
+var QQ=30,AP=34,F1={f:12},rows1=[];
+function modeSet(f){
+  var out=[],n;
+  for(n=1;n<=14;n++){
+    var fn=n*f1(),r=f/fn,dr=1-r*r,di=r/QQ,den=dr*dr+di*di,hr=dr/den,hi=-di/den;
+    out.push({n:n,hr:hr/QQ,hi:hi/QQ,amp:Math.sqrt(hr*hr+hi*hi)/QQ});
+  }
+  return out;
+}
+function bestOf(ms){var b=ms[0];ms.forEach(function(m){if(m.amp>b.amp)b=m;});return b;}
+function ampAt(f){return bestOf(modeSet(f)).amp;}
+function stateOf(f){var ms=modeSet(f),b=bestOf(ms);return {ms:ms,best:b,res:b.amp>0.6};}
+function fmax(){return Math.round(8.5*f1());}
+function onParam(){
+  var fm=fmax();$("sf").max=fm;$("sf").min=Math.max(1,Math.round(0.2*f1()));
+  if(F1.f>fm)F1.f=fm;$("sf").value=F1.f;
+  rows1=[];renderRows1();$("condTxt").style.display="none";
+  lam3=clamp(lam3,0.2*P.L,2*P.L);setLamRange();buildTbl3();
+}
+$("sf").addEventListener("input",function(){F1.f=parseFloat($("sf").value);S.sweep=false;$("sweep").textContent="Quét tần số tự động";});
+$("sweep").addEventListener("click",function(){
+  S.sweep=!S.sweep;
+  if(S.sweep&&F1.f>=fmax()-0.5)F1.f=parseFloat($("sf").min);
+  $("sweep").textContent=S.sweep?"Dừng quét":"Quét tần số tự động";
+});
+$("pp1").addEventListener("click",function(){S.run1=!S.run1;$("pp1").textContent=S.run1?"Tạm dừng hình":"Tiếp tục";});
+[1,2,3,4,5,6].forEach(function(n){
+  var b=document.querySelector?document.querySelector('#hintBox [data-n="'+n+'"]'):null;
+  if(b)b.addEventListener("click",function(){F1.f=Math.min(n*f1(),fmax());S.sweep=false;$("sf").value=F1.f;$("sweep").textContent="Quét tần số tự động";});
+});
+function uStr(x,ph,ms){
+  var s=0,i;
+  for(i=0;i<ms.length;i++){var m=ms[i];s+=Math.sin(m.n*Math.PI*x/P.L)*(m.hr*Math.cos(ph)-m.hi*Math.sin(ph));}
+  return s*AP;
+}
+var c1=$("sc1").getContext("2d"),cres=$("gres").getContext("2d");
+function drawStr1(){
+  var c=c1,W=640,H=280,x0=84,x1=584,y0=150;
+  c.setTransform(2,0,0,2,0,0);c.clearRect(0,0,W,H);
+  var ink=css("--ink"),muted=css("--muted"),hot=css("--hot"),ok=css("--ok"),acc=css("--accent");
+  c.fillStyle=css("--canvas");c.fillRect(0,0,W,H);
+  var st=stateOf(F1.f),ph=vis1,sc=(x1-x0)/P.L;
+  function X(x){return x0+x*sc;}
+  // giá và bộ rung
+  c.fillStyle="rgba(120,130,140,.35)";c.fillRect(x1+2,y0-60,16,120);c.strokeStyle=ink;c.lineWidth=1.5;c.strokeRect(x1+2,y0-60,16,120);
+  txt(c,"Q",x1+10,y0-66,ink,"center","bold 13px sans-serif");txt(c,"Giá thí nghiệm",x1+10,y0+78,muted,"center","11px sans-serif");
+  var drv=4*(st.best.hr*Math.cos(ph)-st.best.hi*Math.sin(ph))*0+3.2*Math.cos(ph);
+  c.fillStyle="#555b63";rr(c,x0-34,y0-18+drv,26,36,4);c.fill();c.stroke();
+  txt(c,"Bộ rung",x0-21,y0+38,ink,"center","11px sans-serif");txt(c,"P",x0-4,y0-26,ink,"center","bold 13px sans-serif");
+  // đường bao
+  if(on("chEnv")&&st.res){
+    var n=st.best.n,A=AP*st.best.amp;
+    [1,-1].forEach(function(sg){c.setLineDash([4,4]);c.strokeStyle=muted;c.lineWidth=1;c.beginPath();
+      for(var x=0;x<=P.L+1e-9;x+=P.L/200){var yy=y0-sg*A*Math.abs(Math.sin(n*Math.PI*x/P.L));if(x===0)c.moveTo(X(x),yy);else c.lineTo(X(x),yy);}
+      c.stroke();c.setLineDash([]);});
+  }
+  // dây
+  c.strokeStyle=hot;c.lineWidth=2.6;c.beginPath();
+  for(var x=0;x<=P.L+1e-9;x+=P.L/240){var y=y0-uStr(x,ph,st.ms);if(x===0)c.moveTo(X(x),y);else c.lineTo(X(x),y);}
+  c.stroke();
+  c.strokeStyle=muted;c.lineWidth=1;c.setLineDash([2,4]);c.beginPath();c.moveTo(x0,y0);c.lineTo(x1,y0);c.stroke();c.setLineDash([]);
+  // nút bụng
+  if(st.res&&on("chNB")){
+    var nn=st.best.n,k;
+    for(k=0;k<=nn;k++){dot(c,X(k*P.L/nn),y0,4.5,hot);}
+    for(k=0;k<nn;k++){var xb=(k+0.5)*P.L/nn;dot(c,X(xb),y0-uStr(xb,ph,st.ms),4.5,ok);}
+    arrow(c,X(0),y0+56,X(P.L/nn),y0+56,1.3,ink);arrow(c,X(P.L/nn),y0+56,X(0),y0+56,1.3,ink);
+    txt(c,"λ/2",X(P.L/(2*nn)),y0+70,ink,"center","bold 11px sans-serif");
+  }
+  txt(c,"Dây đàn hồi PQ",(x0+x1)/2,y0-96,ink,"center","bold 12px sans-serif");
+  // máy phát âm tần
+  c.fillStyle="#1c2227";rr(c,W-150,12,134,50,6);c.fill();
+  c.fillStyle="#8fe3f0";c.font="10px sans-serif";c.textAlign="left";c.fillText("Máy phát âm tần",W-142,26);
+  c.font="bold 20px monospace";c.fillText(fmt(F1.f,1)+" Hz",W-142,52);
+  txt(c,st.res?("Sóng dừng: "+st.best.n+" bụng, "+(st.best.n+1)+" nút (kể cả hai đầu)"):"Dây dao động yếu, chưa có sóng dừng rõ rệt",12,H-12,st.res?ok:muted,"left","bold 12px sans-serif");
+}
+function drawRes(){
+  var c=cres,fm=fmax(),o=axesBasic(c,{W:640,H:240,L:54,R:622,T:22,B:196,x0:0,x1:fm,y0:0,y1:1.1,xs:niceStep(fm,8),ys:0.2,xl:"f (Hz)",yl:"Biên độ (tương đối)"});
+  var ac=css("--accent");c.strokeStyle=ac;c.lineWidth=2.2;c.beginPath();
+  for(var i=0;i<=900;i++){var f=fm*i/900,a=ampAt(f);if(i===0)c.moveTo(o.X(f),o.Y(a));else c.lineTo(o.X(f),o.Y(a));}
+  c.stroke();
+  for(var n=1;n<=8;n++){var fn=n*f1();if(fn<=fm){txt(c,"f"+n,o.X(fn),o.Y(1)-6,css("--muted"),"center","10px sans-serif");}}
+  var a0=ampAt(F1.f);dot(c,o.X(F1.f),o.Y(a0),6,css("--hot"));
+}
+function renderRows1(){
+  var tb=$("rows1");
+  if(!rows1.length){tb.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--muted)">Chưa có dữ liệu. Tìm tần số có sóng dừng rồi bấm “Ghi tần số vào bảng”.</td></tr>';return;}
+  tb.innerHTML=rows1.map(function(r,i){
+    var d=P.L/r.n,lam=2*d;
+    return "<tr><td>"+(i+1)+"</td><td>"+fmt(r.f,1)+"</td><td>"+r.n+"</td><td>"+fmt(d,3)+"</td><td>"+fmt(lam,3)+"</td><td>"+fmt(lam*r.f,1)+"</td><td>"+fmt(P.L/(lam/2),1)+"</td></tr>";
+  }).join("");
+}
+$("rec1").addEventListener("click",function(){
+  var st=stateOf(F1.f);
+  if(!st.res){$("condTxt").style.display="";$("condTxt").className="result";$("condTxt").textContent="Chưa quan sát được sóng dừng ở tần số này. Hãy điều chỉnh tần số cho đến khi trên dây có các nút đứng yên và các bụng dao động mạnh.";return;}
+  var exist=rows1.some(function(r){return r.n===st.best.n;});
+  if(exist){$("condTxt").style.display="";$("condTxt").className="result";$("condTxt").textContent="Lần quan sát với "+st.best.n+" bụng đã có trong bảng. Hãy tìm tần số khác.";return;}
+  rows1.push({f:F1.f,n:st.best.n});rows1.sort(function(a,b){return a.f-b.f;});renderRows1();
+});
+$("clr1").addEventListener("click",function(){rows1=[];renderRows1();$("condTxt").style.display="none";});
+$("cond").addEventListener("click",function(){
+  var el=$("condTxt");el.style.display="";
+  if(rows1.length<2){el.className="result";el.textContent="Hãy ghi ít nhất 2 tần số có sóng dừng.";return;}
+  var s="";rows1.forEach(function(r){s+="f = "+fmt(r.f,1)+" Hz ứng với n = "+r.n+"; ";});
+  el.className="result done";
+  el.innerHTML="<b>Nhận xét:</b> ở mọi lần quan sát, tỉ số L / (λ/2) là một <b>số nguyên</b> bằng số bụng n, còn v = λ·f luôn bằng "+fmt(P.v,0)+" m/s. Vậy điều kiện để có sóng dừng trên sợi dây có hai đầu cố định là: <b>chiều dài của sợi dây phải bằng một số nguyên lần nửa bước sóng</b>, L = n·λ/2 (n = 1, 2, 3, ...). Các tần số tương ứng là f = n·v/(2L), cách đều nhau một khoảng f₁ = "+fmt(f1(),1)+" Hz.";
+});
+function renderRead1(){
+  var st=stateOf(F1.f);
+  $("fTxt").textContent=fmt(F1.f,1)+" Hz";
+  $("o_f").textContent=fmt(F1.f,1)+" Hz";
+  $("o_s").textContent=st.res?("Sóng dừng, n = "+st.best.n):"Chưa có sóng dừng";
+  $("o_a").textContent=fmt(st.best.amp*100,0)+" %";
+  $("o_L").textContent=fmt(P.L,2)+" m";
+  $("hintBox").style.display=on("chHide")?"none":"";
+  $("resPanel").style.display=on("chHide")?"none":"";
+}
+
+/* ================= TAB 2 ================= */
+var c2=$("w2").getContext("2d"),cs2=$("snap2").getContext("2d");
+var LAM2=1,A2=1;
+function curves(x,ph){return {a:Math.sin(2*Math.PI*x-ph),b:Math.sin(2*Math.PI*x+ph),s:2*Math.sin(2*Math.PI*x)*Math.cos(ph)};}
+function drawWaves(c,y0,amp,ph,x0,x1,top,opt){
+  var ink=css("--ink"),muted=css("--muted"),cold=css("--cold"),hot=css("--hot"),qz=css("--quiz"),ok=css("--ok");
+  function X(x){return x0+x/2*(x1-x0);}
+  c.strokeStyle=muted;c.lineWidth=1;c.beginPath();c.moveTo(x0-10,y0);c.lineTo(x1+10,y0);c.stroke();
+  var i,x,u;
+  function line(f,col,lw){c.strokeStyle=col;c.lineWidth=lw;c.beginPath();for(i=0;i<=400;i++){x=2*i/400;u=f(x);if(i===0)c.moveTo(X(x),y0-u*amp);else c.lineTo(X(x),y0-u*amp);}c.stroke();}
+  if(opt.inc)line(function(x){return curves(x,ph).a;},cold,2);
+  if(opt.ref)line(function(x){return curves(x,ph).b;},hot,2);
+  if(opt.sum)line(function(x){return curves(x,ph).s;},qz,3.4);
+  var k,L=["A","B","C","D","E"];
+  c.setLineDash([2,4]);c.strokeStyle=muted;c.lineWidth=1;
+  for(k=0;k<5;k++){c.beginPath();c.moveTo(X(k/2),top);c.lineTo(X(k/2),y0+amp*2.15);c.stroke();}
+  c.setLineDash([]);
+  for(k=0;k<5;k++){txt(c,L[k],X(k/2),y0+amp*2.15+12,ink,"center","bold 12px sans-serif");}
+  if(opt.nb){
+    for(k=0;k<5;k++)dot(c,X(k/2),y0,4.5,hot);
+    for(k=0;k<4;k++){var xb=0.25+k/2;dot(c,X(xb),y0-curves(xb,ph).s*amp,4.5,ok);}
+  }
+}
+function drawW2(){
+  var c=c2,W=640,H=280,amp=34,y0=140,ph=2*Math.PI*S.t2;
+  c.setTransform(2,0,0,2,0,0);c.clearRect(0,0,W,H);c.fillStyle=css("--canvas");c.fillRect(0,0,W,H);
+  drawWaves(c,y0,amp,ph,60,590,34,{inc:true,ref:true,sum:true,nb:on("chNB")});
+  arrow(c,70,20,150,20,2,css("--cold"));txt(c,"sóng tới",156,24,css("--cold"),"left","11px sans-serif");
+  arrow(c,300,20,220,20,2,css("--hot"));txt(c,"sóng phản xạ",306,24,css("--hot"),"left","11px sans-serif");
+  txt(c,"sóng tổng hợp = sóng dừng",590,24,css("--quiz"),"right","bold 11px sans-serif");
+  txt(c,"t = "+fmt(S.t2,2)+" T",W-10,H-8,css("--ink"),"right","bold 12px sans-serif");
+}
+function drawSnap2(){
+  var c=cs2,W=640,H=550;
+  c.setTransform(2,0,0,2,0,0);c.clearRect(0,0,W,H);c.fillStyle=css("--canvas");c.fillRect(0,0,W,H);
+  var names=["t = 0","t = T/4","t = T/2","t = 3T/4"],k,ph;
+  for(k=0;k<4;k++){
+    var top=k*138;ph=k*Math.PI/2;
+    if(k>0){c.strokeStyle=css("--line");c.lineWidth=1;c.beginPath();c.moveTo(0,top);c.lineTo(W,top);c.stroke();}
+    if(Math.abs(((S.t2%1)+1)%1-k/4)<0.02){c.strokeStyle=css("--accent");c.lineWidth=2;c.strokeRect(5,top+4,W-10,134);}
+    txt(c,names[k],12,top+22,css("--ink"),"left","bold 13px sans-serif");
+    drawWaves(c,top+66,26,ph,70,590,top+14,{inc:true,ref:true,sum:true,nb:false});
+  }
+}
+function renderState2(){
+  var t=S.t2,ph=2*Math.PI*t,s=Math.cos(ph);
+  var msg;
+  if(Math.abs(s)<0.03)msg="Lúc này hai sóng <b>ngược pha</b> ở mọi điểm nên sóng tổng hợp bằng 0 trên toàn dây: mọi điểm đều đang đi qua vị trí cân bằng.";
+  else msg="Tại các <b>nút</b> (A, B, C, D, E) hai sóng luôn ngược pha nên li độ luôn bằng 0. Tại các <b>bụng</b> hai sóng đồng pha nên biên độ cực đại bằng 2A (hiện đang ở "+fmt(Math.abs(s)*100,0)+"% của giá trị cực đại).";
+  $("state2").className="result";$("state2").innerHTML="<b>t = "+fmt(t,2)+" T.</b> "+msg;
+  $("prog2").value=Math.round((((t%1)+1)%1)*1000);$("progTxt2").textContent=fmt(((t%1)+1)%1,2)+" T";
+}
+$("play2").addEventListener("click",function(){S.play2=!S.play2;$("play2").textContent=S.play2?"Tạm dừng":"Tiếp tục";});
+$("fr2").addEventListener("click",function(){S.t2=0;});
+$("prog2").addEventListener("input",function(){S.play2=false;$("play2").textContent="Tiếp tục";S.t2=$("prog2").value/1000;});
+
+/* ================= TAB 3 ================= */
+var lam3=2/3,c3=$("c3").getContext("2d");
+function setLamRange(){var s=$("sLam");s.min=(0.2*P.L).toFixed(3);s.max=(2*P.L).toFixed(3);lam3=clamp(lam3,0.2*P.L,2*P.L);s.value=lam3;}
+setLamRange();
+$("sLam").addEventListener("input",function(){lam3=parseFloat($("sLam").value);});
+[1,2,3,4,5,6].forEach(function(n){
+  var b=document.querySelector?document.querySelector('#p_t3 [data-m="'+n+'"]'):null;
+  if(b)b.addEventListener("click",function(){lam3=2*P.L/n;$("sLam").value=lam3;});
+});
+$("f133").addEventListener("click",function(){lam3=2*P.L/3;$("sLam").value=lam3;});
+$("a1").addEventListener("click",function(){$("a1t").style.display="";});
+$("a2").addEventListener("click",function(){$("a2t").style.display="";});
+function drawC3(){
+  var c=c3,W=640,H=280,x0=64,x1=584,y0=140,A=52;
+  c.setTransform(2,0,0,2,0,0);c.clearRect(0,0,W,H);
+  var ink=css("--ink"),muted=css("--muted"),hot=css("--hot"),cold=css("--cold"),ok=css("--ok");
+  c.fillStyle=css("--canvas");c.fillRect(0,0,W,H);
+  var m=P.L/(lam3/2),mi=Math.round(m),good=Math.abs(m-mi)<0.015&&mi>=1;
+  var sc=(x1-x0)/P.L,k=2*Math.PI/lam3,ph=vis1;
+  function X(x){return x0+x*sc;}
+  txt(c,"P",x0-12,y0+4,ink,"center","bold 13px sans-serif");txt(c,"Q",x1+12,y0+4,ink,"center","bold 13px sans-serif");
+  c.fillStyle=muted;c.fillRect(x0-6,y0-22,6,44);c.fillRect(x1,y0-22,6,44);
+  // hình dạng ở hai thời điểm cực đại (đỏ, xanh) giống Hình 13.3
+  [[1,cold],[-1,hot]].forEach(function(q){
+    c.strokeStyle=q[1];c.lineWidth=1.6;c.beginPath();
+    for(var x=0;x<=P.L+1e-9;x+=P.L/300){var u=Math.sin(k*x)*A*q[0];if(x===0)c.moveTo(X(x),y0-u);else c.lineTo(X(x),y0-u);}
+    c.stroke();
+  });
+  // dây đang dao động
+  c.strokeStyle=ink;c.lineWidth=3;c.beginPath();
+  for(var x2=0;x2<=P.L+1e-9;x2+=P.L/300){var u2=Math.sin(k*x2)*A*Math.cos(ph);if(x2===0)c.moveTo(X(x2),y0-u2);else c.lineTo(X(x2),y0-u2);}
+  c.stroke();
+  c.setLineDash([2,4]);c.strokeStyle=muted;c.lineWidth=1;c.beginPath();c.moveTo(x0,y0);c.lineTo(x1,y0);c.stroke();c.setLineDash([]);
+  var j;
+  if(good){
+    if(on("chNB")){
+      for(j=0;j<=mi;j++)dot(c,X(j*P.L/mi),y0,5,hot);
+      for(j=0;j<mi;j++)dot(c,X((j+0.5)*P.L/mi),y0-Math.sin(k*(j+0.5)*P.L/mi)*A*Math.cos(ph),5,ok);
+    }
+    var h=P.L/mi;
+    arrow(c,X(0),y0+A+22,X(h),y0+A+22,1.3,ink);arrow(c,X(h),y0+A+22,X(0),y0+A+22,1.3,ink);txt(c,"λ/2",X(h/2),y0+A+36,ink,"center","bold 12px sans-serif");
+    if(mi>=2){arrow(c,X(0),y0-A-24,X(2*h),y0-A-24,1.3,ink);arrow(c,X(2*h),y0-A-24,X(0),y0-A-24,1.3,ink);txt(c,"λ",X(h),y0-A-30,ink,"center","bold 12px sans-serif");}
+  } else {
+    var yq=y0-Math.sin(k*P.L)*A*Math.cos(ph);
+    c.strokeStyle=hot;c.lineWidth=2;c.setLineDash([3,3]);c.beginPath();c.moveTo(x1,y0);c.lineTo(x1,yq);c.stroke();c.setLineDash([]);
+    dot(c,x1,yq,5,hot);
+    txt(c,"đầu Q không phải là nút",x1-4,y0-A-12,hot,"right","bold 12px sans-serif");
+  }
+  txt(c,good?("L = "+mi+" · λ/2: thoả mãn điều kiện"):"L không bằng số nguyên lần λ/2",12,H-10,good?ok:hot,"left","bold 12px sans-serif");
+}
+function renderRead3(){
+  var m=P.L/(lam3/2),mi=Math.round(m),good=Math.abs(m-mi)<0.015&&mi>=1;
+  $("lamTxt").textContent=fmt(lam3,3)+" m";
+  $("m_ratio").textContent=fmt(m,2);
+  $("m_state").textContent=good?"Có sóng dừng":"Không có sóng dừng";
+  $("m_b").textContent=good?String(mi):"–";
+  $("m_n").textContent=good?String(mi+1):"–";
+  var el=$("m_txt");
+  if(good){el.className="result done";el.innerHTML="L / (λ/2) = <b>"+mi+"</b> là số nguyên: hai đầu P, Q đều là nút. Trên dây có <b>"+mi+" bụng</b> và <b>"+(mi+1)+" nút</b> (kể cả hai đầu), "+(mi-1)+" nút ở giữa dây. Tần số tương ứng f = v/λ = "+fmt(P.v/lam3,1)+" Hz.";}
+  else{el.className="result";el.innerHTML="L / (λ/2) = "+fmt(m,2)+" <b>không phải số nguyên</b> nên đầu Q không thể là nút: không hình thành sóng dừng ổn định. Hãy thay đổi λ (hoặc tần số) để L = n·λ/2.";}
+}
+function buildTbl3(){
+  var h="",n;
+  for(n=1;n<=6;n++){h+="<tr><td>"+n+"</td><td>"+n+"</td><td>"+(n+1)+"</td><td>"+fmt(2*P.L/n,3)+"</td><td>"+fmt(n*P.v/(2*P.L),1)+"</td></tr>";}
+  $("tbl3").innerHTML=h;
+}
+
+/* ================= TAB 4: đàn ghita ================= */
+var F0=[329.63,246.94,196.00,146.83,110.00,82.41],LG=0.65,G={pl:0};
+var cg=$("gt").getContext("2d"),aud=null;
+function gv(){return 2*LG*F0[parseInt($("gStr").value,10)];}
+function gL(){return LG/Math.pow(2,parseInt($("gFret").value,10)/12);}
+function gN(){return parseInt($("gHar").value,10);}
+function gF(){return gN()*gv()/(2*gL());}
+function playTone(f){
+  try{
+    var AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;
+    if(!aud)aud=new AC();
+    if(aud.state==="suspended")aud.resume();
+    var t0=aud.currentTime,master=aud.createGain();master.gain.setValueAtTime(0.0001,t0);master.gain.exponentialRampToValueAtTime(0.22,t0+0.01);master.gain.exponentialRampToValueAtTime(0.0001,t0+2.2);master.connect(aud.destination);
+    [[1,0.6],[2,0.3],[3,0.16],[4,0.08]].forEach(function(h){
+      if(f*h[0]>8000)return;
+      var o=aud.createOscillator(),g=aud.createGain();o.type="sine";o.frequency.value=f*h[0];g.gain.value=h[1];o.connect(g);g.connect(master);o.start(t0);o.stop(t0+2.3);
+    });
+  }catch(e){}
+}
+$("pluck").addEventListener("click",function(){G.pl=AT;if(on("chSnd"))playTone(gF());});
+function drawG(){
+  var c=cg,W=640,H=240,sc=520/LG,xb=592,y0=120;
+  c.setTransform(2,0,0,2,0,0);c.clearRect(0,0,W,H);
+  var ink=css("--ink"),muted=css("--muted"),hot=css("--hot"),acc=css("--accent"),ok=css("--ok");
+  c.fillStyle=css("--canvas");c.fillRect(0,0,W,H);
+  var x12=xb-LG*sc/2;
+  // thùng đàn
+  c.fillStyle="hsl(30,60%,55%)";c.strokeStyle=ink;c.lineWidth=1.6;
+  c.beginPath();c.ellipse((x12+xb)/2+8,y0,(xb-x12)/2+34,86,0,0,7);c.fill();c.stroke();
+  c.fillStyle="#2b1d10";c.beginPath();c.arc(x12+(xb-x12)*0.45,y0,24,0,7);c.fill();
+  // cần đàn
+  c.fillStyle="hsl(28,45%,30%)";c.fillRect(xb-LG*sc-6,y0-24,LG*sc-LG*sc/2+8,48);c.strokeRect(xb-LG*sc-6,y0-24,LG*sc-LG*sc/2+8,48);
+  // phím
+  c.strokeStyle="#d9dde2";c.lineWidth=2;
+  var k;
+  for(k=1;k<=12;k++){var xf=xb-LG*sc/Math.pow(2,k/12);c.beginPath();c.moveTo(xf,y0-24);c.lineTo(xf,y0+24);c.stroke();}
+  c.fillStyle="#eee";c.fillRect(xb-LG*sc-8,y0-24,5,48);
+  txt(c,"Ngựa đàn",xb,y0-100,ink,"center","11px sans-serif");txt(c,"Đầu cố định",xb-LG*sc,y0-34,ink,"center","11px sans-serif");
+  // ngón tay và dây dao động
+  var fret=parseInt($("gFret").value,10),L=gL(),xs=xb-L*sc,n=gN();
+  c.strokeStyle=muted;c.lineWidth=1.4;c.beginPath();c.moveTo(xb-LG*sc,y0);c.lineTo(xs,y0);c.stroke();
+  var amp=15*Math.exp(-Math.max(0,AT-G.pl)*0.9)+3;
+  var ph=AT*7,x;
+  c.strokeStyle=hot;c.lineWidth=2.6;c.beginPath();
+  for(x=0;x<=1.0001;x+=0.004){var xx=xs+x*(xb-xs),u=Math.sin(n*Math.PI*x)*amp*Math.cos(ph);if(x===0)c.moveTo(xx,y0-u);else c.lineTo(xx,y0-u);}
+  c.stroke();
+  if(on("chNB")){
+    for(k=0;k<=n;k++)dot(c,xs+k/n*(xb-xs),y0,4.2,hot);
+    for(k=0;k<n;k++)dot(c,xs+(k+0.5)/n*(xb-xs),y0-Math.sin(n*Math.PI*(k+0.5)/n)*amp*Math.cos(ph),4.2,ok);
+  }
+  if(fret>0){c.fillStyle="hsl(25,70%,45%)";c.beginPath();c.arc(xs-6,y0,9,0,7);c.fill();c.strokeStyle=ink;c.lineWidth=1;c.stroke();}
+  arrow(c,xs,y0+44,xb,y0+44,1.4,ink);arrow(c,xb,y0+44,xs,y0+44,1.4,ink);txt(c,"L",(xs+xb)/2,y0+60,ink,"center","bold 13px sans-serif");
+  // sóng âm từ thùng đàn
+  var dt=AT-G.pl;
+  if(dt>=0&&dt<1.8){
+    for(k=0;k<3;k++){var rr0=((dt*70)+k*26)%80+10,al=1-rr0/90;c.strokeStyle="rgba(217,72,43,"+clamp(al,0,1)*0.6+")";c.lineWidth=2;c.beginPath();c.arc(x12+(xb-x12)*0.45,y0,24+rr0*0.6,0,7);c.stroke();}
+  }
+  txt(c,"Thùng đàn (hộp cộng hưởng)",(x12+xb)/2,y0+104,ink,"center","11px sans-serif");
+}
+function renderG(){
+  var fr=parseInt($("gFret").value,10),L=gL(),n=gN(),f=gF(),f0=n*gv()/(2*LG);
+  $("gFretTxt").textContent=fr===0?"không ấn (dây buông)":fr;
+  $("g_L").textContent=fmt(L*100,1)+" cm";
+  $("g_l").textContent=fmt(2*L/n*100,1)+" cm";
+  $("g_f").textContent=fmt(f,1)+" Hz";
+  $("g_r").textContent=fmt(f/f0,3)+" ×";
+  $("g_txt").className="result";
+  $("g_txt").innerHTML="Dây dao động với <b>"+n+" bụng</b> giữa hai điểm cố định (đầu ngón tay và ngựa đàn). Từ L = nλ/2 suy ra λ = 2L/n và f = v/λ = <b>n·v/(2L)</b>, với v = "+fmt(gv(),0)+" m/s trên dây này. "+(fr>0?"Ấn phím càng xa đầu đàn thì dây dao động càng ngắn, tần số càng lớn, âm càng cao.":"Dây buông cho âm thấp nhất của dây này.");
+}
+$("gStr").addEventListener("change",function(){});
+
+/* ================= TAB 5 ================= */
+var QZ=[
+ {q:"Sóng dừng được tạo thành khi có",o:["Hai sóng khác biên độ truyền cùng chiều","Hai sóng cùng biên độ, cùng bước sóng truyền theo hai hướng ngược nhau","Một sóng truyền thẳng không gặp vật cản","Hai sóng truyền vuông góc nhau"],a:1,w:"Hai sóng cùng biên độ, cùng bước sóng lan truyền ngược chiều gặp nhau, giao thoa tạo nên sóng tổng hợp là sóng dừng."},
+ {q:"Nút sóng là những điểm mà tại đó",o:["Hai sóng đồng pha, biên độ cực đại","Hai sóng ngược pha, điểm không dao động","Biên độ bằng một nửa biên độ cực đại","Điểm dao động nhanh nhất"],a:1,w:"Tại nút, hai sóng ngược pha nên triệt tiêu: điểm đứng yên."},
+ {q:"Bụng sóng là những điểm mà tại đó",o:["Hai sóng ngược pha nên đứng yên","Hai sóng đồng pha, dao động với biên độ cực đại","Dao động với biên độ bằng 0","Chỉ xuất hiện khi dây không bị giữ"],a:1,w:"Tại bụng, hai sóng đồng pha nên biên độ cực đại (bằng 2A nếu mỗi sóng có biên độ A)."},
+ {q:"Điều kiện để có sóng dừng trên sợi dây có hai đầu cố định là chiều dài dây",o:["Bằng một số lẻ lần bước sóng","Bằng một số nguyên lần nửa bước sóng","Bằng bước sóng","Bằng một phần tư bước sóng"],a:1,w:"L = n·λ/2 với n = 1, 2, 3, ..."},
+ {q:"Khoảng cách giữa hai nút sóng liên tiếp (hoặc hai bụng liên tiếp) bằng",o:["λ/4","λ/2","λ","2λ"],a:1,w:"Hai nút liên tiếp cách nhau λ/2. Từ nút đến bụng liền kề là λ/4."},
+ {q:"Dây dài 60 cm, hai đầu cố định, có sóng dừng với 3 bụng. Bước sóng là",o:["120 cm","60 cm","40 cm","30 cm"],a:2,w:"L = nλ/2 ⇒ λ = 2L/n = 2·60/3 = 40 cm."},
+ {q:"Trên sợi dây hai đầu cố định có sóng dừng với 4 bụng thì số nút (kể cả hai đầu) là",o:["3","4","5","8"],a:2,w:"Số nút bằng số bụng cộng 1: 4 + 1 = 5 nút."},
+ {q:"Với dây đàn ghita, khi ấn ngón tay vào phím cao hơn (dây dao động ngắn lại) thì âm phát ra",o:["Thấp hơn vì tần số giảm","Cao hơn vì tần số f = v/(2L) tăng","Không đổi","Chỉ to hơn, độ cao không đổi"],a:1,w:"L giảm thì f = v/(2L) tăng nên âm cao hơn."},
+ {q:"Trong thực tế, sóng dừng thường là tổng hợp của",o:["Sóng tới và sóng phản xạ","Hai sóng từ hai nguồn khác tần số","Sóng ngang và sóng dọc","Sóng điện từ và sóng âm"],a:0,w:"Thường gặp một trong hai sóng là sóng phản xạ của sóng kia."}
+];
+var qDone={};
+function renderQuiz(){
+  var box=$("qz");box.innerHTML="";qDone={};
+  QZ.forEach(function(it,qi){
+    var d=document.createElement("div");d.className="q";
+    var p=document.createElement("p");p.textContent=(qi+1)+". "+it.q;d.appendChild(p);
+    var fb=document.createElement("div");
+    it.o.forEach(function(op,oi){
+      var lab=document.createElement("label");lab.className="opt";
+      var r=document.createElement("input");r.type="radio";r.name="q"+qi;
+      r.addEventListener("change",function(){qDone[qi]=(oi===it.a);fb.className="fb "+(oi===it.a?"ok":"no");fb.textContent=(oi===it.a?"Đúng. ":"Chưa đúng. ")+it.w;updScore();});
+      var s=document.createElement("span");s.textContent=op;lab.appendChild(r);lab.appendChild(s);d.appendChild(lab);
+    });
+    d.appendChild(fb);box.appendChild(d);
+  });
+  updScore();
+}
+function updScore(){var ok=0,done=0;Object.keys(qDone).forEach(function(k){done++;if(qDone[k])ok++;});$("qzScore").textContent="Đã trả lời "+done+"/"+QZ.length+" · đúng "+ok;}
+$("qzReset").addEventListener("click",renderQuiz);
+
+var CH=null;
+function pick(a){return a[Math.floor(Math.random()*a.length)];}
+function newCh(){
+  CH={L:pick([0.6,0.8,1.0,1.2]),n:pick([2,3,4,5]),v:pick([20,30,40,50,60])};
+  CH.f=CH.n*CH.v/(2*CH.L);
+  $("chTxt").innerHTML="Một sợi dây đàn hồi dài <b>L = "+fmt(CH.L,1)+" m</b>, hai đầu cố định. Khi bộ rung có tần số <b>f = "+fmt(CH.f,1)+" Hz</b> thì trên dây có sóng dừng với <b>"+CH.n+" bụng</b>. Tính bước sóng λ và tốc độ truyền sóng v trên dây.";
+  $("in_lam").value="";$("in_v").value="";$("chRes").style.display="none";
+}
+$("chNew").addEventListener("click",newCh);
+$("chCheck").addEventListener("click",function(){
+  if(!CH)return;
+  var lam=2*CH.L/CH.n,a=parseFloat($("in_lam").value.replace(",",".")),b=parseFloat($("in_v").value.replace(",","."));
+  var el=$("chRes");el.style.display="";
+  var ok1=!isNaN(a)&&Math.abs(a-lam)<=0.03*lam,ok2=!isNaN(b)&&Math.abs(b-CH.v)<=0.03*CH.v;
+  el.className="result "+((ok1&&ok2)?"done":"");
+  el.innerHTML="λ: <b class='"+(ok1?"good":"bad")+"'>"+(ok1?"đạt":"chưa đạt")+"</b> (đáp án "+fmt(lam,2)+" m) · v: <b class='"+(ok2?"good":"bad")+"'>"+(ok2?"đạt":"chưa đạt")+"</b> (đáp án "+fmt(CH.v,1)+" m/s). Gợi ý: λ = 2L/n, v = λ·f.";
+});
+
+/* ================= vòng lặp ================= */
+function loop(ts){
+  if(lastTs===null)lastTs=ts;
+  var dt=Math.min(.05,(ts-lastTs)/1000);lastTs=ts;AT+=dt;
+  if(S.run1)vis1+=dt*2*Math.PI*1.1*parseFloat($("sp").value);
+  if(S.sweep){
+    F1.f+=dt*(fmax()-parseFloat($("sf").min))/60;
+    if(F1.f>=fmax()){F1.f=fmax();S.sweep=false;$("sweep").textContent="Quét tần số tự động";}
+    $("sf").value=F1.f;
+  }
+  if(S.play2)S.t2+=dt*0.8*parseFloat($("sp2").value)*0.5;
+  if(S.tab===0){drawStr1();if(!on("chHide"))drawRes();renderRead1();}
+  else if(S.tab===1){drawW2();drawSnap2();renderState2();}
+  else if(S.tab===2){drawC3();renderRead3();}
+  else if(S.tab===3){drawG();renderG();}
+  requestAnimationFrame(loop);
+}
+onParam();renderRows1();renderQuiz();newCh();
+requestAnimationFrame(loop);
+
+})();
+</script>
+</body>
+</html>
