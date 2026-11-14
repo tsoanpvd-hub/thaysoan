@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Quy tắc bàn tay trái</title>
+<style>
+  :root{
+    --bg:#0c1222; --panel:rgba(18,26,46,.84); --line:rgba(160,185,255,.18);
+    --text:#e8edff; --muted:#9aa8cf; --I:#ffc233; --B:#4da3ff; --F:#ff5d6c; --ok:#5ee0a0;
+    --safe-t:env(safe-area-inset-top,0px); --safe-b:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--text);
+    font-family:"Be Vietnam Pro","Segoe UI",system-ui,sans-serif}
+  #stage{position:fixed;inset:0}
+  canvas{display:block;touch-action:none;cursor:grab}
+  canvas:active{cursor:grabbing}
+  .panel{position:fixed;background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    backdrop-filter:blur(8px);padding:14px 16px}
+  #title{top:calc(14px + var(--safe-t));left:14px;max-width:360px}
+  #title h1{margin:0 0 2px;font-size:20px;font-weight:700}
+  #title .author{margin:0 0 6px;font-size:12.5px;color:var(--I);line-height:1.4;font-weight:600}
+  #title p{margin:0;font-size:13px;color:var(--muted);line-height:1.45}
+  #guide{top:calc(14px + var(--safe-t));right:14px;width:320px}
+  #guide h2{margin:0 0 8px;font-size:15px}
+  #guide ol{margin:0;padding:0;list-style:none;display:grid;gap:8px}
+  #guide li{display:grid;grid-template-columns:22px 1fr;gap:9px;font-size:13px;line-height:1.4;padding:6px 8px;border-radius:10px;
+    border:1px solid transparent;opacity:.55;transition:.25s}
+  #guide li.on{opacity:1;border-color:var(--line);background:rgba(255,255,255,.05)}
+  #guide li i{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-weight:700;font-size:12px;color:#0c1222}
+  #guide b{font-weight:600}
+  #controls{bottom:calc(14px + var(--safe-b));left:14px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;max-width:calc(100% - 28px)}
+  button{font:inherit;font-size:14px;font-weight:600;color:var(--text);background:#1d2a4d;
+    border:1px solid var(--line);border-radius:10px;padding:10px 14px;cursor:pointer;transition:background .15s,transform .1s}
+  button:hover{background:#27386a}
+  button:active{transform:scale(.97)}
+  button:focus-visible,input:focus-visible{outline:2px solid #fff;outline-offset:2px}
+  button.i{border-left:4px solid var(--I)}
+  button.b{border-left:4px solid var(--B)}
+  button.f{border-left:4px solid var(--F)}
+  .modes{flex-basis:100%;display:flex;flex-wrap:wrap;gap:8px}
+  .modes button{font-size:13px;padding:8px 12px}
+  .modes button.act{background:#3a4f94;border-color:#9ab4ff}
+  #goal{margin:0 0 8px;font-size:13px;color:var(--text);font-weight:600}
+  button.go{background:#1f7a52;border-color:#5ee0a0}
+  button.go:hover{background:#26935f}
+  button.go.off{background:#7a2f3a;border-color:#ff8d9a}
+  label.chk{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);cursor:pointer}
+  #status{bottom:calc(14px + var(--safe-b));right:14px;font-size:13px;line-height:1.7;min-width:270px}
+  #status .row{display:flex;justify-content:space-between;gap:16px}
+  #status .row span:first-child{color:var(--muted)}
+  #status .formula{margin-top:6px;padding-top:6px;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
+  .lbl{position:fixed;left:0;top:0;pointer-events:none;font-weight:700;font-size:14px;white-space:nowrap;
+    padding:3px 9px;border-radius:999px;background:rgba(10,15,30,.78);border:1.5px solid currentColor;
+    transform:translate(-50%,-50%);will-change:left,top;transition:opacity .2s}
+  .lbl small{font-weight:500;font-size:11px;color:var(--text);margin-left:5px}
+  #lHand{color:#ffd0b0} #lI{color:var(--I)} #lB{color:var(--B)} #lF{color:var(--F)}
+  @media (max-width:760px){
+    #guide{top:auto;bottom:calc(196px + var(--safe-b));right:14px;left:14px;width:auto;padding:10px 12px}
+    #guide li{font-size:12px;padding:4px 6px}
+    #status{display:none}
+    #title p{display:none}
+  }
+</style>
+</head>
+<body>
+<div id="stage"></div>
+
+<div class="panel" id="title">
+  <h1>Quy tắc bàn tay trái</h1>
+  <div class="author">Thầy Đàng Năng Soạn<br>Trường THPT Phạm Văn Đồng – Phước Hậu</div>
+  <p>Xác định chiều lực từ tác dụng lên dây dẫn mang dòng điện đặt trong từ trường. Kéo chuột để xoay cảnh, cuộn để phóng to.</p>
+</div>
+
+<div class="panel" id="guide">
+  <h2>Các bước thực hiện</h2>
+  <p id="goal"></p>
+  <ol>
+    <li id="s1" class="on"><i style="background:var(--I)">1</i><span id="t1"></span></li>
+    <li id="s2"><i style="background:var(--B)">2</i><span id="t2"></span></li>
+    <li id="s3"><i style="background:var(--F)">3</i><span id="t3"></span></li>
+  </ol>
+</div>
+
+<div class="panel" id="controls">
+  <div class="modes">
+    <button data-mode="F">① Biết I, B → tìm F</button>
+    <button data-mode="I">② Biết B, F → tìm I</button>
+    <button data-mode="B">③ Biết I, F → tìm B</button>
+  </div>
+  <button class="i" id="btnI">Đảo chiều dòng điện I</button>
+  <button class="b" id="btnB">Đảo chiều từ trường B</button>
+  <button class="f" id="btnF">Đảo chiều lực từ F</button>
+  <button class="go" id="btnHand">Đặt bàn tay trái vào</button>
+  <button id="btnReset">Đặt lại</button>
+  <label class="chk"><input type="checkbox" id="chkRot"> Tự xoay cảnh</label>
+</div>
+
+<div class="panel" id="status">
+  <div class="row"><span>Dòng điện I</span><b id="sI"></b></div>
+  <div class="row"><span>Từ trường B</span><b id="sB"></b></div>
+  <div class="row"><span>Lực từ F</span><b id="sF"></b></div>
+  <div class="formula">F = B · I · ℓ · sin α  (α = 90° ⇒ F lớn nhất)</div>
+</div>
+
+<div class="lbl" id="lHand"></div>
+<div class="lbl" id="lI">I<small>Dòng điện</small></div>
+<div class="lbl" id="lB">B⃗<small>Cảm ứng từ</small></div>
+<div class="lbl" id="lF">F⃗<small>Lực từ</small></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+  /* ---------- Cảnh, camera, đèn ---------- */
+  const stage = document.getElementById('stage');
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x0c1222);
+  scene.fog = new THREE.Fog(0x0c1222, 18, 40);
+  const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+  const renderer = new THREE.WebGLRenderer({antialias:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  stage.appendChild(renderer.domElement);
+  scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+  const sun = new THREE.DirectionalLight(0xffffff, 0.85); sun.position.set(5,8,7); scene.add(sun);
+  const rim = new THREE.DirectionalLight(0x7aa2ff, 0.4); rim.position.set(-6,3,-6); scene.add(rim);
+  const grid = new THREE.GridHelper(16,16,0x2a3a6a,0x1a274a); grid.position.y = -3.2; scene.add(grid);
+
+  /* Hệ trục: x = chiều dây, y = lên, z = hướng về người xem */
+  const C = {I:0xffc233, B:0x4da3ff, F:0xff5d6c};
+
+  function makeArrow(axis, from, to, radius, color, opacity){
+    const head = Math.min(0.55, (to-from)*0.3);
+    const mat = new THREE.MeshStandardMaterial({color, roughness:.45, metalness:.1,
+      transparent: opacity<1, opacity, emissive:color, emissiveIntensity:.25});
+    const shaftLen = (to-from) - head;
+    const shaft = new THREE.CylinderGeometry(radius, radius, shaftLen, 14);
+    shaft.translate(0, from + shaftLen/2, 0);
+    const cone = new THREE.ConeGeometry(radius*2.6, head, 18);
+    cone.translate(0, to - head/2, 0);
+    if(axis==='x'){ shaft.rotateZ(-Math.PI/2); cone.rotateZ(-Math.PI/2); }
+    if(axis==='z'){ shaft.rotateX(Math.PI/2);  cone.rotateX(Math.PI/2); }
+    const g = new THREE.Group();
+    g.add(new THREE.Mesh(shaft, mat), new THREE.Mesh(cone, mat));
+    return g;
+  }
+
+  /* ---------- Dây dẫn + dòng điện ---------- */
+  const WIRE_L = 9;
+  scene.add(new THREE.Mesh(
+    new THREE.CylinderGeometry(0.08,0.08,WIRE_L,24).rotateZ(Math.PI/2),
+    new THREE.MeshStandardMaterial({color:0xc9773a, metalness:.7, roughness:.3})));
+  const chevrons = [];
+  const chevGeo = new THREE.ConeGeometry(0.17,0.42,14).rotateZ(-Math.PI/2);
+  const chevMat = new THREE.MeshStandardMaterial({color:C.I, emissive:C.I, emissiveIntensity:.6});
+  for(let k=0;k<7;k++){ const m = new THREE.Mesh(chevGeo, chevMat); chevrons.push(m); scene.add(m); }
+  const arrowI = new THREE.Group();
+  arrowI.add(makeArrow('x', -1.6, 1.6, 0.06, C.I, 1));
+  arrowI.position.set(0,-2.2,0);
+  scene.add(arrowI);
+
+  /* ---------- Đường sức từ ---------- */
+  const fieldLines = new THREE.Group();
+  const bArrow = makeArrow('z', -3.4, 3.4, 0.028, C.B, 0.55);
+  [-3,-1.5,0,1.5,3].forEach(x=>{ [-2,-1,1,2].forEach(y=>{
+    const a = bArrow.clone(); a.position.set(x,y,0); fieldLines.add(a);
+  });});
+  scene.add(fieldLines);
+
+  /* ---------- Mũi tên lực từ F (nối tiếp đầu ngón cái) ---------- */
+  const arrowF = new THREE.Group();
+  arrowF.add(makeArrow('y', 0, 3.2, 0.075, C.F, 1));
+  scene.add(arrowF);
+
+  /* ---------- Bàn tay trái vẽ bằng canvas: lòng bàn tay và mu bàn tay khác nhau rõ ----------
+     Hệ cục bộ: ngón tay +X, ngón cái +Y, lòng bàn tay hướng +Z (n = f × t ⇒ bàn tay TRÁI).
+     Ảnh lòng bàn tay trái nhìn từ phía trước: ngón tay hướng lên, ngón cái bên trái. */
+  const IW = 640, IH = 800, SC = 2, PX = 190;
+  const REF_X = 330, REF_Y = 540;       // điểm ảnh nằm trên dây dẫn (giữa lòng bàn tay)
+
+  function rr(g,x,y,w,h,r){
+    g.beginPath(); g.moveTo(x+r,y);
+    g.arcTo(x+w,y,x+w,y+h,r); g.arcTo(x+w,y+h,x,y+h,r);
+    g.arcTo(x,y+h,x,y,r); g.arcTo(x,y,x+w,y,r); g.closePath();
+  }
+  function handCanvas(back){
+    const c = document.createElement('canvas'); c.width = IW*SC; c.height = IH*SC;
+    const g = c.getContext('2d'); g.scale(SC,SC); g.translate(30,0);
+    g.lineJoin = 'round';
+    const fingers = [[205,62,150],[285,66,90],[365,62,130],[430,52,235]];   // [tâm x, bề rộng, đỉnh y]
+    const shapes = [
+      ()=>rr(g,150,380,300,300,70),
+      ()=>rr(g,190,640,220,200,20),
+      ...fingers.map(([cx,w,t])=>()=>rr(g,cx-w/2,t,w,430-t,w/2)),
+      ()=>{ g.save(); g.translate(185,610); g.rotate(-1.3); rr(g,-38,-190,76,230,38); }
+    ];
+    const done = ()=>{ if(g._thumb) g.restore(); };
+    const skin = back ? '#e3ae83' : '#f7d1b0';
+    const run = fn => { fn(); };
+    // viền ngoài rồi tô màu da
+    shapes.forEach((s,i)=>{ const th = i===shapes.length-1; s(); g.strokeStyle = back?'#8a5638':'#9a6446'; g.lineWidth = 7; g.stroke(); if(th) g.restore(); });
+    shapes.forEach((s,i)=>{ const th = i===shapes.length-1; s(); g.fillStyle = skin; g.fill(); if(th) g.restore(); });
+
+    g.globalCompositeOperation = 'source-atop';
+    // đổ bóng nhẹ: giữa sáng, mép tối
+    let rg = g.createRadialGradient(300,500,40,300,480,430);
+    rg.addColorStop(0,'rgba(255,255,255,.16)'); rg.addColorStop(1,'rgba(110,50,25,.22)');
+    g.fillStyle = rg; g.fillRect(-30,0,IW,IH);
+    const line = (w,col)=>{ g.lineWidth=w; g.strokeStyle=col; g.lineCap='round'; };
+
+    if(!back){
+      // LÒNG BÀN TAY: nếp chỉ tay, đường chỉ tay, gò thịt hồng
+      const pad = g.createRadialGradient(225,560,10,225,560,110);
+      pad.addColorStop(0,'rgba(240,150,130,.35)'); pad.addColorStop(1,'rgba(240,150,130,0)');
+      g.fillStyle = pad; g.fillRect(100,430,250,250);
+      const pad2 = g.createRadialGradient(330,420,5,330,420,120);
+      pad2.addColorStop(0,'rgba(240,150,130,.25)'); pad2.addColorStop(1,'rgba(240,150,130,0)');
+      g.fillStyle = pad2; g.fillRect(200,380,260,120);
+      line(4,'rgba(140,70,45,.6)');
+      g.beginPath(); g.moveTo(445,478); g.bezierCurveTo(390,440,300,455,232,432); g.stroke();   // đường tình cảm
+      g.beginPath(); g.moveTo(205,492); g.bezierCurveTo(290,500,380,520,440,560); g.stroke();   // đường trí tuệ
+      line(5,'rgba(140,70,45,.65)');
+      g.beginPath(); g.moveTo(215,445); g.bezierCurveTo(140,510,185,600,262,650); g.stroke();   // đường sinh mệnh
+      line(3,'rgba(140,70,45,.5)');
+      fingers.forEach(([cx,w,t])=>{
+        const L = 430-t;
+        [0.33,0.66].forEach(f=>{ const y = 430-L*f;
+          g.beginPath(); g.moveTo(cx-w*0.3,y); g.quadraticCurveTo(cx,y+4,cx+w*0.3,y); g.stroke(); });
+        g.beginPath(); g.moveTo(cx-w*0.32,412); g.quadraticCurveTo(cx,420,cx+w*0.32,412); g.stroke();
+        // đầu ngón tay (đệm thịt)
+        const tp = g.createRadialGradient(cx,t+40,3,cx,t+40,w*0.6);
+        tp.addColorStop(0,'rgba(240,150,130,.3)'); tp.addColorStop(1,'rgba(240,150,130,0)');
+        g.fillStyle = tp; g.fillRect(cx-w,t,2*w,120);
+      });
+      g.save(); g.translate(185,610); g.rotate(-1.3);
+      g.beginPath(); g.moveTo(-20,-95); g.quadraticCurveTo(0,-89,20,-95); g.stroke();
+      g.beginPath(); g.moveTo(-22,-15); g.quadraticCurveTo(0,-8,22,-15); g.stroke();
+      g.restore();
+    } else {
+      // MU BÀN TAY: móng, nếp khớp ngón, gân, tĩnh mạch
+      const tone = g.createLinearGradient(0,380,0,700);
+      tone.addColorStop(0,'rgba(180,110,70,.12)'); tone.addColorStop(1,'rgba(180,110,70,0)');
+      g.fillStyle = tone; g.fillRect(100,380,420,320);
+      // gân nổi từ khớp xuống cổ tay
+      line(7,'rgba(160,95,60,.22)');
+      fingers.forEach(([cx],i)=>{ g.beginPath(); g.moveTo(cx,430); g.lineTo(300+(cx-300)*0.45,690); g.stroke(); });
+      // tĩnh mạch xanh nhạt
+      line(9,'rgba(86,120,160,.30)');
+      g.beginPath(); g.moveTo(330,470); g.bezierCurveTo(300,540,350,610,318,700); g.stroke();
+      g.beginPath(); g.moveTo(400,475); g.bezierCurveTo(385,550,400,610,370,690); g.stroke();
+      line(6,'rgba(86,120,160,.28)');
+      g.beginPath(); g.moveTo(318,545); g.bezierCurveTo(270,560,240,590,232,640); g.stroke();
+      g.beginPath(); g.moveTo(392,560); g.bezierCurveTo(430,580,440,610,436,650); g.stroke();
+      // khớp ngón: nếp nhăn
+      line(3,'rgba(130,70,45,.55)');
+      fingers.forEach(([cx,w,t])=>{
+        const L = 430-t;
+        [0.0,0.33,0.66].forEach(f=>{ const y = 428-L*f-6;
+          for(let k=-1;k<=1;k++){ g.beginPath(); g.moveTo(cx-w*0.28,y+k*5); g.quadraticCurveTo(cx,y+k*5-4,cx+w*0.28,y+k*5); g.stroke(); } });
+        const kn = g.createRadialGradient(cx,430,2,cx,430,w*0.7);
+        kn.addColorStop(0,'rgba(255,235,215,.35)'); kn.addColorStop(1,'rgba(255,235,215,0)');
+        g.fillStyle = kn; g.fillRect(cx-w,380,2*w,100);
+      });
+      // móng tay
+      const nail = (x,y,w,h)=>{
+        rr(g,x,y,w,h,w*0.38); g.fillStyle = '#f9e2d8'; g.fill();
+        g.lineWidth = 3; g.strokeStyle = '#b97b68'; g.stroke();
+        g.beginPath(); g.ellipse(x+w*0.35,y+h*0.3,w*0.1,h*0.2,0,0,Math.PI*2); g.fillStyle='rgba(255,255,255,.7)'; g.fill();
+      };
+      fingers.forEach(([cx,w,t])=>nail(cx-w*0.34,t+14,w*0.68,54));
+      g.save(); g.translate(185,610); g.rotate(-1.3); nail(-26,-176,52,56); g.restore();
+    }
+    g.globalCompositeOperation = 'source-over';
+    const tex = new THREE.CanvasTexture(c);
+    tex.minFilter = THREE.LinearFilter; tex.generateMipmaps = false;
+    tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    return tex;
+  }
+
+  const palmMat = new THREE.MeshBasicMaterial({map:handCanvas(false), transparent:true, alphaTest:0.05, side:THREE.FrontSide});
+  const backTex = handCanvas(true);
+  const backMat = new THREE.MeshBasicMaterial({map:backTex, transparent:true, alphaTest:0.05, side:THREE.BackSide});
+  const midMat  = new THREE.MeshBasicMaterial({map:backTex, transparent:true, alphaTest:0.05, side:THREE.DoubleSide, color:0xd9a27a});
+  const hand = new THREE.Group();
+  const handGeo = new THREE.PlaneGeometry(IW/PX, IH/PX);
+  const cx0 = (IW/2 - REF_X)/PX, cy0 = (REF_Y - IH/2)/PX;
+  [[palmMat,0],[midMat,-0.03],[midMat,-0.06],[midMat,-0.09],[backMat,-0.12]].forEach(([mat,z])=>{
+    const m = new THREE.Mesh(handGeo, mat);
+    m.rotation.z = -Math.PI/2;           // ảnh: lên → +X, phải → −Y
+    m.position.set(cy0, -cx0, z);
+    hand.add(m);
+  });
+  // Ống tay áo che mép cắt ở cổ tay
+  const wristX = (REF_Y - IH)/PX;
+  const sleeve = new THREE.Mesh(new THREE.CylinderGeometry(0.62,0.7,0.9,32),
+    new THREE.MeshStandardMaterial({color:0x2d4b8f, roughness:.8}));
+  sleeve.rotation.z = -Math.PI/2; sleeve.scale.z = 0.4;
+  sleeve.position.set(wristX - 0.3, 0, -0.06);
+  hand.add(sleeve);
+
+  const handRoot = new THREE.Group();
+  handRoot.add(hand); scene.add(handRoot); handRoot.visible = false;
+
+  /* ---------- Trạng thái ---------- */
+  let tI = 1, tB = -1;        // dấu của I (theo +x) và B (theo +z)
+  let sI = tI, sB = tB;       // giá trị đang hoạt ảnh
+  let placed = false, place = 0;   // đã đặt bàn tay chưa / tiến độ 0..1
+  const qTarget = new THREE.Quaternion();
+  const mat4 = new THREE.Matrix4();
+  const vf = new THREE.Vector3(), vt = new THREE.Vector3(), vn = new THREE.Vector3();
+  function computeTarget(){
+    // F = I × B ⇒ với I=(sI,0,0), B=(0,0,sB): F = (0, -sI·sB, 0)
+    vf.set(tI,0,0); vt.set(0,-tI*tB,0); vn.crossVectors(vf,vt);
+    mat4.makeBasis(vf,vt,vn); qTarget.setFromRotationMatrix(mat4);
+  }
+  computeTarget(); handRoot.quaternion.copy(qTarget);
+
+  const $ = id => document.getElementById(id);
+  const btnHand = $('btnHand');
+  let mode = 'F';                       // F: tìm F | I: tìm I | B: tìm B
+  let tF = -tI*tB;                      // F = I × B ⇒ F theo +y có dấu −I·B
+  function sync(){                      // hai đại lượng đã biết quyết định đại lượng còn lại
+    if(mode==='F') tF = -tI*tB; else if(mode==='I') tI = -tF*tB; else tB = -tF*tI;
+    computeTarget();
+  }
+  const GOAL = {F:'Biết I và B → tìm chiều lực từ F', I:'Biết B và F → tìm chiều dòng điện I', B:'Biết I và F → tìm chiều cảm ứng từ B'};
+  const T2 = {
+    F:'Nhấn <b>“Đặt bàn tay trái vào”</b>: đường sức từ <b>B</b> đâm xuyên vào <b>lòng bàn tay</b>, <b>bốn ngón tay</b> chỉ chiều <b>I</b>.',
+    I:'Nhấn <b>“Đặt bàn tay trái vào”</b>: để <b>B</b> đâm xuyên vào <b>lòng bàn tay</b> và <b>ngón cái choãi 90°</b> chỉ chiều <b>F</b>.',
+    B:'Nhấn <b>“Đặt bàn tay trái vào”</b>: <b>bốn ngón tay</b> chỉ chiều <b>I</b>, <b>ngón cái choãi 90°</b> chỉ chiều <b>F</b>.'};
+  const T1 = {
+    F:'Đã biết chiều <b>dòng điện I</b> và <b>từ trường B</b> (đảo chiều bằng các nút). Cần tìm <b>lực từ F</b>.',
+    I:'Đã biết chiều <b>từ trường B</b> và <b>lực từ F</b> (đảo chiều bằng các nút). Cần tìm <b>dòng điện I</b>.',
+    B:'Đã biết chiều <b>dòng điện I</b> và <b>lực từ F</b> (đảo chiều bằng các nút). Cần tìm <b>cảm ứng từ B</b>.'};
+  const T3 = {
+    F:'<b>Ngón cái choãi 90°</b> chỉ chiều <b>lực từ F</b>.',
+    I:'Chiều <b>bốn ngón tay</b> chính là chiều <b>dòng điện I</b>.',
+    B:'<b>Đường sức từ B</b> đâm xuyên vào <b>lòng bàn tay</b> (đi từ lòng bàn tay ra mu bàn tay).'};
+  function updateUI(){
+    const unk = placed ? '' : mode;
+    const set = (id,q,txt,col)=>{ const e=$(id); e.textContent = unk===q ? 'chưa xác định' : txt; e.style.color = unk===q ? 'var(--muted)' : col; };
+    set('sI','I', tI>0 ? 'từ trái sang phải' : 'từ phải sang trái', 'var(--I)');
+    set('sB','B', tB<0 ? 'từ Nam đến Bắc (đi vào xa)' : 'từ Bắc đến Nam (về phía bạn)', 'var(--B)');
+    set('sF','F', tF>0 ? 'hướng lên' : 'hướng xuống', 'var(--F)');
+    btnHand.textContent = placed ? 'Bỏ bàn tay ra' : 'Đặt bàn tay trái vào';
+    btnHand.classList.toggle('off', placed);
+    $('btnI').style.display = mode==='I' ? 'none' : '';
+    $('btnB').style.display = mode==='B' ? 'none' : '';
+    $('btnF').style.display = mode==='F' ? 'none' : '';
+    document.querySelectorAll('[data-mode]').forEach(b=>b.classList.toggle('act', b.dataset.mode===mode));
+    $('goal').textContent = GOAL[mode];
+    $('t1').innerHTML = T1[mode]; $('t2').innerHTML = T2[mode]; $('t3').innerHTML = T3[mode];
+    $('s1').classList.toggle('on', !placed);
+    $('s2').classList.toggle('on', placed);
+    $('s3').classList.toggle('on', placed);
+  }
+  sync(); updateUI();
+  $('btnI').onclick = ()=>{ tI=-tI; sync(); updateUI(); };
+  $('btnB').onclick = ()=>{ tB=-tB; sync(); updateUI(); };
+  $('btnF').onclick = ()=>{ tF=-tF; sync(); updateUI(); };
+  btnHand.onclick   = ()=>{ placed=!placed; updateUI(); };
+  $('btnReset').onclick = ()=>{ tI=1; tB=-1; tF=1; placed=false; sync(); updateUI(); };
+  document.querySelectorAll('[data-mode]').forEach(b=>{
+    b.onclick = ()=>{ mode=b.dataset.mode; placed=false; sync(); updateUI(); };
+  });
+
+  /* ---------- Điều khiển camera ---------- */
+  let theta = 0.75, phi = 1.12, radius = 12.5;
+  let drag = false, lx = 0, ly = 0, pinch = 0;
+  const el = renderer.domElement, pts = new Map();
+  function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
+  el.addEventListener('pointerdown', e=>{ el.setPointerCapture(e.pointerId); pts.set(e.pointerId,[e.clientX,e.clientY]); drag=true; lx=e.clientX; ly=e.clientY; });
+  el.addEventListener('pointerup', e=>{ pts.delete(e.pointerId); if(pts.size<2) pinch=0; if(pts.size===0) drag=false; });
+  el.addEventListener('pointermove', e=>{
+    if(!pts.has(e.pointerId)) return;
+    pts.set(e.pointerId,[e.clientX,e.clientY]);
+    if(pts.size===2){
+      const [a,b]=[...pts.values()]; const d=Math.hypot(a[0]-b[0],a[1]-b[1]);
+      if(pinch) radius = clamp(radius*pinch/d, 6, 24);
+      pinch=d; return;
+    }
+    theta -= (e.clientX-lx)*0.006;
+    phi = clamp(phi-(e.clientY-ly)*0.006, 0.25, 2.2);
+    lx=e.clientX; ly=e.clientY;
+  });
+  el.addEventListener('wheel', e=>{ e.preventDefault(); radius = clamp(radius*(1+e.deltaY*0.001), 6, 24); }, {passive:false});
+
+  /* ---------- Nhãn ---------- */
+  const lHand=$('lHand'), lI=$('lI'), lB=$('lB'), lF=$('lF');
+  const tmp = new THREE.Vector3();
+  function put(div,x,y,z,vis){
+    tmp.set(x,y,z).project(camera);
+    div.style.left = ((tmp.x*.5+.5)*innerWidth)+'px';
+    div.style.top  = ((-tmp.y*.5+.5)*innerHeight)+'px';
+    div.style.opacity = (tmp.z<1 ? 1 : 0)*vis;
+  }
+
+  /* ---------- Vòng lặp ---------- */
+  const chkRot=$('chkRot');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const clock = new THREE.Clock();
+  let phase = 0;
+  const ss = t => { t=clamp(t,0,1); return t*t*(3-2*t); };
+  function resize(){
+    renderer.setSize(innerWidth, innerHeight);
+    camera.aspect = innerWidth/innerHeight; camera.updateProjectionMatrix();
+  }
+  addEventListener('resize', resize); resize();
+
+  function tick(){
+    const dt = Math.min(clock.getDelta(), 0.05);
+    const k = reduce ? 1 : 1 - Math.exp(-dt*5);
+    sI += (tI-sI)*k; sB += (tB-sB)*k;
+    handRoot.quaternion.slerp(qTarget, k);
+    place = clamp(place + (placed?1:-1)*dt*(reduce?10:0.9), 0, 1);
+    const e = ss(place);
+    const fShow = ss((place-0.7)/0.3);
+    const fA = -sI*sB;
+    const nz = v => (Math.abs(v)<0.001 ? 0.001 : v);
+
+    // Bàn tay bay vào từ ngoài cảnh, lòng bàn tay áp vào dây dẫn, hứng B
+    handRoot.visible = place > 0.001;
+    handRoot.position.set(-7*(1-e), 4.5*(1-e), 0.1*sB + 6*(1-e));
+    handRoot.scale.setScalar(0.55 + 0.45*e);
+
+    // đại lượng cần tìm chỉ hiện ra sau khi đã đặt bàn tay
+    const rI = mode==='I' ? fShow : 1, rB = mode==='B' ? fShow : 1, rF = mode==='F' ? fShow : 1;
+    arrowI.visible = rI > 0.01; arrowI.scale.x = nz(sI)*Math.max(rI,0.001);
+    fieldLines.visible = rB > 0.01; fieldLines.scale.z = nz(sB)*Math.max(rB,0.001);
+    arrowF.visible = rF > 0.01;
+    arrowF.position.set(0, 0, -0.1*sB);   // điểm đặt tại trung điểm dây dẫn, sát lòng bàn tay
+    arrowF.scale.y = nz(fA)*Math.max(rF,0.001);
+
+    phase += dt*1.3*sI;
+    chevrons.forEach((m,i)=>{
+      const u = (((i/chevrons.length + phase) % 1) + 1) % 1;
+      m.position.set(-WIRE_L/2 + u*WIRE_L, 0, 0);
+      m.scale.x = nz(sI); m.visible = rI > 0.01;
+    });
+
+    if(chkRot.checked && !drag) theta += dt*0.25;
+    camera.position.set(
+      radius*Math.sin(phi)*Math.sin(theta),
+      radius*Math.cos(phi),
+      radius*Math.sin(phi)*Math.cos(theta));
+    camera.lookAt(0,0.3,0);
+
+    // Nhãn
+    const nW = new THREE.Vector3(0,0,1).applyQuaternion(handRoot.quaternion);
+    const palmSeen = nW.dot(camera.position.clone().sub(handRoot.position)) > 0;
+    lHand.innerHTML = palmSeen ? 'Lòng bàn tay<small>B đâm vào lòng bàn tay</small>' : 'Mu bàn tay<small>mặt có móng, khớp ngón</small>';
+    const hp = new THREE.Vector3(-0.5,-0.55,palmSeen?0.05:-0.2); handRoot.localToWorld(hp);
+    put(lHand, hp.x, hp.y, hp.z, ss((place-0.8)/0.2));
+    const txt = (el,s)=>{ if(el._t!==s){ el._t=s; el.innerHTML=s; } };
+    txt(lI, rI>0.5 ? 'I<small>Dòng điện</small>' : 'I = ?<small>cần tìm</small>');
+    txt(lB, rB>0.5 ? 'B⃗<small>Cảm ứng từ</small>' : 'B = ?<small>cần tìm</small>');
+    txt(lF, rF>0.5 ? 'F⃗<small>Lực từ</small>' : 'F = ?<small>cần tìm</small>');
+    put(lI, rI>0.5 ? sI*1.9 : 0, -2.2, 0.5, 1);
+    put(lB, 3, 2.6, rB>0.5 ? sB*3.9 : 3.9, 1);
+    put(lF, 0.5, rF>0.5 ? fA*3.5 : 3.5, rF>0.5 ? -0.1*sB : 0, 1);
+
+    renderer.render(scene, camera);
+    requestAnimationFrame(tick);
+  }
+  tick();
+})();
+</script>
+</body>
+</html>
